@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historydle - 21st Century US Figures</title>
+    <title>Historydle - 21st Century Icons</title>
     <style>
         :root {
             --green: #6aaa64;
@@ -27,11 +27,11 @@
         }
 
         h1 { margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
-        .subtitle { color: #a0a0a2; margin-bottom: 15px; font-size: 0.95rem; }
+        .subtitle { color: #a0a0a2; margin-bottom: 25px; font-size: 0.95rem; text-align: center; }
 
         .game-container {
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -65,13 +65,12 @@
             background-color: #ffffff;
             color: #000000;
             border: none;
-            padding: 0 24px;
+            padding: 0 28px;
             font-size: 1rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: background-color 0.2s;
         }
         .submit-btn:hover { background-color: #cccccc; }
 
@@ -81,7 +80,7 @@
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 0 0 8px 8px;
-            max-height: 220px;
+            max-height: 250px;
             overflow-y: auto;
             z-index: 999;
         }
@@ -96,6 +95,7 @@
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
+        /* Exactly 7 distinct grid tracks to isolate categories uniformly */
         .grid-header, .guess-row {
             display: grid;
             grid-template-columns: 2fr repeat(6, 1fr);
@@ -112,23 +112,24 @@
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 6px;
-            min-height: 65px;
+            min-height: 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 6px;
             box-sizing: border-box;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
+        /* Strict Spotle Matrix state colors */
         .cell.correct { background-color: var(--green); border-color: var(--green); }
         .cell.partial { background-color: var(--yellow); border-color: var(--yellow); }
         .cell.wrong { background-color: #1a1a1c; border-color: var(--border-color); }
 
-        .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 1rem; }
-        .cell span.emoji-icon { font-size: 1.4rem; margin-bottom: 3px; display: block; }
-        .cell div.text-label { display: block; width: 100%; }
+        .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 0.95rem; }
+        .cell span.emoji-icon { font-size: 1.5rem; margin-bottom: 4px; display: block; }
+        .cell div.text-label { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
         .win-message {
             text-align: center;
@@ -156,22 +157,20 @@
             text-transform: uppercase;
         }
         .share-btn:hover { background-color: #53934f; }
+        
+        .game-link-anchor { color: #5ab0ff; text-decoration: none; font-weight: bold; }
+        .game-link-anchor:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <h1>HISTORYDLE</h1>
-    <div class="subtitle">Crack the code to find the secret 21st-century historical figure.</div>
-    
-    <!-- Styled hyperlink display container -->
-    <div style="margin-bottom: 25px;">
-        <a href="https://andrew-e-walters.github.io/Historydle/" style="color: var(--green); text-decoration: none; font-weight: bold; font-size: 1.1rem; letter-spacing: 0.5px;">AndrewsFirstGame</a>
-    </div>
+    <div class="subtitle">Guess the 21st-century historical titan, business giant, or scientific mind.</div>
 
     <div class="game-container">
         <div class="search-box-row">
             <div class="input-wrapper">
-                <input type="text" id="guess-input" placeholder="Type a figure's name..." autocomplete="off">
+                <input type="text" id="guess-input" placeholder="Type an influential figure's name..." autocomplete="off">
                 <div id="suggestions" class="suggestions"></div>
             </div>
             <button id="submit-guess-btn" class="submit-btn">Guess</button>
@@ -180,12 +179,15 @@
         <div id="win-message" class="win-message">
             <div>🎉 Incredible Job! You guessed the secret figure!</div>
             <button id="share-button" class="share-btn">Share Score 📋</button>
+            <div style="margin-top: 15px; font-size: 0.9rem; color: #818384;">
+                Play game at: <a class="game-link-anchor" href="https://github.io">AndrewsFirstGame</a>
+            </div>
         </div>
 
         <div class="grid-header">
             <div>Name</div>
-            <div>Role</div>
-            <div>Party/Field</div>
+            <div>Arena</div>
+            <div>Specialty / Field</div>
             <div>Country</div>
             <div>Birth State</div>
             <div>Gender</div>
@@ -196,17 +198,16 @@
     </div>
 
     <script>
-        const domainEmojis = {
-            "Democratic": "🐴", "Republican": "🐘", "Business": "💼", "Judiciary": "⚖️", "Culture": "🎨"
-        };
-
-        const stateEmojis = {
-            "HI": "🌴", "CT": "⚓", "NY": "🗽", "PA": "🔔", "CA": "🐻",
-            "MD": "🦀", "WA": "🌲", "AL": "🏈", "International": "🌐"
+        // Immersive Spotle Attribute Icon Libraries
+        const arenaEmojis = {
+            "Politics": "🏛️",
+            "Business": "💼",
+            "Science / Culture": "🔬"
         };
 
         const countryEmojis = {
-            "USA": "🇺🇸", "South Africa": "🇿🇦"
+            "USA": "🇺🇸", "South Africa": "🇿🇦", "UK": "🇬🇧", "Germany": "🇩🇪", 
+            "India": "🇮🇳", "Australia": "🇦🇺", "Canada": "🇨🇦", "Ukraine": "🇺🇦"
         };
 
         function getDecadeEmoji(age) {
@@ -219,49 +220,26 @@
             return "🧙‍♂️";
         }
 
+        // Evenly Mixed Master Database: 15 Politics, 15 Business, 15 Science/Culture
         const figures = [
-            { name: "Barack Obama", role: "President", domain: "Democratic", country: "USA", state: "HI", gender: "Male", age: 65 },
-            { name: "George W. Bush", role: "President", domain: "Republican", country: "USA", state: "CT", gender: "Male", age: 80 },
-            { name: "Donald Trump", role: "President", domain: "Republican", country: "USA", state: "NY", gender: "Male", age: 80 },
-            { name: "Joe Biden", role: "President", domain: "Democratic", country: "USA", state: "PA", gender: "Male", age: 83 },
-            { name: "Kamala Harris", role: "Vice Pres", domain: "Democratic", country: "USA", state: "CA", gender: "Female", age: 61 },
-            { name: "Nancy Pelosi", role: "Speaker", domain: "Democratic", country: "USA", state: "MD", gender: "Female", age: 86 },
-            { name: "Elon Musk", role: "Tech Exec", domain: "Business", country: "South Africa", state: "International", gender: "Male", age: 55 },
-            { name: "Bill Gates", role: "Tech Exec", domain: "Business", country: "USA", state: "WA", gender: "Male", age: 70 },
-            { name: "Sonia Sotomayor", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Female", age: 72 },
-            { name: "John Roberts", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Male", age: 71 },
-            { name: "Taylor Swift", role: "Artist", domain: "Culture", country: "USA", state: "PA", gender: "Female", age: 36 }
-        ];
+            // --- POLITICS (15) ---
+            { name: "Barack Obama", arena: "Politics", field: "President", country: "USA", state: "HI", gender: "Male", age: 65 },
+            { name: "George W. Bush", arena: "Politics", field: "President", country: "USA", state: "CT", gender: "Male", age: 80 },
+            { name: "Donald Trump", arena: "Politics", field: "President", country: "USA", state: "NY", gender: "Male", age: 80 },
+            { name: "Joe Biden", arena: "Politics", field: "President", country: "USA", state: "PA", gender: "Male", age: 83 },
+            { name: "Kamala Harris", arena: "Politics", field: "Vice Pres", country: "USA", state: "CA", gender: "Female", age: 61 },
+            { name: "Nancy Pelosi", arena: "Politics", field: "Speaker", country: "USA", state: "MD", gender: "Female", age: 86 },
+            { name: "Angela Merkel", arena: "Politics", field: "Chancellor", country: "Germany", state: "Hamburg", gender: "Female", age: 72 },
+            { name: "Volodymyr Zelenskyy", arena: "Politics", field: "President", country: "Ukraine", state: "Kryvyi Rih", gender: "Male", age: 48 },
+            { name: "Narendra Modi", arena: "Politics", field: "Prime Minister", country: "India", state: "Gujarat", gender: "Male", age: 76 },
+            { name: "Rishi Sunak", arena: "Politics", field: "Prime Minister", country: "UK", state: "Hampshire", gender: "Male", age: 46 },
+            { name: "John Roberts", arena: "Politics", field: "Judiciary", country: "USA", state: "NY", gender: "Male", age: 71 },
+            { name: "Sonia Sotomayor", arena: "Politics", field: "Judiciary", country: "USA", state: "NY", gender: "Female", age: 72 },
+            { name: "Mitt Romney", arena: "Politics", field: "Senator", country: "USA", state: "MI", gender: "Male", age: 79 },
+            { name: "Bernie Sanders", arena: "Politics", field: "Senator", country: "USA", state: "NY", gender: "Male", age: 85 },
+            { name: "Alexandria Ocasio-Cortez", arena: "Politics", field: "Congress", country: "USA", state: "NY", gender: "Female", age: 36 },
 
-        const secretFigure = figures[Math.floor(Math.random() * figures.length)];
-        let gameOver = false;
-        let guessGridHistory = [];
-
-        const input = document.getElementById('guess-input');
-        const suggestionsContainer = document.getElementById('suggestions');
-        const guessesContainer = document.getElementById('guesses-container');
-        const winMessage = document.getElementById('win-message');
-        const shareButton = document.getElementById('share-button');
-        const submitBtn = document.getElementById('submit-guess-btn');
-
-        input.addEventListener('input', () => {
-            if (gameOver) return;
-            const query = input.value.toLowerCase().trim();
-            suggestionsContainer.innerHTML = '';
-            
-            if (!query) return;
-
-            const matches = figures.filter(f => f.name.toLowerCase().includes(query));
-            matches.forEach(match => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.innerText = match.name;
-                
-                div.addEventListener('click', () => {
-                    input.value = match.name;
-                    suggestionsContainer.innerHTML = '';
-                });
-                suggestionsContainer.appendChild(div);
-            });
-        });
-
+            // --- BUSINESS & TECH GIANTS (15) ---
+            { name: "Elon Musk", arena: "Business", field: "Tech Exec", country: "South Africa", state: "Gauteng", gender: "Male", age: 55 },
+            { name: "Bill Gates", arena: "Business", field: "Tech Exec", country: "USA", state: "WA", gender: "Male", age: 70 },
+            { name: "Jeff Bezos", arena: "Business", field: "E-Commerce", country: "USA", state: "NM", gender: "Male", age: 62 },
