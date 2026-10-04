@@ -72,7 +72,7 @@
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
-        /* Unified grid system mapping 7 equal data tiers */
+        /* Setup 7-Column grid to cleanly parse out all modern data vectors */
         .grid-header, .guess-row {
             display: grid;
             grid-template-columns: 2fr repeat(6, 1fr);
@@ -208,7 +208,7 @@
 
         const secretFigure = figures[Math.floor(Math.random() * figures.length)];
         let gameOver = false;
-        let guessGridHistory = []; // Tracks block matrix configurations for sharing updates
+        let guessGridHistory = [];
 
         const input = document.getElementById('guess-input');
         const suggestionsContainer = document.getElementById('suggestions');
@@ -260,4 +260,4 @@
             if (matches.age) {
                 ageClass = "correct";
             } else {
-
+                ageLabel += guessedFigure.age < secretFigure.age ? " ⬆️" : " ⬇️";
