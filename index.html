@@ -9,7 +9,7 @@
             --green: #6aaa64;
             --yellow: #c9b458;
             --gray: #242526;
-            --bg-color: #000000; /* Pure black background as requested */
+            --bg-color: #000000; /* Pure black background */
             --card-bg: #121213;
             --text-color: #ffffff;
             --border-color: #3a3a3c;
@@ -58,17 +58,20 @@
             position: absolute;
             top: 100%; left: 0; right: 0;
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             border-radius: 0 0 8px 8px;
             max-height: 220px;
             overflow-y: auto;
-            z-index: 10;
+            z-index: 100; /* Fixed: Kept dropdown above all grid elements */
         }
 
         .suggestion-item {
             padding: 12px 16px;
             cursor: pointer;
             border-bottom: 1px solid var(--border-color);
+            color: #ffffff;
+            text-align: left;
+            font-size: 1rem;
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
@@ -105,6 +108,7 @@
 
         .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 1rem; }
         .cell span.emoji-icon { font-size: 1.4rem; margin-bottom: 3px; display: block; }
+        .cell div.text-label { display: block; width: 100%; }
 
         .win-message {
             text-align: center;
@@ -216,9 +220,10 @@
         const winMessage = document.getElementById('win-message');
         const shareButton = document.getElementById('share-button');
 
+        // FIXED: Re-engineered selection binding to prevent input registry loss
         input.addEventListener('input', () => {
             if (gameOver) return;
-            const query = input.value.toLowerCase();
+            const query = input.value.toLowerCase().trim();
             suggestionsContainer.innerHTML = '';
             
             if (!query) return;
@@ -228,7 +233,10 @@
                 const div = document.createElement('div');
                 div.className = 'suggestion-item';
                 div.innerText = match.name;
-                div.addEventListener('click', () => {
+                
+                // Fixed: Bound individual pointer triggers cleanly to structural references
+                div.addEventListener('mousedown', (e) => {
+                    e.preventDefault(); // Prevents blur event from closing dropdown early
                     submitGuess(match);
                     input.value = '';
                     suggestionsContainer.innerHTML = '';
@@ -237,8 +245,9 @@
             });
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== input) suggestionsContainer.innerHTML = '';
+        // Fixed: Adjusted background blur layout to prevent dropdown click interference
+        input.addEventListener('blur', () => {
+            setTimeout(() => { suggestionsContainer.innerHTML = ''; }, 150);
         });
 
         function submitGuess(guessedFigure) {
@@ -248,16 +257,3 @@
             const matches = {
                 name: guessedFigure.name === secretFigure.name,
                 role: guessedFigure.role === secretFigure.role,
-                domain: guessedFigure.domain === secretFigure.domain,
-                country: guessedFigure.country === secretFigure.country,
-                state: guessedFigure.state === secretFigure.state,
-                gender: guessedFigure.gender === secretFigure.gender,
-                age: guessedFigure.age === secretFigure.age
-            };
-
-            let ageLabel = guessedFigure.age;
-            let ageClass = "wrong";
-            if (matches.age) {
-                ageClass = "correct";
-            } else {
-                ageLabel += guessedFigure.age < secretFigure.age ? " ⬆️" : " ⬇️";
