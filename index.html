@@ -83,6 +83,7 @@
             max-height: 250px;
             overflow-y: auto;
             z-index: 999;
+            display: none; /* Hidden until user types */
         }
 
         .suggestion-item {
@@ -95,7 +96,7 @@
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
-        /* Exactly 7 distinct grid tracks to isolate categories uniformly */
+        /* Grid layout for game rows */
         .grid-header, .guess-row {
             display: grid;
             grid-template-columns: 2fr repeat(6, 1fr);
@@ -122,13 +123,13 @@
             font-size: 0.85rem;
         }
 
-        /* Strict Spotle Matrix state colors */
+        /* Attribute state classes */
         .cell.correct { background-color: var(--green); border-color: var(--green); }
         .cell.partial { background-color: var(--yellow); border-color: var(--yellow); }
         .cell.wrong { background-color: #1a1a1c; border-color: var(--border-color); }
 
         .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 0.95rem; }
-        .cell span.emoji-icon { font-size: 1.5rem; margin-bottom: 4px; display: block; }
+        .cell span.emoji-icon { font-size: 1.3rem; margin-bottom: 4px; display: block; }
         .cell div.text-label { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
         .win-message {
@@ -198,7 +199,7 @@
     </div>
 
     <script>
-        // Immersive Spotle Attribute Icon Libraries
+        // Attribute Icon Maps
         const arenaEmojis = {
             "Politics": "🏛️",
             "Business": "💼",
@@ -220,7 +221,7 @@
             return "🧙‍♂️";
         }
 
-        // Evenly Mixed Master Database: 15 Politics, 15 Business, 15 Science/Culture
+        // Full Master Database (45 Figures)
         const figures = [
             // --- POLITICS (15) ---
             { name: "Barack Obama", arena: "Politics", field: "President", country: "USA", state: "HI", gender: "Male", age: 65 },
@@ -243,3 +244,200 @@
             { name: "Elon Musk", arena: "Business", field: "Tech Exec", country: "South Africa", state: "Gauteng", gender: "Male", age: 55 },
             { name: "Bill Gates", arena: "Business", field: "Tech Exec", country: "USA", state: "WA", gender: "Male", age: 70 },
             { name: "Jeff Bezos", arena: "Business", field: "E-Commerce", country: "USA", state: "NM", gender: "Male", age: 62 },
+            { name: "Mark Zuckerberg", arena: "Business", field: "Social Media", country: "USA", state: "NY", gender: "Male", age: 42 },
+            { name: "Tim Cook", arena: "Business", field: "Tech Exec", country: "USA", state: "AL", gender: "Male", age: 65 },
+            { name: "Satya Nadella", arena: "Business", field: "Tech Exec", country: "India", state: "Telangana", gender: "Male", age: 59 },
+            { name: "Sundar Pichai", arena: "Business", field: "Tech Exec", country: "India", state: "Tamil Nadu", gender: "Male", age: 54 },
+            { name: "Jensen Huang", arena: "Business", field: "Semiconductors", country: "USA", state: "Tainan", gender: "Male", age: 63 },
+            { name: "Warren Buffett", arena: "Business", field: "Finance", country: "USA", state: "NE", gender: "Male", age: 96 },
+            { name: "Jamie Dimon", arena: "Business", field: "Banking", country: "USA", state: "NY", gender: "Male", age: 70 },
+            { name: "Sheryl Sandberg", arena: "Business", field: "Tech Exec", country: "USA", state: "DC", gender: "Female", age: 57 },
+            { name: "Indra Nooyi", arena: "Business", field: "Consumer Goods", country: "India", state: "Tamil Nadu", gender: "Female", age: 70 },
+            { name: "Sam Altman", arena: "Business", field: "AI Tech", country: "USA", state: "IL", gender: "Male", age: 41 },
+            { name: "Rupert Murdoch", arena: "Business", field: "Media Mogul", country: "Australia", state: "Victoria", gender: "Male", age: 95 },
+            { name: "Jack Dorsey", arena: "Business", field: "Fintech", country: "USA", state: "MO", gender: "Male", age: 49 },
+
+            // --- SCIENCE, INNOVATION & CULTURE (15) ---
+            { name: "Anthony Fauci", arena: "Science / Culture", field: "Medicine", country: "USA", state: "NY", gender: "Male", age: 85 },
+            { name: "Jennifer Doudna", arena: "Science / Culture", field: "Genetics", country: "USA", state: "DC", gender: "Female", age: 62 },
+            { name: "Katalin Karikó", arena: "Science / Culture", field: "Biochemistry", country: "USA", state: "Szolnok", gender: "Female", age: 71 },
+            { name: "Neil deGrasse Tyson", arena: "Science / Culture", field: "Astrophysics", country: "USA", state: "NY", gender: "Male", age: 67 },
+            { name: "Michio Kaku", arena: "Science / Culture", field: "Theoretical Phys", country: "USA", state: "CA", gender: "Male", age: 79 },
+            { name: "Jane Goodall", arena: "Science / Culture", field: "Primatology", country: "UK", state: "London", gender: "Female", age: 92 },
+            { name: "Tim Berners-Lee", arena: "Science / Culture", field: "Computer Science", country: "UK", state: "London", gender: "Male", age: 71 },
+            { name: "Kip Thorne", arena: "Science / Culture", field: "Astrophysics", country: "USA", state: "UT", gender: "Male", age: 86 },
+            { name: "Steven Pinker", arena: "Science / Culture", field: "Psychology", country: "Canada", state: "Quebec", gender: "Male", age: 72 },
+            { name: "Terence Tao", arena: "Science / Culture", field: "Mathematics", country: "Australia", state: "South Australia", gender: "Male", age: 51 },
+            { name: "Malala Yousafzai", arena: "Science / Culture", field: "Activism", country: "UK", state: "Khyber", gender: "Female", age: 29 },
+            { name: "Greta Thunberg", arena: "Science / Culture", field: "Activism", country: "Sweden", state: "Stockholm", gender: "Female", age: 23 },
+            { name: "Oprah Winfrey", arena: "Science / Culture", field: "Media Culture", country: "USA", state: "MS", gender: "Female", age: 72 },
+            { name: "Jon Stewart", arena: "Science / Culture", field: "Media Commentary", country: "USA", state: "NY", gender: "Male", age: 63 },
+            { name: "David Attenborough", arena: "Science / Culture", field: "Natural History", country: "UK", state: "Middlesex", gender: "Male", age: 100 }
+        ];
+
+        // Randomly select target figure for the game session
+        const secretFigure = figures[Math.floor(Math.random() * figures.length)];
+
+        const input = document.getElementById('guess-input');
+        const suggestionsBox = document.getElementById('suggestions');
+        const submitBtn = document.getElementById('submit-guess-btn');
+        const guessesContainer = document.getElementById('guesses-container');
+        const winMessage = document.getElementById('win-message');
+        const shareBtn = document.getElementById('share-button');
+
+        const guessedNames = new Set();
+        let gameOver = false;
+
+        // 1. Search Box Autocomplete Logic
+        input.addEventListener('input', () => {
+            if (gameOver) return;
+
+            const query = input.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = '';
+
+            if (!query) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            const matches = figures.filter(f => 
+                f.name.toLowerCase().includes(query) && !guessedNames.has(f.name)
+            );
+
+            if (matches.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            matches.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = item.name;
+                
+                div.addEventListener('click', () => {
+                    input.value = item.name;
+                    suggestionsBox.style.display = 'none';
+                    input.focus();
+                });
+
+                suggestionsBox.appendChild(div);
+            });
+
+            suggestionsBox.style.display = 'block';
+        });
+
+        // Close dropdown when clicking outside input area
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.input-wrapper')) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // 2. Add Row to Grid
+        function renderGuessRow(guess) {
+            const row = document.createElement('div');
+            row.className = 'guess-row';
+
+            // Name Cell
+            const nameCell = document.createElement('div');
+            nameCell.className = 'cell name-cell';
+            nameCell.textContent = guess.name;
+            row.appendChild(nameCell);
+
+            // Helper function to build attribute cell
+            function createAttributeCell(value, targetValue, icon, isAge = false) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+
+                let statusClass = 'wrong';
+
+                if (value === targetValue) {
+                    statusClass = 'correct';
+                } else if (isAge) {
+                    // Yellow if age is within 5 years
+                    const diff = Math.abs(value - targetValue);
+                    if (diff <= 5) {
+                        statusClass = 'partial';
+                    }
+                }
+
+                cell.classList.add(statusClass);
+
+                let contentHtml = '';
+                if (icon) {
+                    contentHtml += `<span class="emoji-icon">${icon}</span>`;
+                }
+                
+                let displayVal = value;
+                if (isAge && value !== targetValue) {
+                    displayVal += value < targetValue ? ' ⬆️' : ' ⬇️';
+                }
+
+                contentHtml += `<div class="text-label">${displayVal}</div>`;
+                cell.innerHTML = contentHtml;
+
+                return cell;
+            }
+
+            row.appendChild(createAttributeCell(guess.arena, secretFigure.arena, arenaEmojis[guess.arena]));
+            row.appendChild(createAttributeCell(guess.field, secretFigure.field, null));
+            row.appendChild(createAttributeCell(guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐'));
+            row.appendChild(createAttributeCell(guess.state, secretFigure.state, null));
+            row.appendChild(createAttributeCell(guess.gender, secretFigure.gender, guess.gender === 'Male' ? '👨' : '👩'));
+            row.appendChild(createAttributeCell(guess.age, secretFigure.age, getDecadeEmoji(guess.age), true));
+
+            // Insert new guess at top of guess stack
+            guessesContainer.insertBefore(row, guessesContainer.firstChild);
+        }
+
+        // 3. Process Guess Submission
+        function submitGuess() {
+            if (gameOver) return;
+
+            const guessName = input.value.trim();
+            const figure = figures.find(f => f.name.toLowerCase() === guessName.toLowerCase());
+
+            if (!figure) {
+                alert("Please select a valid figure from the dropdown list.");
+                return;
+            }
+
+            if (guessedNames.has(figure.name)) {
+                alert("You've already guessed this person!");
+                return;
+            }
+
+            guessedNames.add(figure.name);
+            input.value = '';
+            suggestionsBox.style.display = 'none';
+
+            renderGuessRow(figure);
+
+            if (figure.name === secretFigure.name) {
+                gameOver = true;
+                winMessage.style.display = 'block';
+                input.disabled = true;
+                submitBtn.disabled = true;
+            }
+        }
+
+        submitBtn.addEventListener('click', submitGuess);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+
+        // 4. Share Score Button Handler
+        shareBtn.addEventListener('click', () => {
+            const scoreText = `I guessed ${secretFigure.name} in ${guessedNames.size} try/tries on Historydle! 🎯`;
+            navigator.clipboard.writeText(scoreText).then(() => {
+                alert("Score copied to clipboard!");
+            }).catch(() => {
+                alert(scoreText);
+            });
+        });
+    </script>
+</body>
+</html>
