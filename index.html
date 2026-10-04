@@ -1,4 +1,228 @@
-        // Verifying match updates and styling conditions
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historydle - 21st Century US Figures</title>
+    <style>
+        :root {
+            --green: #6aaa64;
+            --yellow: #c9b458;
+            --gray: #242526;
+            --bg-color: #000000; /* Pure black background */
+            --card-bg: #121213;
+            --text-color: #ffffff;
+            --border-color: #3a3a3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
+        .subtitle { color: #a0a0a2; margin-bottom: 25px; font-size: 0.95rem; }
+
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 1.1rem;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 8px 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .suggestion-item:hover { background-color: #2a2a2b; }
+
+        /* FIXED: Set to exactly 7 columns to accommodate Country */
+        .grid-header, .guess-row {
+            display: grid;
+            grid-template-columns: 2fr repeat(6, 1fr);
+            gap: 6px;
+            text-align: center;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .grid-header div { padding: 8px 0; color: #818384; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .cell {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 65px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        .cell.correct { background-color: var(--green); border-color: var(--green); }
+        .cell.partial { background-color: var(--yellow); border-color: var(--yellow); }
+        .cell.wrong { background-color: #1a1a1c; border-color: var(--border-color); }
+
+        .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 1rem; }
+        .cell span.emoji-icon { font-size: 1.4rem; margin-bottom: 3px; display: block; }
+
+        .win-message {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #6aaa64;
+            background-color: #121213;
+            border: 2px solid var(--green);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>HISTORYDLE</h1>
+    <div class="subtitle">Crack the code to find the secret 21st-century historical figure.</div>
+
+    <div class="game-container">
+        <div class="search-box">
+            <input type="text" id="guess-input" placeholder="Search and select a historical figure..." autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+
+        <div id="win-message" class="win-message">🎉 Incredible Job! You guessed the secret figure!</div>
+
+        <!-- FIXED: Added Country to the visual headers -->
+        <div class="grid-header">
+            <div>Name</div>
+            <div>Role</div>
+            <div>Party/Field</div>
+            <div>Country</div>
+            <div>Birth State</div>
+            <div>Gender</div>
+            <div>Age</div>
+        </div>
+
+        <div id="guesses-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </div>
+
+    <script>
+        const domainEmojis = {
+            "Democratic": "🐴",
+            "Republican": "🐘",
+            "Business": "💼",
+            "Judiciary": "⚖️",
+            "Culture": "🎨"
+        };
+
+        const stateEmojis = {
+            "HI": "🌴", "CT": "⚓", "NY": "🗽", "PA": "🔔", "CA": "🐻",
+            "MD": "🦀", "WA": "🌲", "AL": "🏈", "International": "🌐"
+        };
+
+        const countryEmojis = {
+            "USA": "🇺🇸",
+            "South Africa": "🇿🇦"
+        };
+
+        function getDecadeEmoji(age) {
+            if (age < 30) return "🧑";
+            if (age < 40) return "👨";
+            if (age < 50) return "🧔";
+            if (age < 60) return "👨‍🦳";
+            if (age < 70) return "👴";
+            if (age < 80) return "🧓";
+            return "🧙‍♂️";
+        }
+
+        const figures = [
+            { name: "Barack Obama", role: "President", domain: "Democratic", country: "USA", state: "HI", gender: "Male", age: 65 },
+            { name: "George W. Bush", role: "President", domain: "Republican", country: "USA", state: "CT", gender: "Male", age: 80 },
+            { name: "Donald Trump", role: "President", domain: "Republican", country: "USA", state: "NY", gender: "Male", age: 80 },
+            { name: "Joe Biden", role: "President", domain: "Democratic", country: "USA", state: "PA", gender: "Male", age: 83 },
+            { name: "Kamala Harris", role: "Vice Pres", domain: "Democratic", country: "USA", state: "CA", gender: "Female", age: 61 },
+            { name: "Nancy Pelosi", role: "Speaker", domain: "Democratic", country: "USA", state: "MD", gender: "Female", age: 86 },
+            { name: "Elon Musk", role: "Tech Exec", domain: "Business", country: "South Africa", state: "International", gender: "Male", age: 55 },
+            { name: "Bill Gates", role: "Tech Exec", domain: "Business", country: "USA", state: "WA", gender: "Male", age: 70 },
+            { name: "Sonia Sotomayor", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Female", age: 72 },
+            { name: "John Roberts", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Male", age: 71 },
+            { name: "Taylor Swift", role: "Artist", domain: "Culture", country: "USA", state: "PA", gender: "Female", age: 36 }
+        ];
+
+        const secretFigure = figures[Math.floor(Math.random() * figures.length)];
+        let gameOver = false;
+
+        const input = document.getElementById('guess-input');
+        const suggestionsContainer = document.getElementById('suggestions');
+        const guessesContainer = document.getElementById('guesses-container');
+        const winMessage = document.getElementById('win-message');
+
+        input.addEventListener('input', () => {
+            if (gameOver) return;
+            const query = input.value.toLowerCase();
+            suggestionsContainer.innerHTML = '';
+            
+            if (!query) return;
+
+            const matches = figures.filter(f => f.name.toLowerCase().includes(query));
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerText = match.name;
+                div.addEventListener('click', () => {
+                    submitGuess(match);
+                    input.value = '';
+                    suggestionsContainer.innerHTML = '';
+                });
+                suggestionsContainer.appendChild(div);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== input) suggestionsContainer.innerHTML = '';
+        });
+
         function submitGuess(guessedFigure) {
             const row = document.createElement('div');
             row.className = 'guess-row';
@@ -13,7 +237,6 @@
                 age: guessedFigure.age === secretFigure.age
             };
 
-            // Handle Age arrow tracking directions
             let ageLabel = guessedFigure.age;
             let ageClass = "wrong";
             if (matches.age) {
@@ -23,33 +246,7 @@
                 if (Math.abs(guessedFigure.age - secretFigure.age) <= 5) ageClass = "partial";
             }
 
-            // --- FIXED ROW INSERTS HERE ---
+            // FIXED: Passing correct parameters (text, emoji, matchClass) across all cells
             row.appendChild(createCell(guessedFigure.name, '', matches.name ? 'correct' : 'wrong'));
             row.appendChild(createCell(guessedFigure.role, '🎭', matches.role ? 'correct' : 'wrong'));
             row.appendChild(createCell(guessedFigure.domain, domainEmojis[guessedFigure.domain] || '❓', matches.domain ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.country, countryEmojis[guessedFigure.country] || '🏳️', matches.country ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.state, stateEmojis[guessedFigure.state] || '📍', matches.state ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.gender, guessedFigure.gender === "Male" ? "👨" : "👩", matches.gender ? 'correct' : 'wrong'));
-            row.appendChild(createCell(ageLabel, getDecadeEmoji(guessedFigure.age), ageClass)); // Passes variables correctly
-
-            guessesContainer.insertBefore(row, guessesContainer.firstChild);
-
-            if (matches.name) {
-                gameOver = true;
-                winMessage.style.display = 'block';
-                input.disabled = true;
-            }
-        }
-
-        // --- FIXED CELL BUILDER ---
-        function createCell(text, emoji, matchClass) {
-            const cell = document.createElement('div');
-            cell.className = `cell ${matchClass}`;
-            if (emoji === '') {
-                cell.className += ' name-cell';
-                cell.innerText = text;
-            } else {
-                cell.innerHTML = `<span class="emoji-icon">${emoji}</span><div>${text}</div>`;
-            }
-            return cell;
-        }
