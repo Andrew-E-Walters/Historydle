@@ -37,9 +37,17 @@
             gap: 20px;
         }
 
-        .search-box {
-            position: relative;
+        /* Improved Flex Bar layout ensuring search actions stay aligned */
+        .search-box-row {
+            display: flex;
+            gap: 10px;
             width: 100%;
+            position: relative;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex-grow: 1;
         }
 
         input {
@@ -54,6 +62,20 @@
             outline: none;
         }
 
+        .submit-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+        .submit-btn:hover { background-color: #cccccc; }
+
         .suggestions {
             position: absolute;
             top: 100%; left: 0; right: 0;
@@ -62,11 +84,11 @@
             border-radius: 0 0 8px 8px;
             max-height: 220px;
             overflow-y: auto;
-            z-index: 100; /* Fixed: Kept dropdown above all grid elements */
+            z-index: 999; /* Higher layer to remain visible over inputs */
         }
 
         .suggestion-item {
-            padding: 12px 16px;
+            padding: 14px 18px;
             cursor: pointer;
             border-bottom: 1px solid var(--border-color);
             color: #ffffff;
@@ -75,7 +97,6 @@
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
-        /* Setup 7-Column grid to cleanly parse out all modern data vectors */
         .grid-header, .guess-row {
             display: grid;
             grid-template-columns: 2fr repeat(6, 1fr);
@@ -144,9 +165,13 @@
     <div class="subtitle">Crack the code to find the secret 21st-century historical figure.</div>
 
     <div class="game-container">
-        <div class="search-box">
-            <input type="text" id="guess-input" placeholder="Search and select a historical figure..." autocomplete="off">
-            <div id="suggestions" class="suggestions"></div>
+        <!-- Structural Input container featuring search elements and physical action keys -->
+        <div class="search-box-row">
+            <div class="input-wrapper">
+                <input type="text" id="guess-input" placeholder="Type a figure's name..." autocomplete="off">
+                <div id="suggestions" class="suggestions"></div>
+            </div>
+            <button id="submit-guess-btn" class="submit-btn">Guess</button>
         </div>
 
         <div id="win-message" class="win-message">
@@ -169,11 +194,7 @@
 
     <script>
         const domainEmojis = {
-            "Democratic": "🐴",
-            "Republican": "🐘",
-            "Business": "💼",
-            "Judiciary": "⚖️",
-            "Culture": "🎨"
+            "Democratic": "🐴", "Republican": "🐘", "Business": "💼", "Judiciary": "⚖️", "Culture": "🎨"
         };
 
         const stateEmojis = {
@@ -182,8 +203,7 @@
         };
 
         const countryEmojis = {
-            "USA": "🇺🇸",
-            "South Africa": "🇿🇦"
+            "USA": "🇺🇸", "South Africa": "🇿🇦"
         };
 
         function getDecadeEmoji(age) {
@@ -219,8 +239,9 @@
         const guessesContainer = document.getElementById('guesses-container');
         const winMessage = document.getElementById('win-message');
         const shareButton = document.getElementById('share-button');
+        const submitBtn = document.getElementById('submit-guess-btn');
 
-        // FIXED: Re-engineered selection binding to prevent input registry loss
+        // Logic processing autocomplete strings
         input.addEventListener('input', () => {
             if (gameOver) return;
             const query = input.value.toLowerCase().trim();
@@ -234,26 +255,11 @@
                 div.className = 'suggestion-item';
                 div.innerText = match.name;
                 
-                // Fixed: Bound individual pointer triggers cleanly to structural references
-                div.addEventListener('mousedown', (e) => {
-                    e.preventDefault(); // Prevents blur event from closing dropdown early
-                    submitGuess(match);
-                    input.value = '';
+                div.addEventListener('click', () => {
+                    input.value = match.name;
                     suggestionsContainer.innerHTML = '';
                 });
                 suggestionsContainer.appendChild(div);
             });
         });
 
-        // Fixed: Adjusted background blur layout to prevent dropdown click interference
-        input.addEventListener('blur', () => {
-            setTimeout(() => { suggestionsContainer.innerHTML = ''; }, 150);
-        });
-
-        function submitGuess(guessedFigure) {
-            const row = document.createElement('div');
-            row.className = 'guess-row';
-
-            const matches = {
-                name: guessedFigure.name === secretFigure.name,
-                role: guessedFigure.role === secretFigure.role,
