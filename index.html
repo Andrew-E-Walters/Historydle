@@ -9,7 +9,7 @@
             --green: #6aaa64;
             --yellow: #c9b458;
             --gray: #242526;
-            --bg-color: #000000; /* Pure black background */
+            --bg-color: #000000;
             --card-bg: #121213;
             --text-color: #ffffff;
             --border-color: #3a3a3c;
@@ -83,7 +83,7 @@
             max-height: 250px;
             overflow-y: auto;
             z-index: 999;
-            display: none; /* Hidden until user types */
+            display: none;
         }
 
         .suggestion-item {
@@ -96,7 +96,6 @@
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
-        /* Grid layout for game rows */
         .grid-header, .guess-row {
             display: grid;
             grid-template-columns: 2fr repeat(6, 1fr);
@@ -123,14 +122,13 @@
             font-size: 0.85rem;
         }
 
-        /* Attribute state classes */
         .cell.correct { background-color: var(--green); border-color: var(--green); }
         .cell.partial { background-color: var(--yellow); border-color: var(--yellow); }
         .cell.wrong { background-color: #1a1a1c; border-color: var(--border-color); }
 
         .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 0.95rem; }
-        .cell span.emoji-icon { font-size: 1.3rem; margin-bottom: 4px; display: block; }
-        .cell div.text-label { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; }
+        .cell span.emoji-icon { font-size: 1.4rem; margin-bottom: 4px; display: block; line-height: 1; }
+        .cell div.text-label { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .win-message {
             text-align: center;
@@ -166,7 +164,7 @@
 <body>
 
     <h1>HISTORYDLE</h1>
-    <div class="subtitle">Guess the 21st-century historical titan, business giant, or scientific mind.</div>
+    <div class="subtitle">Guess the 21st-century titan across politics, business, science, sports, &amp; entertainment!</div>
 
     <div class="game-container">
         <div class="search-box-row">
@@ -190,7 +188,7 @@
             <div>Arena</div>
             <div>Specialty / Field</div>
             <div>Country</div>
-            <div>Birth State</div>
+            <div>Birth Region</div>
             <div>Gender</div>
             <div>Age</div>
         </div>
@@ -199,31 +197,66 @@
     </div>
 
     <script>
-        // Attribute Icon Maps
+        // Clean Emoji & Continent Mappings
         const arenaEmojis = {
             "Politics": "🏛️",
             "Business": "💼",
-            "Science / Culture": "🔬"
+            "Science": "🔬",
+            "Culture / Arts": "🎭",
+            "Sports": "🏆"
         };
 
         const countryEmojis = {
-            "USA": "🇺🇸", "South Africa": "🇿🇦", "UK": "🇬🇧", "Germany": "🇩🇪", 
-            "India": "🇮🇳", "Australia": "🇦🇺", "Canada": "🇨🇦", "Ukraine": "🇺🇦"
+            "USA": "🇺🇸", 
+            "South Africa": "🇿🇦", 
+            "UK": "🇬🇧", 
+            "Germany": "🇩🇪", 
+            "India": "🇮🇳", 
+            "Australia": "🇦🇺", 
+            "Canada": "🇨🇦", 
+            "Ukraine": "🇺🇦",
+            "Sweden": "🇸🇪",
+            "Argentina": "🇦🇷",
+            "Portugal": "🇵🇹",
+            "France": "🇫🇷",
+            "Brazil": "🇧🇷",
+            "Norway": "🇳🇴",
+            "Japan": "🇯🇵"
         };
 
-        function getDecadeEmoji(age) {
-            if (age < 30) return "🧑";
-            if (age < 40) return "👨";
-            if (age < 50) return "🧔";
-            if (age < 60) return "👨‍🦳";
-            if (age < 70) return "👴";
-            if (age < 80) return "🧓";
+        const countryContinents = {
+            "USA": "North America",
+            "Canada": "North America",
+            "UK": "Europe",
+            "Germany": "Europe",
+            "Ukraine": "Europe",
+            "Sweden": "Europe",
+            "Portugal": "Europe",
+            "France": "Europe",
+            "Norway": "Europe",
+            "India": "Asia",
+            "Japan": "Asia",
+            "South Africa": "Africa",
+            "Australia": "Oceania",
+            "Argentina": "South America",
+            "Brazil": "South America"
+        };
+
+        const genderEmojis = {
+            "Male": "👨",
+            "Female": "👩"
+        };
+
+        function getAgeGroupEmoji(age) {
+            if (age < 40) return "🧑";
+            if (age < 65) return "👨";
+            if (age < 80) return "👴";
             return "🧙‍♂️";
         }
 
-        // Full Master Database (45 Figures)
+        // Master Database
         const figures = [
-            // --- POLITICS (15) ---
+            // Politics
             { name: "Barack Obama", arena: "Politics", field: "President", country: "USA", state: "HI", gender: "Male", age: 65 },
             { name: "George W. Bush", arena: "Politics", field: "President", country: "USA", state: "CT", gender: "Male", age: 80 },
             { name: "Donald Trump", arena: "Politics", field: "President", country: "USA", state: "NY", gender: "Male", age: 80 },
@@ -240,7 +273,7 @@
             { name: "Bernie Sanders", arena: "Politics", field: "Senator", country: "USA", state: "NY", gender: "Male", age: 85 },
             { name: "Alexandria Ocasio-Cortez", arena: "Politics", field: "Congress", country: "USA", state: "NY", gender: "Female", age: 36 },
 
-            // --- BUSINESS & TECH GIANTS (15) ---
+            // Business & Tech
             { name: "Elon Musk", arena: "Business", field: "Tech Exec", country: "South Africa", state: "Gauteng", gender: "Male", age: 55 },
             { name: "Bill Gates", arena: "Business", field: "Tech Exec", country: "USA", state: "WA", gender: "Male", age: 70 },
             { name: "Jeff Bezos", arena: "Business", field: "E-Commerce", country: "USA", state: "NM", gender: "Male", age: 62 },
@@ -257,25 +290,75 @@
             { name: "Rupert Murdoch", arena: "Business", field: "Media Mogul", country: "Australia", state: "Victoria", gender: "Male", age: 95 },
             { name: "Jack Dorsey", arena: "Business", field: "Fintech", country: "USA", state: "MO", gender: "Male", age: 49 },
 
-            // --- SCIENCE, INNOVATION & CULTURE (15) ---
-            { name: "Anthony Fauci", arena: "Science / Culture", field: "Medicine", country: "USA", state: "NY", gender: "Male", age: 85 },
-            { name: "Jennifer Doudna", arena: "Science / Culture", field: "Genetics", country: "USA", state: "DC", gender: "Female", age: 62 },
-            { name: "Katalin Karikó", arena: "Science / Culture", field: "Biochemistry", country: "USA", state: "Szolnok", gender: "Female", age: 71 },
-            { name: "Neil deGrasse Tyson", arena: "Science / Culture", field: "Astrophysics", country: "USA", state: "NY", gender: "Male", age: 67 },
-            { name: "Michio Kaku", arena: "Science / Culture", field: "Theoretical Phys", country: "USA", state: "CA", gender: "Male", age: 79 },
-            { name: "Jane Goodall", arena: "Science / Culture", field: "Primatology", country: "UK", state: "London", gender: "Female", age: 92 },
-            { name: "Tim Berners-Lee", arena: "Science / Culture", field: "Computer Science", country: "UK", state: "London", gender: "Male", age: 71 },
-            { name: "Kip Thorne", arena: "Science / Culture", field: "Astrophysics", country: "USA", state: "UT", gender: "Male", age: 86 },
-            { name: "Steven Pinker", arena: "Science / Culture", field: "Psychology", country: "Canada", state: "Quebec", gender: "Male", age: 72 },
-            { name: "Terence Tao", arena: "Science / Culture", field: "Mathematics", country: "Australia", state: "South Australia", gender: "Male", age: 51 },
-            { name: "Malala Yousafzai", arena: "Science / Culture", field: "Activism", country: "UK", state: "Khyber", gender: "Female", age: 29 },
-            { name: "Greta Thunberg", arena: "Science / Culture", field: "Activism", country: "Sweden", state: "Stockholm", gender: "Female", age: 23 },
-            { name: "Oprah Winfrey", arena: "Science / Culture", field: "Media Culture", country: "USA", state: "MS", gender: "Female", age: 72 },
-            { name: "Jon Stewart", arena: "Science / Culture", field: "Media Commentary", country: "USA", state: "NY", gender: "Male", age: 63 },
-            { name: "David Attenborough", arena: "Science / Culture", field: "Natural History", country: "UK", state: "Middlesex", gender: "Male", age: 100 }
+            // Science
+            { name: "Anthony Fauci", arena: "Science", field: "Medicine", country: "USA", state: "NY", gender: "Male", age: 85 },
+            { name: "Jennifer Doudna", arena: "Science", field: "Genetics", country: "USA", state: "DC", gender: "Female", age: 62 },
+            { name: "Katalin Karikó", arena: "Science", field: "Biochemistry", country: "USA", state: "Szolnok", gender: "Female", age: 71 },
+            { name: "Neil deGrasse Tyson", arena: "Science", field: "Astrophysics", country: "USA", state: "NY", gender: "Male", age: 67 },
+            { name: "Michio Kaku", arena: "Science", field: "Theoretical Phys", country: "USA", state: "CA", gender: "Male", age: 79 },
+            { name: "Jane Goodall", arena: "Science", field: "Primatology", country: "UK", state: "London", gender: "Female", age: 92 },
+            { name: "Tim Berners-Lee", arena: "Science", field: "Computer Science", country: "UK", state: "London", gender: "Male", age: 71 },
+            { name: "Kip Thorne", arena: "Science", field: "Astrophysics", country: "USA", state: "UT", gender: "Male", age: 86 },
+            { name: "Steven Pinker", arena: "Science", field: "Psychology", country: "Canada", state: "Quebec", gender: "Male", age: 72 },
+            { name: "Terence Tao", arena: "Science", field: "Mathematics", country: "Australia", state: "South Australia", gender: "Male", age: 51 },
+            { name: "Malala Yousafzai", arena: "Science", field: "Activism", country: "UK", state: "Khyber", gender: "Female", age: 29 },
+            { name: "Greta Thunberg", arena: "Science", field: "Activism", country: "Sweden", state: "Stockholm", gender: "Female", age: 23 },
+            { name: "Oprah Winfrey", arena: "Culture / Arts", field: "Media Culture", country: "USA", state: "MS", gender: "Female", age: 72 },
+            { name: "Jon Stewart", arena: "Culture / Arts", field: "Media Commentary", country: "USA", state: "NY", gender: "Male", age: 63 },
+            { name: "David Attenborough", arena: "Science", field: "Natural History", country: "UK", state: "Middlesex", gender: "Male", age: 100 },
+
+            // Music
+            { name: "Taylor Swift", arena: "Culture / Arts", field: "Music", country: "USA", state: "PA", gender: "Female", age: 36 },
+            { name: "Beyoncé", arena: "Culture / Arts", field: "Music", country: "USA", state: "TX", gender: "Female", age: 45 },
+            { name: "Drake", arena: "Culture / Arts", field: "Music", country: "Canada", state: "Ontario", gender: "Male", age: 39 },
+            { name: "Bad Bunny", arena: "Culture / Arts", field: "Music", country: "USA", state: "Puerto Rico", gender: "Male", age: 32 },
+            { name: "Ed Sheeran", arena: "Culture / Arts", field: "Music", country: "UK", state: "West Yorkshire", gender: "Male", age: 35 },
+            { name: "Lady Gaga", arena: "Culture / Arts", field: "Music", country: "USA", state: "NY", gender: "Female", age: 40 },
+            { name: "Rihanna", arena: "Culture / Arts", field: "Music", country: "USA", state: "St. Michael", gender: "Female", age: 38 },
+            { name: "Justin Bieber", arena: "Culture / Arts", field: "Music", country: "Canada", state: "Ontario", gender: "Male", age: 32 },
+            { name: "Adele", arena: "Culture / Arts", field: "Music", country: "UK", state: "London", gender: "Female", age: 38 },
+            { name: "Bruno Mars", arena: "Culture / Arts", field: "Music", country: "USA", state: "HI", gender: "Male", age: 40 },
+            { name: "Billie Eilish", arena: "Culture / Arts", field: "Music", country: "USA", state: "CA", gender: "Female", age: 24 },
+            { name: "Kendrick Lamar", arena: "Culture / Arts", field: "Music", country: "USA", state: "CA", gender: "Male", age: 39 },
+            { name: "Eminem", arena: "Culture / Arts", field: "Music", country: "USA", state: "MO", gender: "Male", age: 53 },
+            { name: "Kanye West", arena: "Culture / Arts", field: "Music", country: "USA", state: "GA", gender: "Male", age: 49 },
+            { name: "Post Malone", arena: "Culture / Arts", field: "Music", country: "USA", state: "NY", gender: "Male", age: 31 },
+
+            // Actors
+            { name: "Leonardo DiCaprio", arena: "Culture / Arts", field: "Acting", country: "USA", state: "CA", gender: "Male", age: 51 },
+            { name: "Denzel Washington", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NY", gender: "Male", age: 71 },
+            { name: "Tom Cruise", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NY", gender: "Male", age: 64 },
+            { name: "Margot Robbie", arena: "Culture / Arts", field: "Acting", country: "Australia", state: "Queensland", gender: "Female", age: 36 },
+            { name: "Zendaya", arena: "Culture / Arts", field: "Acting", country: "USA", state: "CA", gender: "Female", age: 30 },
+            { name: "Dwayne Johnson", arena: "Culture / Arts", field: "Acting", country: "USA", state: "CA", gender: "Male", age: 54 },
+            { name: "Scarlett Johansson", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NY", gender: "Female", age: 41 },
+            { name: "Ryan Reynolds", arena: "Culture / Arts", field: "Acting", country: "Canada", state: "British Columbia", gender: "Male", age: 49 },
+            { name: "Meryl Streep", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NJ", gender: "Female", age: 77 },
+            { name: "Brad Pitt", arena: "Culture / Arts", field: "Acting", country: "USA", state: "OK", gender: "Male", age: 62 },
+            { name: "Viola Davis", arena: "Culture / Arts", field: "Acting", country: "USA", state: "SC", gender: "Female", age: 61 },
+            { name: "Robert Downey Jr.", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NY", gender: "Male", age: 61 },
+            { name: "Keanu Reeves", arena: "Culture / Arts", field: "Acting", country: "Canada", state: "Beirut", gender: "Male", age: 62 },
+            { name: "Jennifer Lawrence", arena: "Culture / Arts", field: "Acting", country: "USA", state: "KY", gender: "Female", age: 36 },
+            { name: "Timothée Chalamet", arena: "Culture / Arts", field: "Acting", country: "USA", state: "NY", gender: "Male", age: 30 },
+
+            // Athletes
+            { name: "LeBron James", arena: "Sports", field: "Basketball", country: "USA", state: "OH", gender: "Male", age: 41 },
+            { name: "Tom Brady", arena: "Sports", field: "Football", country: "USA", state: "CA", gender: "Male", age: 49 },
+            { name: "Serena Williams", arena: "Sports", field: "Tennis", country: "USA", state: "MI", gender: "Female", age: 45 },
+            { name: "Patrick Mahomes", arena: "Sports", field: "Football", country: "USA", state: "TX", gender: "Male", age: 31 },
+            { name: "Stephen Curry", arena: "Sports", field: "Basketball", country: "USA", state: "OH", gender: "Male", age: 38 },
+            { name: "Simone Biles", arena: "Sports", field: "Gymnastics", country: "USA", state: "OH", gender: "Female", age: 29 },
+            { name: "Shohei Ohtani", arena: "Sports", field: "Baseball", country: "Japan", state: "Iwate", gender: "Male", age: 32 },
+            { name: "Aaron Judge", arena: "Sports", field: "Baseball", country: "USA", state: "CA", gender: "Male", age: 34 },
+            { name: "Katie Ledecky", arena: "Sports", field: "Swimming", country: "USA", state: "MD", gender: "Female", age: 29 },
+            { name: "Tiger Woods", arena: "Sports", field: "Golf", country: "USA", state: "CA", gender: "Male", age: 50 },
+            { name: "Lionel Messi", arena: "Sports", field: "Soccer", country: "Argentina", state: "Santa Fe", gender: "Male", age: 39 },
+            { name: "Cristiano Ronaldo", arena: "Sports", field: "Soccer", country: "Portugal", state: "Madeira", gender: "Male", age: 41 },
+            { name: "Kylian Mbappé", arena: "Sports", field: "Soccer", country: "France", state: "Île-de-France", gender: "Male", age: 27 },
+            { name: "Neymar Jr.", arena: "Sports", field: "Soccer", country: "Brazil", state: "São Paulo", gender: "Male", age: 34 },
+            { name: "Erling Haaland", arena: "Sports", field: "Soccer", country: "Norway", state: "Leeds", gender: "Male", age: 26 }
         ];
 
-        // Randomly select target figure for the game session
         const secretFigure = figures[Math.floor(Math.random() * figures.length)];
 
         const input = document.getElementById('guess-input');
@@ -288,7 +371,6 @@
         const guessedNames = new Set();
         let gameOver = false;
 
-        // 1. Search Box Autocomplete Logic
         input.addEventListener('input', () => {
             if (gameOver) return;
 
@@ -326,38 +408,42 @@
             suggestionsBox.style.display = 'block';
         });
 
-        // Close dropdown when clicking outside input area
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.input-wrapper')) {
                 suggestionsBox.style.display = 'none';
             }
         });
 
-        // 2. Add Row to Grid
         function renderGuessRow(guess) {
             const row = document.createElement('div');
             row.className = 'guess-row';
 
-            // Name Cell
             const nameCell = document.createElement('div');
             nameCell.className = 'cell name-cell';
             nameCell.textContent = guess.name;
             row.appendChild(nameCell);
 
-            // Helper function to build attribute cell
-            function createAttributeCell(value, targetValue, icon, isAge = false) {
+            function createAttributeCell(value, targetValue, icon, type = 'standard') {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
 
                 let statusClass = 'wrong';
 
-                if (value === targetValue) {
-                    statusClass = 'correct';
-                } else if (isAge) {
-                    // Yellow if age is within 5 years
-                    const diff = Math.abs(value - targetValue);
-                    if (diff <= 5) {
-                        statusClass = 'partial';
+                if (type === 'country') {
+                    if (value === targetValue) {
+                        statusClass = 'correct';
+                    } else if (countryContinents[value] === countryContinents[targetValue]) {
+                        statusClass = 'partial'; // Same continent match
+                    }
+                } else if (type === 'age') {
+                    if (value === targetValue) {
+                        statusClass = 'correct';
+                    } else if (Math.abs(value - targetValue) <= 10) {
+                        statusClass = 'partial'; // Within 10 years match
+                    }
+                } else {
+                    if (value === targetValue) {
+                        statusClass = 'correct';
                     }
                 }
 
@@ -369,7 +455,7 @@
                 }
                 
                 let displayVal = value;
-                if (isAge && value !== targetValue) {
+                if (type === 'age' && value !== targetValue) {
                     displayVal += value < targetValue ? ' ⬆️' : ' ⬇️';
                 }
 
@@ -379,18 +465,16 @@
                 return cell;
             }
 
-            row.appendChild(createAttributeCell(guess.arena, secretFigure.arena, arenaEmojis[guess.arena]));
-            row.appendChild(createAttributeCell(guess.field, secretFigure.field, null));
-            row.appendChild(createAttributeCell(guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐'));
-            row.appendChild(createAttributeCell(guess.state, secretFigure.state, null));
-            row.appendChild(createAttributeCell(guess.gender, secretFigure.gender, guess.gender === 'Male' ? '👨' : '👩'));
-            row.appendChild(createAttributeCell(guess.age, secretFigure.age, getDecadeEmoji(guess.age), true));
+            row.appendChild(createAttributeCell(guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
+            row.appendChild(createAttributeCell(guess.field, secretFigure.field, "🎯"));
+            row.appendChild(createAttributeCell(guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
+            row.appendChild(createAttributeCell(guess.state, secretFigure.state, "📍"));
+            row.appendChild(createAttributeCell(guess.gender, secretFigure.gender, genderEmojis[guess.gender]));
+            row.appendChild(createAttributeCell(guess.age, secretFigure.age, getAgeGroupEmoji(guess.age), 'age'));
 
-            // Insert new guess at top of guess stack
             guessesContainer.insertBefore(row, guessesContainer.firstChild);
         }
 
-        // 3. Process Guess Submission
         function submitGuess() {
             if (gameOver) return;
 
@@ -429,7 +513,6 @@
             }
         });
 
-        // 4. Share Score Button Handler
         shareBtn.addEventListener('click', () => {
             const scoreText = `I guessed ${secretFigure.name} in ${guessedNames.size} try/tries on Historydle! 🎯`;
             navigator.clipboard.writeText(scoreText).then(() => {
