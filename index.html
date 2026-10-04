@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>21st Century US Figure Guesser</title>
+    <title>Historydle - 21st Century US Figures</title>
     <style>
         :root {
             --green: #6aaa64;
             --yellow: #c9b458;
-            --gray: #787c7e;
-            --bg-color: #121213;
-            --card-bg: #1a1a1b;
+            --gray: #242526;
+            --bg-color: #000000; /* Pure black background as requested */
+            --card-bg: #121213;
             --text-color: #ffffff;
             --border-color: #3a3a3c;
         }
@@ -26,12 +26,12 @@
             align-items: center;
         }
 
-        h1 { margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .subtitle { color: #818384; margin-bottom: 25px; font-size: 0.9rem; }
+        h1 { margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
+        .subtitle { color: #a0a0a2; margin-bottom: 25px; font-size: 0.95rem; }
 
         .game-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -44,16 +44,17 @@
 
         input {
             width: 100%;
-            padding: 12px 16px;
-            font-size: 1rem;
+            padding: 14px 18px;
+            font-size: 1.1rem;
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
             color: var(--text-color);
             border-radius: 8px;
             box-sizing: border-box;
             outline: none;
+            transition: border-color 0.2s;
         }
-        input:focus { border-color: #565758; }
+        input:focus { border-color: #818384; }
 
         .suggestions {
             position: absolute;
@@ -61,7 +62,7 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 0 0 8px 8px;
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
             z-index: 10;
         }
@@ -70,12 +71,13 @@
             padding: 12px 16px;
             cursor: pointer;
             border-bottom: 1px solid var(--border-color);
+            font-size: 1rem;
         }
         .suggestion-item:hover { background-color: #2a2a2b; }
 
         .grid-header, .guess-row {
             display: grid;
-            grid-template-columns: 2fr repeat(5, 1fr);
+            grid-template-columns: 2fr repeat(6, 1fr);
             gap: 6px;
             text-align: center;
             align-items: center;
@@ -83,32 +85,39 @@
             font-weight: bold;
         }
 
-        .grid-header div { padding: 8px 0; color: #818384; text-transform: uppercase; }
+        .grid-header div { padding: 8px 0; color: #818384; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .cell {
             background-color: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 4px;
-            min-height: 50px;
+            border-radius: 6px;
+            min-height: 60px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: 6px;
             box-sizing: border-box;
-            animation: flip 0.5s ease forward;
+            font-size: 0.9rem;
         }
 
-        .cell.correct { background-color: var(--green); border-color: var(--green); }
-        .cell.partial { background-color: var(--yellow); border-color: var(--yellow); }
-        .cell.wrong { background-color: var(--gray); border-color: var(--gray); }
+        /* Color States */
+        .cell.correct { background-color: var(--green); border-color: var(--green); color: #ffffff; }
+        .cell.partial { background-color: var(--yellow); border-color: var(--yellow); color: #ffffff; }
+        .cell.wrong { background-color: #1a1a1c; border-color: var(--border-color); }
 
-        .cell.name-cell { justify-content: flex-start; padding-left: 12px; font-weight: 600; }
+        .cell.name-cell { align-items: flex-start; padding-left: 12px; font-weight: 600; font-size: 1rem; }
+        .cell span.emoji-icon { font-size: 1.4rem; margin-bottom: 2px; }
 
         .win-message {
             text-align: center;
-            font-size: 1.5rem;
-            color: var(--green);
-            margin: 20px 0;
+            font-size: 1.6rem;
+            color: #6aaa64;
+            background-color: #121213;
+            border: 2px solid var(--green);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
             display: none;
             font-weight: bold;
         }
@@ -116,21 +125,22 @@
 </head>
 <body>
 
-    <h1>HISTORIC-SPOTLE (21st C.)</h1>
-    <div class="subtitle">Guess the influential 21st-century US figure.</div>
+    <h1>HISTORYDLE</h1>
+    <div class="subtitle">Crack the code to find the secret 21st-century historical figure.</div>
 
     <div class="game-container">
         <div class="search-box">
-            <input type="text" id="guess-input" placeholder="Type a figure's name (e.g., Barack Obama, Elon Musk)..." autocomplete="off">
+            <input type="text" id="guess-input" placeholder="Search and select a historical figure..." autocomplete="off">
             <div id="suggestions" class="suggestions"></div>
         </div>
 
-        <div id="win-message" class="win-message">🎉 Splendid! You found the Secret Figure!</div>
+        <div id="win-message" class="win-message">🎉 Incredible Job! You guessed the secret figure!</div>
 
         <div class="grid-header">
             <div>Name</div>
             <div>Role</div>
             <div>Party/Field</div>
+            <div>Country</div>
             <div>Birth State</div>
             <div>Gender</div>
             <div>Age</div>
@@ -140,25 +150,52 @@
     </div>
 
     <script>
-        // 1. Data Structure: 21st Century US Figures
+        // Mapping structures to translate data strings into immersive emojis
+        const domainEmojis = {
+            "Democratic": "🐴",
+            "Republican": "🐘",
+            "Business": "💼",
+            "Judiciary": "⚖️",
+            "Culture": "🎨"
+        };
+
+        const stateEmojis = {
+            "HI": "🌴", "CT": "⚓", "NY": "🗽", "PA": "🔔", "CA": "🐻",
+            "MD": "🦀", "WA": "🌲", "AL": "🏈", "International": "🌐"
+        };
+
+        const countryEmojis = {
+            "USA": "🇺🇸",
+            "South Africa": "🇿🇦"
+        };
+
+        // Custom function to scale age emojis down through life's decades
+        function getDecadeEmoji(age) {
+            if (age < 30) return "🧑";       // 20s
+            if (age < 40) return "👨";       // 30s
+            if (age < 50) return "🧔";       // 40s
+            if (age < 60) return "👨‍🦳";     // 50s
+            if (age < 70) return "👴";       // 60s
+            if (age < 80) return "🧓";       // 70s
+            return "🧙‍♂️";                     // 80s+
+        }
+
+        // Expanded dataset tracking Name, Role, Party/Domain, Country, Birth State, Gender, and Age
         const figures = [
-            { name: "Barack Obama", role: "President", domain: "Democratic", state: "HI", gender: "Male", age: 65 },
-            { name: "George W. Bush", role: "President", domain: "Republican", state: "CT", gender: "Male", age: 80 },
-            { name: "Donald Trump", role: "President", domain: "Republican", state: "NY", gender: "Male", age: 80 },
-            { name: "Joe Biden", role: "President", domain: "Democratic", state: "PA", gender: "Male", age: 83 },
-            { name: "Kamala Harris", role: "Vice President", domain: "Democratic", state: "CA", gender: "Female", age: 61 },
-            { name: "Nancy Pelosi", role: "Speaker", domain: "Democratic", state: "MD", gender: "Female", age: 86 },
-            { name: "Elon Musk", role: "Tech Exec", domain: "Business", state: "International", gender: "Male", age: 55 },
-            { name: "Bill Gates", role: "Tech Exec", domain: "Business", state: "WA", gender: "Male", age: 70 },
-            { name: "Sonia Sotomayor", role: "Justice", domain: "Judiciary", state: "NY", gender: "Female", age: 72 },
-            { name: "John Roberts", role: "Justice", domain: "Judiciary", state: "NY", gender: "Male", age: 71 },
-            { name: "Colin Powell", role: "Cabinet", domain: "Republican", state: "NY", gender: "Male", age: 84 },
-            { name: "Condoleezza Rice", role: "Cabinet", domain: "Republican", state: "AL", gender: "Female", age: 71 },
-            { name: "Taylor Swift", role: "Artist", domain: "Culture", state: "PA", gender: "Female", age: 36 }
+            { name: "Barack Obama", role: "President", domain: "Democratic", country: "USA", state: "HI", gender: "Male", age: 65 },
+            { name: "George W. Bush", role: "President", domain: "Republican", country: "USA", state: "CT", gender: "Male", age: 80 },
+            { name: "Donald Trump", role: "President", domain: "Republican", country: "USA", state: "NY", gender: "Male", age: 80 },
+            { name: "Joe Biden", role: "President", domain: "Democratic", country: "USA", state: "PA", gender: "Male", age: 83 },
+            { name: "Kamala Harris", role: "Vice Pres", domain: "Democratic", country: "USA", state: "CA", gender: "Female", age: 61 },
+            { name: "Nancy Pelosi", role: "Speaker", domain: "Democratic", country: "USA", state: "MD", gender: "Female", age: 86 },
+            { name: "Elon Musk", role: "Tech Exec", domain: "Business", country: "South Africa", state: "International", gender: "Male", age: 55 },
+            { name: "Bill Gates", role: "Tech Exec", domain: "Business", country: "USA", state: "WA", gender: "Male", age: 70 },
+            { name: "Sonia Sotomayor", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Female", age: 72 },
+            { name: "John Roberts", role: "Justice", domain: "Judiciary", country: "USA", state: "NY", gender: "Male", age: 71 },
+            { name: "Taylor Swift", role: "Artist", domain: "Culture", country: "USA", state: "PA", gender: "Female", age: 36 }
         ];
 
-        // 2. Select Secret Figure (Simulates Daily Game via a fixed or randomized index)
-        // For a true daily game, you would bind this to the calendar day.
+        // Randomly locks in the mystery figure for this session
         const secretFigure = figures[Math.floor(Math.random() * figures.length)];
         let gameOver = false;
 
@@ -167,7 +204,7 @@
         const guessesContainer = document.getElementById('guesses-container');
         const winMessage = document.getElementById('win-message');
 
-        // 3. Search and Dropdown Logic
+        // Logic processing autocomplete text inputs
         input.addEventListener('input', () => {
             if (gameOver) return;
             const query = input.value.toLowerCase();
@@ -189,60 +226,29 @@
             });
         });
 
-        // Close autocomplete when clicking outside
         document.addEventListener('click', (e) => {
             if (e.target !== input) suggestionsContainer.innerHTML = '';
         });
 
-        // 4. Comparison and Rendering Engine
+        // Verifying match updates and styling conditions
         function submitGuess(guessedFigure) {
             const row = document.createElement('div');
             row.className = 'guess-row';
 
-            // Compare attributes
             const matches = {
                 name: guessedFigure.name === secretFigure.name,
                 role: guessedFigure.role === secretFigure.role,
                 domain: guessedFigure.domain === secretFigure.domain,
+                country: guessedFigure.country === secretFigure.country,
                 state: guessedFigure.state === secretFigure.state,
                 gender: guessedFigure.gender === secretFigure.gender,
                 age: guessedFigure.age === secretFigure.age
             };
 
-            // Calculate age direction indicators
-            let ageDisplay = guessedFigure.age;
+            // Handle Age arrow tracking directions
+            let ageLabel = guessedFigure.age;
             let ageClass = "wrong";
             if (matches.age) {
                 ageClass = "correct";
             } else {
-                ageDisplay += guessedFigure.age < secretFigure.age ? " ⬆️" : " ⬇️";
-                // Partial age hint: if within 5 years
-                if (Math.abs(guessedFigure.age - secretFigure.age) <= 5) ageClass = "partial";
-            }
 
-            // Create columns
-            row.appendChild(createCell(guessedFigure.name, matches.name ? 'correct' : 'wrong', true));
-            row.appendChild(createCell(guessedFigure.role, matches.role ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.domain, matches.domain ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.state, matches.state ? 'correct' : 'wrong'));
-            row.appendChild(createCell(guessedFigure.gender, matches.gender ? 'correct' : 'wrong'));
-            row.appendChild(createCell(ageDisplay, ageClass));
-
-            guessesContainer.insertBefore(row, guessesContainer.firstChild);
-
-            if (matches.name) {
-                gameOver = true;
-                winMessage.style.display = 'block';
-                input.disabled = true;
-            }
-        }
-
-        function createCell(text, matchClass, isName = false) {
-            const cell = document.createElement('div');
-            cell.className = `cell ${matchClass} ${isName ? 'name-cell' : ''}`;
-            cell.innerText = text;
-            return cell;
-        }
-    </script>
-</body>
-</html>
