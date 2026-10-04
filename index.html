@@ -27,7 +27,7 @@
         }
 
         h1 { margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
-        .subtitle { color: #a0a0a2; margin-bottom: 25px; font-size: 0.95rem; }
+        .subtitle { color: #a0a0a2; margin-bottom: 15px; font-size: 0.95rem; }
 
         .game-container {
             width: 100%;
@@ -37,7 +37,6 @@
             gap: 20px;
         }
 
-        /* Improved Flex Bar layout ensuring search actions stay aligned */
         .search-box-row {
             display: flex;
             gap: 10px;
@@ -84,7 +83,7 @@
             border-radius: 0 0 8px 8px;
             max-height: 220px;
             overflow-y: auto;
-            z-index: 999; /* Higher layer to remain visible over inputs */
+            z-index: 999;
         }
 
         .suggestion-item {
@@ -163,9 +162,13 @@
 
     <h1>HISTORYDLE</h1>
     <div class="subtitle">Crack the code to find the secret 21st-century historical figure.</div>
+    
+    <!-- Styled hyperlink display container -->
+    <div style="margin-bottom: 25px;">
+        <a href="https://andrew-e-walters.github.io/Historydle/" style="color: var(--green); text-decoration: none; font-weight: bold; font-size: 1.1rem; letter-spacing: 0.5px;">AndrewsFirstGame</a>
+    </div>
 
     <div class="game-container">
-        <!-- Structural Input container featuring search elements and physical action keys -->
         <div class="search-box-row">
             <div class="input-wrapper">
                 <input type="text" id="guess-input" placeholder="Type a figure's name..." autocomplete="off">
@@ -241,7 +244,6 @@
         const shareButton = document.getElementById('share-button');
         const submitBtn = document.getElementById('submit-guess-btn');
 
-        // Logic processing autocomplete strings
         input.addEventListener('input', () => {
             if (gameOver) return;
             const query = input.value.toLowerCase().trim();
