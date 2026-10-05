@@ -989,6 +989,15 @@
                     } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 300000) {
                         statusClass = 'partial';
                     }
+                    } else if (type === 'netWorth') {
+    if (value === targetValue || Math.abs(value - targetValue) <= (targetValue * 0.15) || Math.abs(value - targetValue) <= 15000000) {
+        statusClass = 'correct';
+    } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 40000000) {
+        statusClass = 'partial';
+    }
+    if (value === targetValue) {
+        statusClass = 'correct';
+    }
                 } else {
                     if (value === targetValue) {
                         statusClass = 'correct';
@@ -1000,8 +1009,10 @@
                 let displayVal = value;
                 if (type === 'age' && value !== targetValue && !isReveal) {
                     displayVal += value < targetValue ? ' ⬆' : ' ⬇️';
-                } else if (type === 'followers') {
-                    let formattedNum = new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(value);
+                } else if (type === 'followers' || type === 'netWorth') {
+                    let formattedNum = typeof value === 'number' 
+        ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: "compact", maximumFractionDigits: 1 }).format(value)
+        : value;
                     if (value !== targetValue && !isReveal) {
                         displayVal = formattedNum + (value < targetValue ? ' ⬆️' : ' ⬇️');
                     } else {
