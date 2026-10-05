@@ -401,203 +401,3579 @@
 
         // Master Database (20 figures per arena across 9 arenas = 180 total figures)
         const figures = [
- // --- MUSIC (20) ---
-            { name: "Taylor Swift", arena: "Music", field: "Pop Star", country: "USA", followers: 59870415, gender: "Female", age: 36 },
-            { name: "Beyoncé", arena: "Music", field: "R&B Star", country: "USA", followers: 13527546, gender: "Female", age: 45 },
-            { name: "Drake", arena: "Music", field: "Hip-Hop", country: "Canada", followers: 147755242, gender: "Male", age: 39 },
-            { name: "Eminem", arena: "Music", field: "Hip-Hop", country: "USA", followers: 131575314, gender: "Male", age: 53 },
-            { name: "Lady Gaga", arena: "Music", field: "Pop Star", country: "USA", followers: 119935355, gender: "Female", age: 40 },
-            { name: "Rihanna", arena: "Music", field: "Pop Star", country: "Canada", followers: 75013853, gender: "Female", age: 38 },
-            { name: "Justin Bieber", arena: "Music", field: "Pop Star", country: "Canada", followers: 55126676, gender: "Male", age: 32 },
-            { name: "Adele", arena: "Music", field: "Pop Star", country: "UK", followers: 292891430, gender: "Female", age: 38 },
-            { name: "Ed Sheeran", arena: "Music", field: "Pop Star", country: "UK", followers: 46774928, gender: "Male", age: 35 },
-            { name: "Kanye West", arena: "Music", field: "Hip-Hop", country: "USA", followers: 226617555, gender: "Male", age: 49 },
-            { name: "Bruno Mars", arena: "Music", field: "Pop Star", country: "USA", followers: 17163198, gender: "Male", age: 40 },
-            { name: "Billie Eilish", arena: "Music", field: "Pop Star", country: "USA", followers: 16097261, gender: "Female", age: 24 },
-            { name: "Ariana Grande", arena: "Music", field: "Pop Star", country: "USA", followers: 50402251, gender: "Female", age: 33 },
-            { name: "Post Malone", arena: "Music", field: "Hip-Hop", country: "USA", followers: 117480369, gender: "Male", age: 31 },
-            { name: "Bad Bunny", arena: "Music", field: "Latin Urban", country: "USA", followers: 125008867, gender: "Male", age: 32 },
-            { name: "Katy Perry", arena: "Music", field: "Pop Star", country: "USA", followers: 271410554, gender: "Female", age: 41 },
-            { name: "The Weeknd", arena: "Music", field: "R&B Star", country: "Canada", followers: 14346390, gender: "Male", age: 36 },
-            { name: "Jay-Z", arena: "Music", field: "Hip-Hop", country: "USA", followers: 106850149, gender: "Male", age: 56 },
-            { name: "Kendrick Lamar", arena: "Music", field: "Hip-Hop", country: "USA", followers: 292663230, gender: "Male", age: 39 },
-            { name: "Britney Spears", arena: "Music", field: "Pop Star", country: "USA", followers: 225327988, gender: "Female", age: 44 },
-
-            // --- MOVIES (20) ---
-            { name: "Leonardo DiCaprio", arena: "Movies", field: "Acting", country: "USA", followers: 118448156, gender: "Male", age: 51 },
-            { name: "Margot Robbie", arena: "Movies", field: "Acting", country: "Australia", followers: 241267269, gender: "Female", age: 36 },
-            { name: "Tom Cruise", arena: "Movies", field: "Acting", country: "USA", followers: 149452498, gender: "Male", age: 64 },
-            { name: "Zendaya", arena: "Movies", field: "Acting", country: "USA", followers: 3588995, gender: "Female", age: 30 },
-            { name: "Dwayne Johnson", arena: "Movies", field: "Acting", country: "USA", followers: 85816440, gender: "Male", age: 54 },
-            { name: "Brad Pitt", arena: "Movies", field: "Acting", country: "USA", followers: 226989378, gender: "Male", age: 62 },
-            { name: "Scarlett Johansson", arena: "Movies", field: "Acting", country: "USA", followers: 182770606, gender: "Female", age: 41 },
-            { name: "Ryan Reynolds", arena: "Movies", field: "Acting", country: "Canada", followers: 149281041, gender: "Male", age: 49 },
-            { name: "Jennifer Lawrence", arena: "Movies", field: "Acting", country: "USA", followers: 83572422, gender: "Female", age: 36 },
-            { name: "Denzel Washington", arena: "Movies", field: "Acting", country: "USA", followers: 115695695, gender: "Male", age: 71 },
-            { name: "Will Smith", arena: "Movies", field: "Acting", country: "USA", followers: 180807823, gender: "Male", age: 58 },
-            { name: "Emma Stone", arena: "Movies", field: "Acting", country: "USA", followers: 54973725, gender: "Female", age: 37 },
-            { name: "Timothée Chalamet", arena: "Movies", field: "Acting", country: "USA", followers: 49892546, gender: "Male", age: 30 },
-            { name: "Keanu Reeves", arena: "Movies", field: "Acting", country: "Canada", followers: 204071919, gender: "Male", age: 62 },
-            { name: "Meryl Streep", arena: "Movies", field: "Acting", country: "USA", followers: 52024210, gender: "Female", age: 77 },
-            { name: "Chris Hemsworth", arena: "Movies", field: "Acting", country: "Australia", followers: 192825585, gender: "Male", age: 43 },
-            { name: "Robert Downey Jr.", arena: "Movies", field: "Acting", country: "USA", followers: 184759822, gender: "Male", age: 61 },
-            { name: "Tom Holland", arena: "Movies", field: "Acting", country: "UK", followers: 142113556, gender: "Male", age: 30 },
-            { name: "Anne Hathaway", arena: "Movies", field: "Acting", country: "USA", followers: 23427276, gender: "Female", age: 43 },
-            { name: "Christopher Nolan", arena: "Movies", field: "Directing", country: "UK", followers: 246751852, gender: "Male", age: 56 },
-
-            // --- TV (20) ---
-            { name: "Oprah Winfrey", arena: "TV", field: "Talk Show", country: "USA", followers: 287985264, gender: "Female", age: 72 },
-            { name: "Jon Stewart", arena: "TV", field: "Late Night", country: "USA", followers: 67115535, gender: "Male", age: 63 },
-            { name: "Steve Carell", arena: "TV", field: "Comedy", country: "USA", followers: 203324098, gender: "Male", age: 64 },
-            { name: "Gordon Ramsay", arena: "TV", field: "Reality Host", country: "UK", followers: 42405533, gender: "Male", age: 59 },
-            { name: "Kim Kardashian", arena: "TV", field: "Reality TV", country: "USA", followers: 296474558, gender: "Female", age: 45 },
-            { name: "Jimmy Fallon", arena: "TV", field: "Late Night", country: "USA", followers: 157498888, gender: "Male", age: 52 },
-            { name: "Simon Cowell", arena: "TV", field: "Reality Host", country: "UK", followers: 194251326, gender: "Male", age: 66 },
-            { name: "Bryan Cranston", arena: "TV", field: "Drama", country: "USA", followers: 103334149, gender: "Male", age: 70 },
-            { name: "Jennifer Aniston", arena: "TV", field: "Comedy", country: "USA", followers: 37442138, gender: "Female", age: 57 },
-            { name: "Judge Judy", arena: "TV", field: "Court TV", country: "USA", followers: 24701779, gender: "Female", age: 83 },
-            { name: "Stephen Colbert", arena: "TV", field: "Late Night", country: "USA", followers: 122451953, gender: "Male", age: 62 },
-            { name: "Ellen DeGeneres", arena: "TV", field: "Talk Show", country: "USA", followers: 155463977, gender: "Female", age: 68 },
-            { name: "Ryan Seacrest", arena: "TV", field: "Hosting", country: "USA", followers: 42937990, gender: "Male", age: 51 },
-            { name: "Pedro Pascal", arena: "TV", field: "Drama", country: "USA", followers: 125078655, gender: "Male", age: 51 },
-            { name: "Tina Fey", arena: "TV", field: "Comedy", country: "USA", followers: 54324730, gender: "Female", age: 56 },
-            { name: "Julia Louis-Dreyfus", arena: "TV", field: "Comedy", country: "USA", followers: 204178714, gender: "Female", age: 65 },
-            { name: "Ken Jeopardy Jennings", arena: "TV", field: "Game Show Host", country: "USA", followers: 149335943, gender: "Male", age: 52 },
-            { name: "David Letterman", arena: "TV", field: "Late Night", country: "USA", followers: 243522802, gender: "Male", age: 79 },
-            { name: "Guy Fieri", arena: "TV", field: "Food TV", country: "USA", followers: 195967784, gender: "Male", age: 58 },
-            { name: "RuPaul", arena: "TV", field: "Reality Host", country: "USA", followers: 87424253, gender: "Male", age: 65 },
-
-            // --- POLITICS (20) ---
-            { name: "Barack Obama", arena: "Politics", field: "President", country: "USA", followers: 198839393, gender: "Male", age: 65 },
-            { name: "Donald Trump", arena: "Politics", field: "President", country: "USA", followers: 190834506, gender: "Male", age: 80 },
-            { name: "Joe Biden", arena: "Politics", field: "President", country: "USA", followers: 112578229, gender: "Male", age: 83 },
-            { name: "Kamala Harris", arena: "Politics", field: "Vice Pres", country: "USA", followers: 143432624, gender: "Female", age: 61 },
-            { name: "Volodymyr Zelenskyy", arena: "Politics", field: "President", country: "Ukraine", followers: 38433930, gender: "Male", age: 48 },
-            { name: "George W. Bush", arena: "Politics", field: "President", country: "USA", followers: 91979360, gender: "Male", age: 80 },
-            { name: "Bill Clinton", arena: "Politics", field: "President", country: "USA", followers: 286864160, gender: "Male", age: 80 },
-            { name: "Hillary Clinton", arena: "Politics", field: "Sec of State", country: "USA", followers: 131531865, gender: "Female", age: 78 },
-            { name: "Bernie Sanders", arena: "Politics", field: "Senator", country: "USA", followers: 87826045, gender: "Male", age: 85 },
-            { name: "Alexandria Ocasio-Cortez", arena: "Politics", field: "Congress", country: "USA", followers: 248274062, gender: "Female", age: 36 },
-            { name: "Nancy Pelosi", arena: "Politics", field: "Speaker", country: "USA", followers: 203818590, gender: "Female", age: 86 },
-            { name: "Mitt Romney", arena: "Politics", field: "Senator", country: "USA", followers: 145027134, gender: "Male", age: 79 },
-            { name: "Ron DeSantis", arena: "Politics", field: "Governor", country: "USA", followers: 299110119, gender: "Male", age: 48 },
-            { name: "JD Vance", arena: "Politics", field: "Vice Pres", country: "USA", followers: 118004996, gender: "Male", age: 42 },
-            { name: "Gavin Newsom", arena: "Politics", field: "Governor", country: "USA", followers: 174197967, gender: "Male", age: 58 },
-            { name: "Justin Trudeau", arena: "Politics", field: "Prime Minister", country: "Canada", followers: 30131457, gender: "Male", age: 54 },
-            { name: "Angela Merkel", arena: "Politics", field: "Chancellor", country: "Germany", followers: 123069247, gender: "Female", age: 72 },
-            { name: "Emmanuel Macron", arena: "Politics", field: "President", country: "France", followers: 17333684, gender: "Male", age: 48 },
-            { name: "Boris Johnson", arena: "Politics", field: "Prime Minister", country: "UK", followers: 169457567, gender: "Male", age: 62 },
-            { name: "Arnold Schwarzenegger", arena: "Politics", field: "Governor", country: "USA", followers: 215473707, gender: "Male", age: 79 },
-
-            // --- SPORTS (20) ---
-            { name: "LeBron James", arena: "Sports", field: "Basketball", country: "USA", followers: 143842291, gender: "Male", age: 41 },
-            { name: "Serena Williams", arena: "Sports", field: "Tennis", country: "USA", followers: 35634736, gender: "Female", age: 45 },
-            { name: "Tom Brady", arena: "Sports", field: "Football", country: "USA", followers: 113370549, gender: "Male", age: 49 },
-            { name: "Lionel Messi", arena: "Sports", field: "Soccer", country: "Argentina", followers: 169041402, gender: "Male", age: 39 },
-            { name: "Shohei Ohtani", arena: "Sports", field: "Baseball", country: "Japan", followers: 114253005, gender: "Male", age: 32 },
-            { name: "Cristiano Ronaldo", arena: "Sports", field: "Soccer", country: "Portugal", followers: 268122742, gender: "Male", age: 41 },
-            { name: "Steph Curry", arena: "Sports", field: "Basketball", country: "USA", followers: 212503258, gender: "Male", age: 38 },
-            { name: "Patrick Mahomes", arena: "Sports", field: "Football", country: "USA", followers: 246444213, gender: "Male", age: 31 },
-            { name: "Tiger Woods", arena: "Sports", field: "Golf", country: "USA", followers: 76803600, gender: "Male", age: 50 },
-            { name: "Simone Biles", arena: "Sports", field: "Gymnastics", country: "USA", followers: 142306459, gender: "Female", age: 29 },
-            { name: "Michael Phelps", arena: "Sports", field: "Swimming", country: "USA", followers: 75063459, gender: "Male", age: 41 },
-            { name: "Rafael Nadal", arena: "Sports", field: "Tennis", country: "Spain", followers: 132507135, gender: "Male", age: 40 },
-            { name: "Novak Djokovic", arena: "Sports", field: "Tennis", country: "Serbia", followers: 289461229, gender: "Male", age: 39 },
-            { name: "Usain Bolt", arena: "Sports", field: "Track & Field", country: "Jamaica", followers: 141158327, gender: "Male", age: 40 },
-            { name: "Caitlin Clark", arena: "Sports", field: "Basketball", country: "USA", followers: 230113656, gender: "Female", age: 24 },
-            { name: "Aaron Judge", arena: "Sports", field: "Baseball", country: "USA", followers: 214526514, gender: "Male", age: 34 },
-            { name: "Shaquille O'Neal", arena: "Sports", field: "Basketball", country: "USA", followers: 194445362, gender: "Male", age: 54 },
-            { name: "Lewis Hamilton", arena: "Sports", field: "Formula 1", country: "UK", followers: 117846935, gender: "Male", age: 41 },
-            { name: "Kevin Durant", arena: "Sports", field: "Basketball", country: "USA", followers: 74366288, gender: "Male", age: 38 },
-            { name: "Kobe Bryant", arena: "Sports", field: "Basketball", country: "USA", followers: 273649845, gender: "Male", age: 41 },
-
-            // --- BUSINESS (20) ---
-            { name: "Warren Buffett", arena: "Business", field: "Investing", country: "USA", followers: 265054299, gender: "Male", age: 96 },
-            { name: "Mark Cuban", arena: "Business", field: "Shark Tank", country: "USA", followers: 48906619, gender: "Male", age: 68 },
-            { name: "Jeff Bezos", arena: "Business", field: "E-Commerce", country: "USA", followers: 25395410, gender: "Male", age: 62 },
-            { name: "Jamie Dimon", arena: "Business", field: "Banking", country: "USA", followers: 58967430, gender: "Male", age: 70 },
-            { name: "Martha Stewart", arena: "Business", field: "Media Mogul", country: "USA", followers: 82156059, gender: "Female", age: 85 },
-            { name: "Steve Jobs", arena: "Business", field: "Tech Founder", country: "USA", followers: 85989680, gender: "Male", age: 56 },
-            { name: "Tim Cook", arena: "Business", field: "Tech CEO", country: "USA", followers: 226745405, gender: "Male", age: 65 },
-            { name: "Richard Branson", arena: "Business", field: "Aviation", country: "UK", followers: 34206178, gender: "Male", age: 76 },
-            { name: "Oprah Winfrey (Business)", arena: "Business", field: "Media Enterprise", country: "USA", followers: 206670376, gender: "Female", age: 72 },
-            { name: "Barbara Corcoran", arena: "Business", field: "Real Estate", country: "USA", followers: 204980292, gender: "Female", age: 77 },
-            { name: "Kevin O'Leary", arena: "Business", field: "Investing", country: "Canada", followers: 251382368, gender: "Male", age: 72 },
-            { name: "Daymond John", arena: "Business", field: "Fashion", country: "USA", followers: 284166101, gender: "Male", age: 57 },
-            { name: "Lori Greiner", arena: "Business", field: "Retail", country: "USA", followers: 135076925, gender: "Female", age: 56 },
-            { name: "Bob Iger", arena: "Business", field: "Entertainment CEO", country: "USA", followers: 297110891, gender: "Male", age: 75 },
-            { name: "Bernard Arnault", arena: "Business", field: "Luxury Goods", country: "France", followers: 6263826, gender: "Male", age: 77 },
-            { name: "Satya Nadella", arena: "Business", field: "Tech CEO", country: "India", followers: 61599497, gender: "Male", age: 59 },
-            { name: "Sundar Pichai", arena: "Business", field: "Tech CEO", country: "India", followers: 288383750, gender: "Male", age: 54 },
-            { name: "Reed Hastings", arena: "Business", field: "Streaming", country: "USA", followers: 143350681, gender: "Male", age: 65 },
-            { name: "Sheryl Sandberg", arena: "Business", field: "Tech Executive", country: "USA", followers: 182730317, gender: "Female", age: 57 },
-            { name: "Howard Schultz", arena: "Business", field: "Coffee Chain", country: "USA", followers: 59989117, gender: "Male", age: 73 },
-
-            // --- TECH & SCIENCE (20) ---
-            { name: "Elon Musk", arena: "Tech & Science", field: "Tech CEO", country: "South Africa", followers: 157671681, gender: "Male", age: 55 },
-            { name: "Bill Gates", arena: "Tech & Science", field: "Tech Founder", country: "USA", followers: 233512819, gender: "Male", age: 70 },
-            { name: "Mark Zuckerberg", arena: "Tech & Science", field: "Social Media", country: "USA", followers: 85010297, gender: "Male", age: 42 },
-            { name: "Neil deGrasse Tyson", arena: "Tech & Science", field: "Astrophysics", country: "USA", followers: 243691060, gender: "Male", age: 67 },
-            { name: "Anthony Fauci", arena: "Tech & Science", field: "Medicine", country: "USA", followers: 1842315, gender: "Male", age: 85 },
-            { name: "Sam Altman", arena: "Tech & Science", field: "Artificial Intelligence", country: "USA", followers: 141505916, gender: "Male", age: 41 },
-            { name: "Jensen Huang", arena: "Tech & Science", field: "Semiconductors", country: "USA", followers: 268850123, gender: "Male", age: 63 },
-            { name: "Bill Nye", arena: "Tech & Science", field: "Science Education", country: "USA", followers: 96012998, gender: "Male", age: 70 },
-            { name: "Stephen Hawking", arena: "Tech & Science", field: "Theoretical Physics", country: "UK", followers: 272659523, gender: "Male", age: 76 },
-            { name: "Larry Page", arena: "Tech & Science", field: "Search Engine", country: "USA", followers: 57228875, gender: "Male", age: 53 },
-            { name: "Sergey Brin", arena: "Tech & Science", field: "Search Engine", country: "USA", followers: 160326325, gender: "Male", age: 53 },
-            { name: "Michio Kaku", arena: "Tech & Science", field: "Theoretical Physics", country: "USA", followers: 272649434, gender: "Male", age: 79 },
-            { name: "Jane Goodall", arena: "Tech & Science", field: "Primatology", country: "UK", followers: 106889585, gender: "Female", age: 92 },
-            { name: "Tim Berners-Lee", arena: "Tech & Science", field: "Computer Science", country: "UK", followers: 82154959, gender: "Male", age: 71 },
-            { name: "Linus Torvalds", arena: "Tech & Science", field: "Software Engineering", country: "Sweden", followers: 200843469, gender: "Male", age: 56 },
-            { name: "Jennifer Doudna", arena: "Tech & Science", field: "Biochemistry", country: "USA", followers: 86830978, gender: "Female", age: 62 },
-            { name: "Marques Brownlee", arena: "Tech & Science", field: "Tech Reviewer", country: "USA", followers: 289676908, gender: "Male", age: 32 },
-            { name: "Guido van Rossum", arena: "Tech & Science", field: "Python Creator", country: "Germany", followers: 284831459, gender: "Male", age: 70 },
-            { name: "Jack Dorsey", arena: "Tech & Science", field: "Social Media", country: "USA", followers: 407034, gender: "Male", age: 49 },
-            { name: "Peter Thiel", arena: "Tech & Science", field: "Venture Capital", country: "Germany", followers: 174129959, gender: "Male", age: 58 },
-
-            // --- INFLUENCERS (20) ---
-            { name: "MrBeast", arena: "Influencers", field: "YouTube", country: "USA", followers: 262418192, gender: "Male", age: 28 },
-            { name: "Charli D'Amelio", arena: "Influencers", field: "TikTok", country: "USA", followers: 10556496, gender: "Female", age: 22 },
-            { name: "Logan Paul", arena: "Influencers", field: "YouTube/WWE", country: "USA", followers: 60158527, gender: "Male", age: 31 },
-            { name: "Khaby Lame", arena: "Influencers", field: "TikTok", country: "Italy", followers: 194973814, gender: "Male", age: 26 },
-            { name: "Kai Cenat", arena: "Influencers", field: "Twitch", country: "USA", followers: 165195391, gender: "Male", age: 24 },
-            { name: "PewDiePie", arena: "Influencers", field: "YouTube", country: "Sweden", followers: 128654982, gender: "Male", age: 36 },
-            { name: "Jake Paul", arena: "Influencers", field: "Boxing/YouTube", country: "USA", followers: 31198339, gender: "Male", age: 29 },
-            { name: "Emma Chamberlain", arena: "Influencers", field: "Fashion/YouTube", country: "USA", followers: 129416949, gender: "Female", age: 25 },
-            { name: "Addison Rae", arena: "Influencers", field: "TikTok", country: "USA", followers: 42382368, gender: "Female", age: 25 },
-            { name: "KSI", arena: "Influencers", field: "YouTube/Music", country: "UK", followers: 46084845, gender: "Male", age: 33 },
-            { name: "IShowSpeed", arena: "Influencers", field: "Streaming", country: "USA", followers: 261014140, gender: "Male", age: 21 },
-            { name: "David Dobrik", arena: "Influencers", field: "YouTube", country: "USA", followers: 37258185, gender: "Male", age: 30 },
-            { name: "Ninja", arena: "Influencers", field: "Gaming", country: "USA", followers: 286094444, gender: "Male", age: 35 },
-            { name: "Alix Earle", arena: "Influencers", field: "TikTok", country: "USA", followers: 67617162, gender: "Female", age: 25 },
-            { name: "Bella Poarch", arena: "Influencers", field: "TikTok", country: "USA", followers: 69029643, gender: "Female", age: 29 },
-            { name: "Dixie D'Amelio", arena: "Influencers", field: "TikTok/Music", country: "USA", followers: 255265283, gender: "Female", age: 25 },
-            { name: "Zach King", arena: "Influencers", field: "Digital Magic", country: "USA", followers: 295273558, gender: "Male", age: 36 },
-            { name: "Markiplier", arena: "Influencers", field: "Gaming", country: "USA", followers: 88751861, gender: "Male", age: 37 },
-            { name: "James Charles", arena: "Influencers", field: "Beauty", country: "USA", followers: 142401192, gender: "Female", age: 27 },
-            { name: "Pokimane", arena: "Influencers", field: "Twitch", country: "Canada", followers: 283392704, gender: "Female", age: 30 },
-
-            // --- PODCASTERS (20) ---
-            { name: "Joe Rogan", arena: "Podcasters", field: "Interview", country: "USA", followers: 227270451, gender: "Male", age: 59 },
-            { name: "Alex Cooper", arena: "Podcasters", field: "Culture", country: "USA", followers: 113808292, gender: "Female", age: 32 },
-            { name: "Theo Von", arena: "Podcasters", field: "Comedy", country: "USA", followers: 289632383, gender: "Male", age: 46 },
-            { name: "Travis Kelce", arena: "Podcasters", field: "Sports", country: "USA", followers: 108092155, gender: "Male", age: 37 },
-            { name: "Dax Shepard (Armchair Expert)", arena: "Podcasters", field: "Interview", country: "USA", followers: 167451411, gender: "Male", age: 51 },
-            { name: "Lex Fridman (Lex Fridman Podcast)", arena: "Podcasters", field: "Tech & AI", country: "USA", followers: 214307359, gender: "Male", age: 43 },
-            { name: "Marc Maron (WTF with Marc Maron)", arena: "Podcasters", field: "Interview", country: "USA", followers: 200578606, gender: "Male", age: 63 },
-            { name: "Andrew Huberman (Huberman Lab)", arena: "Podcasters", field: "Health & Science", country: "USA", followers: 235303188, gender: "Male", age: 50 },
-            { name: "Ira Glass (This American Life)", arena: "Podcasters", field: "Public Radio", country: "USA", followers: 277971414, gender: "Male", age: 67 },
-            { name: "Conan O'Brien (Conan O'Brien Needs a Friend)", arena: "Podcasters", field: "Comedy", country: "USA", followers: 242489777, gender: "Male", age: 63 },
-            { name: "Bill Simmons (The Bill Simmons Podcast)", arena: "Podcasters", field: "Sports & Culture", country: "USA", followers: 65063634, gender: "Male", age: 57 },
-            { name: "Jason Bateman (SmartLess)", arena: "Podcasters", field: "Comedy", country: "USA", followers: 133193315, gender: "Male", age: 57 },
-            { name: "Mel Robbins (The Mel Robbins Podcast)", arena: "Podcasters", field: "Self-Improvement", country: "USA", followers: 120733465, gender: "Female", age: 57 },
-            { name: "Tim Ferriss (The Tim Ferriss Show)", arena: "Podcasters", field: "Productivity", country: "USA", followers: 34473643, gender: "Male", age: 49 },
-            { name: "Jay Shetty (On Purpose with Jay Shetty)", arena: "Podcasters", field: "Wellness", country: "UK", followers: 181608307, gender: "Male", age: 39 },
-            { name: "Big Cat (Pardon My Take)", arena: "Podcasters", field: "Sports", country: "USA", followers: 11392683, gender: "Male", age: 41 },
-            { name: "Ashley Flowers (Crime Junkie)", arena: "Podcasters", field: "True Crime", country: "USA", followers: 297484352, gender: "Female", age: 36 },
-            { name: "Karen Kilgariff (My Favorite Murder)", arena: "Podcasters", field: "True Crime", country: "USA", followers: 123641906, gender: "Female", age: 56 },
-            { name: "Dan Carlin (Dan Carlin's Hardcore History)", arena: "Podcasters", field: "History", country: "USA", followers: 118328310, gender: "Male", age: 60 },
-            { name: "Stephen J. Dubner (Freakonomics Radio)", arena: "Podcasters", field: "Economics", country: "USA", followers: 3960554, gender: "Male", age: 63 }
+ {
+    "name": "Steve Jobs",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Bill Gates",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 8500000,
+    "gender": "Male",
+    "age": 70
+  },
+  {
+    "name": "Mark Zuckerberg",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 14500000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "Elon Musk",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Jeff Bezos",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 4400000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Tim Cook",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Sundar Pichai",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 2400000,
+    "gender": "Male",
+    "age": 54
+  },
+  {
+    "name": "Satya Nadella",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 59
+  },
+  {
+    "name": "Larry Page",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 53
+  },
+  {
+    "name": "Sergey Brin",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 53
+  },
+  {
+    "name": "Sheryl Sandberg",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Susan Wojcicki",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 56
+  },
+  {
+    "name": "Jack Dorsey",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Reed Hastings",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Peter Thiel",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 58
+  },
+  {
+    "name": "Marc Andreessen",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Sam Altman",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 1400000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Jensen Huang",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Kevin Systrom",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 7800000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "Brian Chesky",
+    "arena": "Tech & Science",
+    "field": "Entrepreneur",
+    "country": "US",
+    "followers": 520000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Neil deGrasse Tyson",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 1900000,
+    "gender": "Male",
+    "age": 68
+  },
+  {
+    "name": "Stephen Hawking",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "UK",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 76
+  },
+  {
+    "name": "Jane Goodall",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 1100000,
+    "gender": "Female",
+    "age": 92
+  },
+  {
+    "name": "Richard Dawkins",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "UK",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 85
+  },
+  {
+    "name": "Bill Nye",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 3100000,
+    "gender": "Male",
+    "age": 70
+  },
+  {
+    "name": "Michio Kaku",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 800000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Brian Greene",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Anthony Fauci",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 85
+  },
+  {
+    "name": "Sanjay Gupta",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 250000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Jennifer Doudna",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 62
+  },
+  {
+    "name": "Emmanuelle Charpentier",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Kip Thorne",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 86
+  },
+  {
+    "name": "James Watson",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 98
+  },
+  {
+    "name": "Francis Collins",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 76
+  },
+  {
+    "name": "Craig Venter",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Katalin Karikó",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 71
+  },
+  {
+    "name": "Drew Weissman",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "Carolyn Porco",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 73
+  },
+  {
+    "name": "Lisa Randall",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 64
+  },
+  {
+    "name": "Sylvia Earle",
+    "arena": "Tech & Science",
+    "field": "Scientist",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Female",
+    "age": 91
+  },
+  {
+    "name": "MrBeast",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 60000000,
+    "gender": "Male",
+    "age": 28
+  },
+  {
+    "name": "Charli D'Amelio",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 45000000,
+    "gender": "Female",
+    "age": 22
+  },
+  {
+    "name": "Addison Rae",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 36000000,
+    "gender": "Female",
+    "age": 25
+  },
+  {
+    "name": "Khaby Lame",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 80000000,
+    "gender": "Male",
+    "age": 26
+  },
+  {
+    "name": "PewDiePie",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 20000000,
+    "gender": "Male",
+    "age": 36
+  },
+  {
+    "name": "Logan Paul",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 27000000,
+    "gender": "Male",
+    "age": 31
+  },
+  {
+    "name": "Jake Paul",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 26000000,
+    "gender": "Male",
+    "age": 29
+  },
+  {
+    "name": "Emma Chamberlain",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Female",
+    "age": 25
+  },
+  {
+    "name": "Markiplier",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Male",
+    "age": 37
+  },
+  {
+    "name": "Jacksepticeye",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 8000000,
+    "gender": "Male",
+    "age": 36
+  },
+  {
+    "name": "Ninja",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Male",
+    "age": 35
+  },
+  {
+    "name": "Pokimane",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 5800000,
+    "gender": "Female",
+    "age": 30
+  },
+  {
+    "name": "KSI",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "UK",
+    "followers": 13000000,
+    "gender": "Male",
+    "age": 33
+  },
+  {
+    "name": "James Charles",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 20000000,
+    "gender": "Male",
+    "age": 27
+  },
+  {
+    "name": "David Dobrik",
+    "arena": "Influencers",
+    "field": "Creator",
+    "country": "US",
+    "followers": 11000000,
+    "gender": "Male",
+    "age": 30
+  },
+  {
+    "name": "Joe Rogan",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 19000000,
+    "gender": "Male",
+    "age": 59
+  },
+  {
+    "name": "Alex Cooper",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 3000000,
+    "gender": "Female",
+    "age": 32
+  },
+  {
+    "name": "Bill Simmons",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Dax Shepard",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Conan O'Brien",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Brené Brown",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 5000000,
+    "gender": "Female",
+    "age": 60
+  },
+  {
+    "name": "Marc Maron",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Karen Kilgariff",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Female",
+    "age": 55
+  },
+  {
+    "name": "Georgia Hardstark",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 600000,
+    "gender": "Female",
+    "age": 46
+  },
+  {
+    "name": "Michael Barbaro",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 46
+  },
+  {
+    "name": "Ben Shapiro",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "Rachel Maddow",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Female",
+    "age": 53
+  },
+  {
+    "name": "Ira Glass",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "Guy Raz",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 150000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Tim Ferriss",
+    "arena": "Podcasters",
+    "field": "Host",
+    "country": "US",
+    "followers": 1600000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Taylor Swift",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 283000000,
+    "gender": "Female",
+    "age": 36
+  },
+  {
+    "name": "Beyoncé",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 315000000,
+    "gender": "Female",
+    "age": 45
+  },
+  {
+    "name": "Jay-Z",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Kanye West",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Drake",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 145000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Rihanna",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 150000000,
+    "gender": "Female",
+    "age": 38
+  },
+  {
+    "name": "Lady Gaga",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 57000000,
+    "gender": "Female",
+    "age": 40
+  },
+  {
+    "name": "Adele",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 56000000,
+    "gender": "Female",
+    "age": 38
+  },
+  {
+    "name": "Eminem",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 44000000,
+    "gender": "Male",
+    "age": 53
+  },
+  {
+    "name": "Justin Bieber",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 293000000,
+    "gender": "Male",
+    "age": 32
+  },
+  {
+    "name": "Bruno Mars",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 32000000,
+    "gender": "Male",
+    "age": 40
+  },
+  {
+    "name": "Ed Sheeran",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 47000000,
+    "gender": "Male",
+    "age": 35
+  },
+  {
+    "name": "Billie Eilish",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 120000000,
+    "gender": "Female",
+    "age": 24
+  },
+  {
+    "name": "Ariana Grande",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 375000000,
+    "gender": "Female",
+    "age": 33
+  },
+  {
+    "name": "The Weeknd",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 75000000,
+    "gender": "Male",
+    "age": 36
+  },
+  {
+    "name": "Kendrick Lamar",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Post Malone",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 25000000,
+    "gender": "Male",
+    "age": 31
+  },
+  {
+    "name": "Katy Perry",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 205000000,
+    "gender": "Female",
+    "age": 41
+  },
+  {
+    "name": "Justin Timberlake",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 72000000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Usher",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 13000000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Snoop Dogg",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 88000000,
+    "gender": "Male",
+    "age": 54
+  },
+  {
+    "name": "Dr. Dre",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 8000000,
+    "gender": "Male",
+    "age": 61
+  },
+  {
+    "name": "Alicia Keys",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 27000000,
+    "gender": "Female",
+    "age": 45
+  },
+  {
+    "name": "Pink",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 10000000,
+    "gender": "Female",
+    "age": 47
+  },
+  {
+    "name": "Chris Martin",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Adam Levine",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 16000000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Harry Styles",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 48000000,
+    "gender": "Male",
+    "age": 32
+  },
+  {
+    "name": "Miley Cyrus",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 215000000,
+    "gender": "Female",
+    "age": 33
+  },
+  {
+    "name": "Selena Gomez",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 424000000,
+    "gender": "Female",
+    "age": 34
+  },
+  {
+    "name": "Dua Lipa",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 88000000,
+    "gender": "Female",
+    "age": 31
+  },
+  {
+    "name": "Olivia Rodrigo",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 38000000,
+    "gender": "Female",
+    "age": 23
+  },
+  {
+    "name": "Bad Bunny",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 45000000,
+    "gender": "Male",
+    "age": 32
+  },
+  {
+    "name": "J Balvin",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 51000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Shakira",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 90000000,
+    "gender": "Female",
+    "age": 49
+  },
+  {
+    "name": "Jennifer Lopez",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 250000000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Mariah Carey",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 13000000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Madonna",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 19000000,
+    "gender": "Female",
+    "age": 68
+  },
+  {
+    "name": "Bruce Springsteen",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Male",
+    "age": 77
+  },
+  {
+    "name": "Paul McCartney",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 84
+  },
+  {
+    "name": "Elton John",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 5000000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Mick Jagger",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "UK",
+    "followers": 3000000,
+    "gender": "Male",
+    "age": 83
+  },
+  {
+    "name": "Bono",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 66
+  },
+  {
+    "name": "John Legend",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 16000000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Pharrell Williams",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Male",
+    "age": 53
+  },
+  {
+    "name": "Lil Wayne",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 19000000,
+    "gender": "Male",
+    "age": 44
+  },
+  {
+    "name": "Nicki Minaj",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 228000000,
+    "gender": "Female",
+    "age": 43
+  },
+  {
+    "name": "Cardi B",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 165000000,
+    "gender": "Female",
+    "age": 33
+  },
+  {
+    "name": "Megan Thee Stallion",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 32000000,
+    "gender": "Female",
+    "age": 31
+  },
+  {
+    "name": "Travis Scott",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 57000000,
+    "gender": "Male",
+    "age": 35
+  },
+  {
+    "name": "Future",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 25000000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "J. Cole",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 9000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Frank Ocean",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 38
+  },
+  {
+    "name": "Lana Del Rey",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000000,
+    "gender": "Female",
+    "age": 41
+  },
+  {
+    "name": "SZA",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 20000000,
+    "gender": "Female",
+    "age": 36
+  },
+  {
+    "name": "Doja Cat",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 24000000,
+    "gender": "Female",
+    "age": 30
+  },
+  {
+    "name": "Luke Combs",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 36
+  },
+  {
+    "name": "Morgan Wallen",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 7000000,
+    "gender": "Male",
+    "age": 33
+  },
+  {
+    "name": "Carrie Underwood",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 13000000,
+    "gender": "Female",
+    "age": 43
+  },
+  {
+    "name": "Blake Shelton",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Kelly Clarkson",
+    "arena": "Music",
+    "field": "Musician",
+    "country": "US",
+    "followers": 7000000,
+    "gender": "Female",
+    "age": 44
+  },
+  {
+    "name": "Leonardo DiCaprio",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 61000000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Brad Pitt",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Tom Cruise",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "Denzel Washington",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 71
+  },
+  {
+    "name": "Meryl Streep",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 77
+  },
+  {
+    "name": "Tom Hanks",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 9500000,
+    "gender": "Male",
+    "age": 70
+  },
+  {
+    "name": "Julia Roberts",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Female",
+    "age": 58
+  },
+  {
+    "name": "Sandra Bullock",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 62
+  },
+  {
+    "name": "George Clooney",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Matt Damon",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Will Smith",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 70000000,
+    "gender": "Male",
+    "age": 58
+  },
+  {
+    "name": "Johnny Depp",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 28000000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Robert Downey Jr.",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 57000000,
+    "gender": "Male",
+    "age": 61
+  },
+  {
+    "name": "Chris Evans",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Chris Hemsworth",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 58000000,
+    "gender": "Male",
+    "age": 43
+  },
+  {
+    "name": "Scarlett Johansson",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 41
+  },
+  {
+    "name": "Jennifer Lawrence",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 36
+  },
+  {
+    "name": "Emma Stone",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 37
+  },
+  {
+    "name": "Margot Robbie",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 36
+  },
+  {
+    "name": "Ryan Gosling",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Ryan Reynolds",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 51000000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Hugh Jackman",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 33000000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Dwayne Johnson",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 395000000,
+    "gender": "Male",
+    "age": 54
+  },
+  {
+    "name": "Kevin Hart",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 180000000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Christian Bale",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "UK",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 52
+  },
+  {
+    "name": "Matthew McConaughey",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 9000000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Anne Hathaway",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 33000000,
+    "gender": "Female",
+    "age": 43
+  },
+  {
+    "name": "Natalie Portman",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 9000000,
+    "gender": "Female",
+    "age": 45
+  },
+  {
+    "name": "Charlize Theron",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 7500000,
+    "gender": "Female",
+    "age": 51
+  },
+  {
+    "name": "Cate Blanchett",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Nicole Kidman",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 10000000,
+    "gender": "Female",
+    "age": 59
+  },
+  {
+    "name": "Viola Davis",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Female",
+    "age": 61
+  },
+  {
+    "name": "Halle Berry",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 8500000,
+    "gender": "Female",
+    "age": 60
+  },
+  {
+    "name": "Morgan Freeman",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 89
+  },
+  {
+    "name": "Samuel L. Jackson",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 7000000,
+    "gender": "Male",
+    "age": 77
+  },
+  {
+    "name": "Harrison Ford",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 84
+  },
+  {
+    "name": "Clint Eastwood",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 96
+  },
+  {
+    "name": "Steven Spielberg",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Martin Scorsese",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Male",
+    "age": 83
+  },
+  {
+    "name": "Quentin Tarantino",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Christopher Nolan",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "UK",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "James Cameron",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 700000,
+    "gender": "Male",
+    "age": 72
+  },
+  {
+    "name": "Peter Jackson",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "Denis Villeneuve",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 59
+  },
+  {
+    "name": "Greta Gerwig",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 43
+  },
+  {
+    "name": "Jordan Peele",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 1500000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Taika Waititi",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 2500000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "J.J. Abrams",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 60
+  },
+  {
+    "name": "Zendaya",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 180000000,
+    "gender": "Female",
+    "age": 30
+  },
+  {
+    "name": "Timothée Chalamet",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 19000000,
+    "gender": "Male",
+    "age": 30
+  },
+  {
+    "name": "Florence Pugh",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 9000000,
+    "gender": "Female",
+    "age": 30
+  },
+  {
+    "name": "Austin Butler",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 4000000,
+    "gender": "Male",
+    "age": 35
+  },
+  {
+    "name": "Tom Holland",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 66000000,
+    "gender": "Male",
+    "age": 30
+  },
+  {
+    "name": "Michael B. Jordan",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 25000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Chadwick Boseman",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 11000000,
+    "gender": "Male",
+    "age": 43
+  },
+  {
+    "name": "Joaquin Phoenix",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Daniel Day-Lewis",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 69
+  },
+  {
+    "name": "Keanu Reeves",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Cillian Murphy",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Bradley Cooper",
+    "arena": "Movies",
+    "field": "Actor/Director",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Oprah Winfrey",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 23000000,
+    "gender": "Female",
+    "age": 72
+  },
+  {
+    "name": "Ellen DeGeneres",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 139000000,
+    "gender": "Female",
+    "age": 68
+  },
+  {
+    "name": "Jon Stewart",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Stephen Colbert",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Jimmy Fallon",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 26000000,
+    "gender": "Male",
+    "age": 52
+  },
+  {
+    "name": "Jimmy Kimmel",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 3000000,
+    "gender": "Male",
+    "age": 58
+  },
+  {
+    "name": "David Letterman",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Jay Leno",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 76
+  },
+  {
+    "name": "Trevor Noah",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 9000000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "John Oliver",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "UK",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Bill Maher",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 70
+  },
+  {
+    "name": "Tucker Carlson",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 5000000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Sean Hannity",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "Anderson Cooper",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 3800000,
+    "gender": "Male",
+    "age": 59
+  },
+  {
+    "name": "Gordon Ramsay",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "UK",
+    "followers": 17000000,
+    "gender": "Male",
+    "age": 59
+  },
+  {
+    "name": "Simon Cowell",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "UK",
+    "followers": 2000000,
+    "gender": "Male",
+    "age": 66
+  },
+  {
+    "name": "Ryan Seacrest",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "RuPaul",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 4500000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Shonda Rhimes",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Female",
+    "age": 56
+  },
+  {
+    "name": "Ryan Murphy",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 800000,
+    "gender": "Male",
+    "age": 60
+  },
+  {
+    "name": "Chuck Lorre",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 73
+  },
+  {
+    "name": "Dick Wolf",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Bryan Cranston",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 5000000,
+    "gender": "Male",
+    "age": 70
+  },
+  {
+    "name": "Aaron Paul",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "James Gandolfini",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Edie Falco",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 63
+  },
+  {
+    "name": "Jon Hamm",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Elisabeth Moss",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1500000,
+    "gender": "Female",
+    "age": 44
+  },
+  {
+    "name": "Steve Carell",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "John Krasinski",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 46
+  },
+  {
+    "name": "Rainn Wilson",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 3500000,
+    "gender": "Male",
+    "age": 60
+  },
+  {
+    "name": "Tina Fey",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 56
+  },
+  {
+    "name": "Amy Poehler",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 55
+  },
+  {
+    "name": "Julia Louis-Dreyfus",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1500000,
+    "gender": "Female",
+    "age": 65
+  },
+  {
+    "name": "Larry David",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Jerry Seinfeld",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1300000,
+    "gender": "Male",
+    "age": 72
+  },
+  {
+    "name": "Jennifer Aniston",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 45000000,
+    "gender": "Female",
+    "age": 57
+  },
+  {
+    "name": "Courteney Cox",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Female",
+    "age": 62
+  },
+  {
+    "name": "Jason Bateman",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Pedro Pascal",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 8500000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Bella Ramsey",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 3500000,
+    "gender": "Female",
+    "age": 23
+  },
+  {
+    "name": "Kieran Culkin",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 44
+  },
+  {
+    "name": "Sarah Snook",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Female",
+    "age": 38
+  },
+  {
+    "name": "Jeremy Strong",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Jason Sudeikis",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Brett Goldstein",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 46
+  },
+  {
+    "name": "Jean Smart",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 75
+  },
+  {
+    "name": "Sydney Sweeney",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 22000000,
+    "gender": "Female",
+    "age": 29
+  },
+  {
+    "name": "Millie Bobby Brown",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "US",
+    "followers": 63000000,
+    "gender": "Female",
+    "age": 22
+  },
+  {
+    "name": "Henry Cavill",
+    "arena": "TV",
+    "field": "TV Personality",
+    "country": "UK",
+    "followers": 27000000,
+    "gender": "Male",
+    "age": 43
+  },
+  {
+    "name": "Barack Obama",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 36000000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Donald Trump",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 24000000,
+    "gender": "Male",
+    "age": 80
+  },
+  {
+    "name": "Joe Biden",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 17000000,
+    "gender": "Male",
+    "age": 83
+  },
+  {
+    "name": "George W. Bush",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Male",
+    "age": 80
+  },
+  {
+    "name": "Bill Clinton",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 3000000,
+    "gender": "Male",
+    "age": 80
+  },
+  {
+    "name": "Hillary Clinton",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Female",
+    "age": 78
+  },
+  {
+    "name": "Kamala Harris",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 18000000,
+    "gender": "Female",
+    "age": 61
+  },
+  {
+    "name": "Mike Pence",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1800000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "Dick Cheney",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 85
+  },
+  {
+    "name": "Al Gore",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Male",
+    "age": 78
+  },
+  {
+    "name": "Bernie Sanders",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 6000000,
+    "gender": "Male",
+    "age": 85
+  },
+  {
+    "name": "Elizabeth Warren",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 3000000,
+    "gender": "Female",
+    "age": 77
+  },
+  {
+    "name": "Mitt Romney",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "John McCain",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 81
+  },
+  {
+    "name": "Nancy Pelosi",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 3000000,
+    "gender": "Female",
+    "age": 86
+  },
+  {
+    "name": "Chuck Schumer",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 75
+  },
+  {
+    "name": "Mitch McConnell",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 84
+  },
+  {
+    "name": "Kevin McCarthy",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 61
+  },
+  {
+    "name": "Paul Ryan",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "John Boehner",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 76
+  },
+  {
+    "name": "Alexandria Ocasio-Cortez",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 8500000,
+    "gender": "Female",
+    "age": 36
+  },
+  {
+    "name": "Ilhan Omar",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1300000,
+    "gender": "Female",
+    "age": 44
+  },
+  {
+    "name": "Rashida Tlaib",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 600000,
+    "gender": "Female",
+    "age": 50
+  },
+  {
+    "name": "Ayanna Pressley",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Female",
+    "age": 52
+  },
+  {
+    "name": "Marjorie Taylor Greene",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Female",
+    "age": 52
+  },
+  {
+    "name": "Matt Gaetz",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 44
+  },
+  {
+    "name": "Ron DeSantis",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 3500000,
+    "gender": "Male",
+    "age": 48
+  },
+  {
+    "name": "Gavin Newsom",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Male",
+    "age": 58
+  },
+  {
+    "name": "Gretchen Whitmer",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Female",
+    "age": 55
+  },
+  {
+    "name": "Pete Buttigieg",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Male",
+    "age": 44
+  },
+  {
+    "name": "Cory Booker",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1500000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Ted Cruz",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Marco Rubio",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 600000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Lindsey Graham",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Female",
+    "age": 71
+  },
+  {
+    "name": "Rand Paul",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Chris Christie",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "Andrew Cuomo",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 68
+  },
+  {
+    "name": "Rudy Giuliani",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 82
+  },
+  {
+    "name": "Michael Bloomberg",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 84
+  },
+  {
+    "name": "Arnold Schwarzenegger",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 25000000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Condoleezza Rice",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Female",
+    "age": 71
+  },
+  {
+    "name": "Colin Powell",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 84
+  },
+  {
+    "name": "Antony Blinken",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 600000,
+    "gender": "Male",
+    "age": 64
+  },
+  {
+    "name": "John Kerry",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Male",
+    "age": 82
+  },
+  {
+    "name": "Ruth Bader Ginsburg",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 87
+  },
+  {
+    "name": "Sonia Sotomayor",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 72
+  },
+  {
+    "name": "Clarence Thomas",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 78
+  },
+  {
+    "name": "John Roberts",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 71
+  },
+  {
+    "name": "Antonin Scalia",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Samuel Alito",
+    "arena": "Politics",
+    "field": "Politician",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 76
+  },
+  {
+    "name": "LeBron James",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 159000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Michael Jordan",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Kobe Bryant",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 21000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Stephen Curry",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 57000000,
+    "gender": "Male",
+    "age": 38
+  },
+  {
+    "name": "Kevin Durant",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 13000000,
+    "gender": "Male",
+    "age": 38
+  },
+  {
+    "name": "Shaquille O'Neal",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 34000000,
+    "gender": "Male",
+    "age": 54
+  },
+  {
+    "name": "Tim Duncan",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Magic Johnson",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 3500000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "Larry Bird",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 69
+  },
+  {
+    "name": "Tom Brady",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Peyton Manning",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Patrick Mahomes",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 6700000,
+    "gender": "Male",
+    "age": 31
+  },
+  {
+    "name": "Aaron Rodgers",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2200000,
+    "gender": "Male",
+    "age": 42
+  },
+  {
+    "name": "Drew Brees",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1700000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Eli Manning",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 350000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Ben Roethlisberger",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 44
+  },
+  {
+    "name": "Serena Williams",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 17000000,
+    "gender": "Female",
+    "age": 45
+  },
+  {
+    "name": "Venus Williams",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Female",
+    "age": 46
+  },
+  {
+    "name": "Roger Federer",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Male",
+    "age": 45
+  },
+  {
+    "name": "Rafael Nadal",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 21000000,
+    "gender": "Male",
+    "age": 40
+  },
+  {
+    "name": "Novak Djokovic",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 15000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Tiger Woods",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 3300000,
+    "gender": "Male",
+    "age": 50
+  },
+  {
+    "name": "Phil Mickelson",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Rory McIlroy",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2800000,
+    "gender": "Male",
+    "age": 37
+  },
+  {
+    "name": "Lionel Messi",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 504000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Cristiano Ronaldo",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 630000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Kylian Mbappé",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 120000000,
+    "gender": "Male",
+    "age": 27
+  },
+  {
+    "name": "Neymar",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 224000000,
+    "gender": "Male",
+    "age": 34
+  },
+  {
+    "name": "Megan Rapinoe",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2100000,
+    "gender": "Female",
+    "age": 41
+  },
+  {
+    "name": "Alex Morgan",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 10000000,
+    "gender": "Female",
+    "age": 37
+  },
+  {
+    "name": "Mia Hamm",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Female",
+    "age": 54
+  },
+  {
+    "name": "Usain Bolt",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 13000000,
+    "gender": "Male",
+    "age": 40
+  },
+  {
+    "name": "Michael Phelps",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 3400000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Simone Biles",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Female",
+    "age": 29
+  },
+  {
+    "name": "Katie Ledecky",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Female",
+    "age": 29
+  },
+  {
+    "name": "Shaun White",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2200000,
+    "gender": "Male",
+    "age": 40
+  },
+  {
+    "name": "Lindsey Vonn",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2300000,
+    "gender": "Female",
+    "age": 41
+  },
+  {
+    "name": "Mikaela Shiffrin",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1400000,
+    "gender": "Female",
+    "age": 31
+  },
+  {
+    "name": "Sidney Crosby",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Alexander Ovechkin",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1600000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Connor McDavid",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 29
+  },
+  {
+    "name": "Wayne Gretzky",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Derek Jeter",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 52
+  },
+  {
+    "name": "Alex Rodriguez",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 4200000,
+    "gender": "Female",
+    "age": 51
+  },
+  {
+    "name": "Albert Pujols",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 350000,
+    "gender": "Male",
+    "age": 46
+  },
+  {
+    "name": "Mike Trout",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 2000000,
+    "gender": "Male",
+    "age": 35
+  },
+  {
+    "name": "Shohei Ohtani",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 8000000,
+    "gender": "Male",
+    "age": 32
+  },
+  {
+    "name": "Aaron Judge",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1700000,
+    "gender": "Male",
+    "age": 34
+  },
+  {
+    "name": "Barry Bonds",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Ken Griffey Jr.",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 56
+  },
+  {
+    "name": "Floyd Mayweather Jr.",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 29000000,
+    "gender": "Male",
+    "age": 49
+  },
+  {
+    "name": "Manny Pacquiao",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 7500000,
+    "gender": "Male",
+    "age": 47
+  },
+  {
+    "name": "Mike Tyson",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 30000000,
+    "gender": "Male",
+    "age": 60
+  },
+  {
+    "name": "Conor McGregor",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 47000000,
+    "gender": "Male",
+    "age": 38
+  },
+  {
+    "name": "Ronda Rousey",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 17000000,
+    "gender": "Female",
+    "age": 39
+  },
+  {
+    "name": "Jon Jones",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 8000000,
+    "gender": "Male",
+    "age": 39
+  },
+  {
+    "name": "Lewis Hamilton",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "UK",
+    "followers": 37000000,
+    "gender": "Male",
+    "age": 41
+  },
+  {
+    "name": "Max Verstappen",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 12000000,
+    "gender": "Male",
+    "age": 29
+  },
+  {
+    "name": "Jeff Gordon",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 55
+  },
+  {
+    "name": "Dale Earnhardt Jr.",
+    "arena": "Sports",
+    "field": "Athlete",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "J.K. Rowling",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "UK",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 61
+  },
+  {
+    "name": "Stephen King",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "George R.R. Martin",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 78
+  },
+  {
+    "name": "James Patterson",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 150000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "John Grisham",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 71
+  },
+  {
+    "name": "Dan Brown",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 62
+  },
+  {
+    "name": "Suzanne Collins",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 64
+  },
+  {
+    "name": "Stephenie Meyer",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 52
+  },
+  {
+    "name": "E.L. James",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Female",
+    "age": 63
+  },
+  {
+    "name": "Neil Gaiman",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "UK",
+    "followers": 1000000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Margaret Atwood",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 250000,
+    "gender": "Female",
+    "age": 86
+  },
+  {
+    "name": "Haruki Murakami",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 77
+  },
+  {
+    "name": "Salman Rushdie",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 150000,
+    "gender": "Male",
+    "age": 79
+  },
+  {
+    "name": "Toni Morrison",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 88
+  },
+  {
+    "name": "Cormac McCarthy",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 89
+  },
+  {
+    "name": "Philip Roth",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 85
+  },
+  {
+    "name": "Thomas Pynchon",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 89
+  },
+  {
+    "name": "Don DeLillo",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 89
+  },
+  {
+    "name": "Jonathan Franzen",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "Donna Tartt",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 62
+  },
+  {
+    "name": "Gillian Flynn",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Female",
+    "age": 55
+  },
+  {
+    "name": "Ta-Nehisi Coates",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 51
+  },
+  {
+    "name": "Malcolm Gladwell",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 400000,
+    "gender": "Male",
+    "age": 63
+  },
+  {
+    "name": "Michael Lewis",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Walter Isaacson",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 74
+  },
+  {
+    "name": "David McCullough",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 89
+  },
+  {
+    "name": "Ron Chernow",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 77
+  },
+  {
+    "name": "Bill O'Reilly",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Male",
+    "age": 77
+  },
+  {
+    "name": "Bob Woodward",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 83
+  },
+  {
+    "name": "Jon Krakauer",
+    "arena": "Literature",
+    "field": "Author",
+    "country": "US",
+    "followers": 100000,
+    "gender": "Male",
+    "age": 72
+  },
+  {
+    "name": "Jake Tapper",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 800000,
+    "gender": "Male",
+    "age": 57
+  },
+  {
+    "name": "Wolf Blitzer",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Male",
+    "age": 78
+  },
+  {
+    "name": "Chris Wallace",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 78
+  },
+  {
+    "name": "Megyn Kelly",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 2500000,
+    "gender": "Female",
+    "age": 55
+  },
+  {
+    "name": "Lester Holt",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 500000,
+    "gender": "Male",
+    "age": 67
+  },
+  {
+    "name": "David Muir",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 600000,
+    "gender": "Male",
+    "age": 52
+  },
+  {
+    "name": "Norah O'Donnell",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 300000,
+    "gender": "Female",
+    "age": 52
+  },
+  {
+    "name": "Robin Roberts",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 1000000,
+    "gender": "Female",
+    "age": 65
+  },
+  {
+    "name": "George Stephanopoulos",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 200000,
+    "gender": "Male",
+    "age": 65
+  },
+  {
+    "name": "Gayle King",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 1100000,
+    "gender": "Female",
+    "age": 71
+  },
+  {
+    "name": "Savannah Guthrie",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 1200000,
+    "gender": "Female",
+    "age": 54
+  },
+  {
+    "name": "Hoda Kotb",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 2400000,
+    "gender": "Female",
+    "age": 62
+  },
+  {
+    "name": "Barbara Walters",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 93
+  },
+  {
+    "name": "Diane Sawyer",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Female",
+    "age": 80
+  },
+  {
+    "name": "Katie Couric",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 1800000,
+    "gender": "Female",
+    "age": 69
+  },
+  {
+    "name": "Matt Lauer",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 68
+  },
+  {
+    "name": "Brian Williams",
+    "arena": "Journalism",
+    "field": "Journalist",
+    "country": "US",
+    "followers": 20000,
+    "gender": "Male",
+    "age": 67
+  }
     ];
 
         // --- DAILY SELECTION LOGIC ---
