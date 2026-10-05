@@ -1,497 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Historydle - 21st Century Icons</title>
-    <style>
-        :root {
-            --green: #6aaa64;
-            --yellow: #c9b458;
-            --gray: #242526;
-            --bg-color: #000000;
-            --card-bg: #121213;
-            --text-color: #ffffff;
-            --border-color: #3a3a3c;
-        }
-
-        * {
-            box-sizing: border-box;
-            touch-action: manipulation;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        h1 { 
-            margin: 4px 0 2px 0; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: #ffffff; 
-            font-size: 1.4rem;
-            text-align: center;
-        }
-
-        .subtitle { 
-            color: #a0a0a2; 
-            margin-bottom: 12px; 
-            font-size: 0.78rem; 
-            text-align: center; 
-        }
-
-        .game-container {
-            width: 100%;
-            max-width: 430px; /* Modern iPhone max width */
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .search-box-row {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-            position: sticky;
-            top: 8px;
-            z-index: 1000;
-            background-color: var(--bg-color);
-            padding-bottom: 4px;
-        }
-
-        .input-wrapper {
-            position: relative;
-            flex-grow: 1;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 16px; /* Prevents auto-zoom on iOS */
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input:focus {
-            border-color: #818384;
-        }
-
-        .submit-btn {
-            background-color: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 0 16px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            min-height: 44px;
-        }
-
-        .submit-btn:active { 
-            background-color: #cccccc; 
-        }
-
-        .suggestions {
-            position: absolute;
-            top: 100%; 
-            left: 0; 
-            right: 0;
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 0 0 8px 8px;
-            max-height: 220px;
-            overflow-y: auto;
-            z-index: 1001;
-            display: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
-        }
-
-        .suggestion-item {
-            padding: 12px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
-            color: #ffffff;
-            text-align: left;
-            font-size: 0.95rem;
-        }
-
-        .suggestion-item:active { 
-            background-color: #2a2a2b; 
-        }
-
-        /* Mobile Stacked Card Layout */
-        .guess-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .guess-card-header {
-            font-size: 1.05rem;
-            font-weight: bold;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border-color);
-            color: #ffffff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .attributes-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
-
-        .cell {
-            background-color: #1a1a1c;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            min-height: 56px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            text-align: center;
-        }
-
-        .cell.correct { 
-            background-color: var(--green); 
-            border-color: var(--green); 
-        }
-        
-        .cell.partial { 
-            background-color: var(--yellow); 
-            border-color: var(--yellow); 
-            color: #000000; 
-        }
-
-        .cell.partial .text-label, 
-        .cell.partial .attr-title { 
-            color: #000000; 
-        }
-
-        .cell.wrong { 
-            background-color: #1a1a1c; 
-            border-color: var(--border-color); 
-        }
-
-        .cell .attr-title {
-            font-size: 0.62rem;
-            text-transform: uppercase;
-            color: #818384;
-            margin-bottom: 2px;
-            font-weight: bold;
-        }
-
-        .cell .emoji-icon { 
-            font-size: 1.05rem; 
-            line-height: 1;
-            margin-bottom: 2px;
-        }
-
-        .cell .text-label { 
-            font-size: 0.72rem;
-            font-weight: 600;
-            width: 100%; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
-        }
-
-        .win-message {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #6aaa64;
-            background-color: var(--card-bg);
-            border: 2px solid var(--green);
-            padding: 16px;
-            border-radius: 8px;
-            display: none;
-            font-weight: bold;
-        }
-
-        .share-btn {
-            background-color: var(--green);
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-            text-transform: uppercase;
-            width: 100%;
-        }
-
-        .share-btn:active {
-            opacity: 0.9;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>HISTORYDLE</h1>
-    <div class="subtitle">Guess the 21st-century titan across politics, tech, science, & arts!</div>
-
-    <div class="game-container">
-        <div class="search-box-row">
-            <div class="input-wrapper">
-                <input type="text" id="guess-input" placeholder="Type a figure's name..." autocomplete="off" autocorrect="off">
-                <div id="suggestions" class="suggestions"></div>
-            </div>
-            <button id="submit-guess-btn" class="submit-btn">Guess</button>
-        </div>
-
-        <div id="win-message" class="win-message">
-            <div>🎉 Victory! You found the figure!</div>
-            <button id="share-button" class="share-btn">Share Score 📋</button>
-        </div>
-
-        <div id="guesses-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-
-    <script>
-        const arenaEmojis = {
-            "Politics": "🏛️",
-            "Business": "💼",
-            "Science": "🔬",
-            "Culture / Arts": "🎭",
-            "Sports": "🏆"
-        };
-
-        const countryEmojis = {
-            "USA": "🇺🇸", 
-            "South Africa": "🇿🇦", 
-            "UK": "🇬🇧", 
-            "Germany": "🇩🇪", 
-            "India": "🇮🇳", 
-            "Australia": "🇦🇺", 
-            "Canada": "🇨🇦", 
-            "Ukraine": "🇺🇦",
-            "Sweden": "🇸🇪",
-            "Argentina": "🇦🇷",
-            "Portugal": "🇵🇹",
-            "France": "🇫🇷",
-            "Brazil": "🇧🇷",
-            "Norway": "🇳🇴",
-            "Japan": "🇯🇵"
-        };
-
-        const countryContinents = {
-            "USA": "North America",
-            "Canada": "North America",
-            "UK": "Europe",
-            "Germany": "Europe",
-            "Ukraine": "Europe",
-            "Sweden": "Europe",
-            "Portugal": "Europe",
-            "France": "Europe",
-            "Norway": "Europe",
-            "India": "Asia",
-            "Japan": "Asia",
-            "South Africa": "Africa",
-            "Australia": "Oceania",
-            "Argentina": "South America",
-            "Brazil": "South America"
-        };
-
-        const genderEmojis = {
-            "Male": "👨",
-            "Female": "👩"
-        };
-
-        function getAgeGroupEmoji(age) {
-            if (age < 40) return "🧑";
-            if (age < 65) return "👨";
-            if (age < 80) return "👴";
-            return "🧙‍♂️";
-        }
-
-        // Master Database
-        const figures = [
-            { name: "Barack Obama", arena: "Politics", field: "President", country: "USA", state: "HI", gender: "Male", age: 65 },
-            { name: "George W. Bush", arena: "Politics", field: "President", country: "USA", state: "CT", gender: "Male", age: 80 },
-            { name: "Donald Trump", arena: "Politics", field: "President", country: "USA", state: "NY", gender: "Male", age: 80 },
-            { name: "Joe Biden", arena: "Politics", field: "President", country: "USA", state: "PA", gender: "Male", age: 83 },
-            { name: "Kamala Harris", arena: "Politics", field: "Vice Pres", country: "USA", state: "CA", gender: "Female", age: 61 },
-            { name: "Nancy Pelosi", arena: "Politics", field: "Speaker", country: "USA", state: "MD", gender: "Female", age: 86 },
-            { name: "Angela Merkel", arena: "Politics", field: "Chancellor", country: "Germany", state: "Hamburg", gender: "Female", age: 72 },
-            { name: "Volodymyr Zelenskyy", arena: "Politics", field: "President", country: "Ukraine", state: "Kryvyi Rih", gender: "Male", age: 48 },
-            { name: "Narendra Modi", arena: "Politics", field: "Prime Minister", country: "India", state: "Gujarat", gender: "Male", age: 76 },
-            { name: "Rishi Sunak", arena: "Politics", field: "Prime Minister", country: "UK", state: "Hampshire", gender: "Male", age: 46 },
-            
-            { name: "Elon Musk", arena: "Business", field: "Tech Exec", country: "South Africa", state: "Gauteng", gender: "Male", age: 55 },
-            { name: "Bill Gates", arena: "Business", field: "Tech Exec", country: "USA", state: "WA", gender: "Male", age: 70 },
-            { name: "Jeff Bezos", arena: "Business", field: "E-Commerce", country: "USA", state: "NM", gender: "Male", age: 62 },
-            { name: "Mark Zuckerberg", arena: "Business", field: "Social Media", country: "USA", state: "NY", gender: "Male", age: 42 },
-            { name: "Tim Cook", arena: "Business", field: "Tech Exec", country: "USA", state: "AL", gender: "Male", age: 65 },
-            { name: "Satya Nadella", arena: "Business", field: "Tech Exec", country: "India", state: "Telangana", gender: "Male", age: 59 },
-            { name: "Jensen Huang", arena: "Business", field: "Semiconductors", country: "USA", state: "Tainan", gender: "Male", age: 63 },
-            { name: "Warren Buffett", arena: "Business", field: "Finance", country: "USA", state: "NE", gender: "Male", age: 96 },
-            { name: "Sam Altman", arena: "Business", field: "AI Tech", country: "USA", state: "IL", gender: "Male", age: 41 },
-
-            { name: "Anthony Fauci", arena: "Science", field: "Medicine", country: "USA", state: "NY", gender: "Male", age: 85 },
-            { name: "Jennifer Doudna", arena: "Science", field: "Genetics", country: "USA", state: "DC", gender: "Female", age: 62 },
-            { name: "Neil deGrasse Tyson", arena: "Science", field: "Astrophysics", country: "USA", state: "NY", gender: "Male", age: 67 },
-            { name: "Tim Berners-Lee", arena: "Science", field: "Computer Science", country: "UK", state: "London", gender: "Male", age: 71 },
-            { name: "Greta Thunberg", arena: "Science", field: "Activism", country: "Sweden", state: "Stockholm", gender: "Female", age: 23 },
-
-            { name: "Taylor Swift", arena: "Culture / Arts", field: "Music", country: "USA", state: "PA", gender: "Female", age: 36 },
-            { name: "Beyoncé", arena: "Culture / Arts", field: "Music", country: "USA", state: "TX", gender: "Female", age: 45 },
-            { name: "Drake", arena: "Culture / Arts", field: "Music", country: "Canada", state: "Ontario", gender: "Male", age: 39 },
-            { name: "Leonardo DiCaprio", arena: "Culture / Arts", field: "Acting", country: "USA", state: "CA", gender: "Male", age: 51 },
-            { name: "Zendaya", arena: "Culture / Arts", field: "Acting", country: "USA", state: "CA", gender: "Female", age: 30 },
-
-            { name: "LeBron James", arena: "Sports", field: "Basketball", country: "USA", state: "OH", gender: "Male", age: 41 },
-            { name: "Serena Williams", arena: "Sports", field: "Tennis", country: "USA", state: "MI", gender: "Female", age: 45 },
-            { name: "Shohei Ohtani", arena: "Sports", field: "Baseball", country: "Japan", state: "Iwate", gender: "Male", age: 32 },
-            { name: "Lionel Messi", arena: "Sports", field: "Soccer", country: "Argentina", state: "Santa Fe", gender: "Male", age: 39 },
-            { name: "Cristiano Ronaldo", arena: "Sports", field: "Soccer", country: "Portugal", state: "Madeira", gender: "Male", age: 41 }
-        ];
-
-        const secretFigure = figures[Math.floor(Math.random() * figures.length)];
-
-        const input = document.getElementById('guess-input');
-        const suggestionsBox = document.getElementById('suggestions');
-        const submitBtn = document.getElementById('submit-guess-btn');
-        const guessesContainer = document.getElementById('guesses-container');
-        const winMessage = document.getElementById('win-message');
-        const shareBtn = document.getElementById('share-button');
-
-        const guessedNames = new Set();
-        let gameOver = false;
-
-        input.addEventListener('input', () => {
-            if (gameOver) return;
-
-            const query = input.value.trim().toLowerCase();
-            suggestionsBox.innerHTML = '';
-
-            if (!query) {
-                suggestionsBox.style.display = 'none';
-                return;
             }
 
-            const matches = figures.filter(f => 
-                f.name.toLowerCase().includes(query) && !guessedNames.has(f.name)
-            );
-
-            if (matches.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
+            if (attempts === 1) {
+                return "You guessed it in 1 attempt... Admit it, you either made this game or you're cheating.";
+            } else if (attempts === 2) {
+                return "In 2 guesses?! Okay, genius, save some brain cells for the rest of us.";
+            } else if (attempts >= 3 && attempts <= 5) {
+                return `Took you ${attempts} tries. Solid work, but let's not pretend you're a mastermind just yet.`;
+            } else {
+                const lateWinMessages = [
+                    `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+                    `You got it in ${attempts}! Only took almost every single try you had available.`,
+                    `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`
+                ];
+                return lateWinMessages[Math.floor(Math.random() * lateWinMessages.length)];
             }
-
-            matches.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = item.name;
-                
-                div.addEventListener('click', () => {
-                    input.value = item.name;
-                    suggestionsBox.style.display = 'none';
-                });
-
-                suggestionsBox.appendChild(div);
-            });
-
-            suggestionsBox.style.display = 'block';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.input-wrapper')) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
-
-        function renderGuessCard(guess) {
-            const card = document.createElement('div');
-            card.className = 'guess-card';
-
-            const cardHeader = document.createElement('div');
-            cardHeader.className = 'guess-card-header';
-            cardHeader.innerHTML = `<span>${guess.name}</span>`;
-            card.appendChild(cardHeader);
-
-            const grid = document.createElement('div');
-            grid.className = 'attributes-grid';
-
-            function createCell(title, value, targetValue, icon, type = 'standard') {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-
-                let statusClass = 'wrong';
-
-                if (type === 'country') {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    } else if (countryContinents[value] === countryContinents[targetValue]) {
-                        statusClass = 'partial';
-                    }
-                } else if (type === 'age') {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    } else if (Math.abs(value - targetValue) <= 10) {
-                        statusClass = 'partial';
-                    }
-                } else {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    }
-                }
-
-                cell.classList.add(statusClass);
-
-                let displayVal = value;
-                if (type === 'age' && value !== targetValue) {
-                    displayVal += value < targetValue ? ' ⬆️' : ' ⬇️';
-                }
-
-                cell.innerHTML = `
-                    <div class="attr-title">${title}</div>
-                    ${icon ? `<span class="emoji-icon">${icon}</span>` : ''}
-                    <div class="text-label">${displayVal}</div>
-                `;
-
-                return cell;
-            }
-
-            grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
-            grid.appendChild(createCell('Field', guess.field, secretFigure.field, "🎯"));
-            grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
-            grid.appendChild(createCell('Birth Place', guess.state, secretFigure.state, "📍"));
-            grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, genderEmojis[guess.gender]));
-            grid.appendChild(createCell('Age', guess.age, secretFigure.age, getAgeGroupEmoji(guess.age), 'age'));
-
-            card.appendChild(grid);
-            guessesContainer.insertBefore(card, guessesContainer.firstChild);
         }
 
         function submitGuess() {
@@ -514,14 +36,30 @@
             input.value = '';
             suggestionsBox.style.display = 'none';
 
+            const currentAttemptCount = guessedNames.size;
+            guessCounterDisplay.textContent = `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+
             renderGuessCard(figure);
 
             if (figure.name === secretFigure.name) {
                 gameOver = true;
-                winMessage.style.display = 'block';
+                endGameText.textContent = getEndGameMessage(currentAttemptCount, true);
+                endGameBox.className = 'end-game-message win';
+                endGameBox.style.display = 'block';
                 input.disabled = true;
                 submitBtn.disabled = true;
-                winMessage.scrollIntoView({ behavior: 'smooth' });
+                endGameBox.scrollIntoView({ behavior: 'smooth' });
+            } else if (currentAttemptCount >= maxGuesses) {
+                gameOver = true;
+                endGameText.textContent = getEndGameMessage(currentAttemptCount, false);
+                endGameBox.className = 'end-game-message loss';
+                endGameBox.style.display = 'block';
+                input.disabled = true;
+                submitBtn.disabled = true;
+                
+                // Show reveal card
+                renderGuessCard(secretFigure, true);
+                endGameBox.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -534,7 +72,8 @@
         });
 
         shareBtn.addEventListener('click', () => {
-            const scoreText = `I guessed ${secretFigure.name} in ${guessedNames.size} guess(es) on Historydle! 🎯`;
+            const resultStatus = guessedNames.has(secretFigure.name) ? `${guessedNames.size}/10` : 'X/10';
+            const scoreText = `Persondle: ${resultStatus}\n${endGameText.textContent}`;
             if (navigator.share) {
                 navigator.share({ text: scoreText });
             } else {
