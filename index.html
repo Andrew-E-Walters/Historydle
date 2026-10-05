@@ -966,59 +966,59 @@
             grid.className = 'attributes-grid';
 
             function createCell(title, value, targetValue, icon, type = 'standard') {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
+            const cell = document.createElement('div');
+            cell.className = 'cell';
 
-                let statusClass = 'wrong';
+            let statusClass = 'wrong';
 
-                if (type === 'country') {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    } else if (countryContinents[value] === countryContinents[targetValue]) {
-                        statusClass = 'partial';
-                    }
-                } else if (type === 'age') {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    } else if (Math.abs(value - targetValue) <= 10) {
-                        statusClass = 'partial';
-                    }
-                } else if (type === 'followers') {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 300000) {
-                        statusClass = 'partial';
-                    }
-                    } else if (type === 'netWorth') {
-    if (value === targetValue || Math.abs(value - targetValue) <= (targetValue * 0.15) || Math.abs(value - targetValue) <= 15000000) {
-        statusClass = 'correct';
-    } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 40000000) {
-        statusClass = 'partial';
-    }
-    if (value === targetValue) {
-        statusClass = 'correct';
-    }
-                } else {
-                    if (value === targetValue) {
-                        statusClass = 'correct';
-                    }
+            if (type === 'country') {
+                if (value === targetValue) {
+                    statusClass = 'correct';
+                } else if (countryContinents[value] === countryContinents[targetValue]) {
+                    statusClass = 'partial';
                 }
+            } else if (type === 'age') {
+                if (value === targetValue) {
+                    statusClass = 'correct';
+                } else if (Math.abs(value - targetValue) <= 10) {
+                    statusClass = 'partial';
+                }
+            } else if (type === 'followers') {
+                if (value === targetValue) {
+                    statusClass = 'correct';
+                } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 300000) {
+                    statusClass = 'partial';
+                }
+            } else if (type === 'netWorth') {
+                // Green if exact, within 15%, or within $15M
+                if (value === targetValue || Math.abs(value - targetValue) <= (targetValue * 0.15) || Math.abs(value - targetValue) <= 15000000) {
+                    statusClass = 'correct';
+                // Yellow if within 30% or within $40M
+                } else if (Math.abs(value - targetValue) <= (targetValue * 0.3) || Math.abs(value - targetValue) <= 40000000) {
+                    statusClass = 'partial';
+                }
+            } else {
+                if (value === targetValue) {
+                    statusClass = 'correct';
+                }
+            }
 
                 cell.classList.add(statusClass);
 
                 let displayVal = value;
-                if (type === 'age' && value !== targetValue && !isReveal) {
-                    displayVal += value < targetValue ? ' ⬆' : ' ⬇️';
-                } else if (type === 'followers' || type === 'netWorth') {
-                    let formattedNum = typeof value === 'number' 
-        ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: "compact", maximumFractionDigits: 1 }).format(value)
-        : value;
-                    if (value !== targetValue && !isReveal) {
-                        displayVal = formattedNum + (value < targetValue ? ' ⬆️' : ' ⬇️');
-                    } else {
-                        displayVal = formattedNum;
-                    }
+            if (type === 'age' && value !== targetValue && !isReveal) {
+                displayVal += value < targetValue ? ' ⬆️' : ' ⬇️';
+            } else if (type === 'followers' || type === 'netWorth') {
+                let formattedNum = typeof value === 'number' 
+                    ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: "compact", maximumFractionDigits: 1 }).format(value)
+                    : value;
+                
+                if (value !== targetValue && !isReveal) {
+                    displayVal = formattedNum + (value < targetValue ? ' ⬆️' : ' ⬇️');
+                } else {
+                    displayVal = formattedNum;
                 }
+            }
 
                 cell.innerHTML = `
                     <div class="attr-title">${title}</div>
