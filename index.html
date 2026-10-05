@@ -879,7 +879,7 @@
         function countGreenAttributes(guess, target) {
             let greenCount = 0;
             if (guess.arena === target.arena) greenCount++;
-            if (guess.field === target.field) greenCount++;
+            if (guess.netWorth === target.netWorth) greenCount++;
             if (guess.country === target.country) greenCount++;
             if (guess.followers === target.followers) greenCount++;
             if (guess.gender === target.gender) greenCount++;
@@ -1019,7 +1019,7 @@
             }
 
             grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
-            grid.appendChild(createCell('Field', guess.field, secretFigure.field, "🎯"));
+            grid.appendChild(createCell('netWorth', guess.netWorth, secretFigure.netWorth, "💵"));
             grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
             grid.appendChild(createCell('Followers', guess.followers, secretFigure.followers, "📱", 'followers'));
             grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, genderEmojis[guess.gender]));
