@@ -4094,9 +4094,14 @@
                 return;
             }
 
-            const matches = figures.filter(f => 
-                f.name.toLowerCase().includes(query) && !guessedNames.has(f.name)
-            );
+            // Matches if the full name or any word within the name starts with the search query
+            const matches = figures.filter(f => {
+                if (guessedNames.has(f.name)) return false;
+                
+                const nameLower = f.name.toLowerCase();
+                const words = nameLower.split(/\s+/);
+                return words.some(word => word.startsWith(query));
+            });
 
             if (matches.length === 0) {
                 suggestionsBox.style.display = 'none';
@@ -4118,7 +4123,6 @@
 
             suggestionsBox.style.display = 'block';
         });
-
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.input-wrapper')) {
                 suggestionsBox.style.display = 'none';
