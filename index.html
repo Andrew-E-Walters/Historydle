@@ -1617,10 +1617,7 @@
 
 
             /*
-             * THIS IS THE IMPORTANT PART:
-             *
-             * The search looks directly at
-             * the figures array above.
+             * Search directly through the figures database.
              */
 
             const matches =
@@ -1641,9 +1638,7 @@
                 );
 
 
-            if (
-                matches.length === 0
-            ) {
+            if (matches.length === 0) {
 
                 suggestionsBox.style.display =
                     "none";
@@ -1654,16 +1649,14 @@
 
 
             /*
-             * Limit the visible results.
-             * This keeps the dropdown clean
-             * when the database becomes large.
+             * Show up to 12 matching figures.
              */
 
             const visibleMatches =
                 matches.slice(0, 12);
 
 
-            vvisibleMatches.forEach(
+            visibleMatches.forEach(
                 function(figure) {
 
                     const item =
@@ -1681,56 +1674,35 @@
 
 
                     /*
-                     * pointerdown works reliably
-                     * on both desktop and mobile.
+                     * IMPORTANT:
+                     *
+                     * pointerdown lets the user select
+                     * a name on desktop and mobile.
+                     *
+                     * We are NOT using click here.
+                     *
+                     * This prevents the normal click event
+                     * from interfering with mobile scrolling.
                      */
 
                     item.addEventListener(
-    "click",
-    function(event) {
+                        "pointerdown",
+                        function(event) {
 
-        event.stopPropagation();
+                            /*
+                             * Only select the figure when
+                             * the user actually touches/clicks
+                             * the suggestion.
+                             */
 
-        selectFigure(figure);
+                            event.stopPropagation();
 
-    }
-)
+                            selectFigure(
+                                figure
+                            );
 
-
-                    /*
-                     * Also support touch devices
-                     * that don't fire pointer events
-                     * correctly.
-                     */
-
-                    item.addEventListener(
-    "click",
-    function(event) {
-item.addEventListener(
-    "click",
-    function(event) {
-
-        event.stopPropagation();
-
-        selectFigure(figure);
-
-    }
-)item.addEventListener(
-    "click",
-    function(event) {
-
-        event.stopPropagation();
-
-        selectFigure(figure);
-
-    }
-)
-        event.stopPropagation();
-
-        selectFigure(figure);
-
-    }
-)
+                        }
+                    );
 
 
                     suggestionsBox.appendChild(
@@ -1766,6 +1738,10 @@ item.addEventListener(
                 "none";
 
 
+            selectedSuggestion =
+                -1;
+
+
             input.focus();
 
         }
@@ -1782,8 +1758,8 @@ item.addEventListener(
 
 
         /*
-         * Clicking/focusing the box
-         * also shows matching names.
+         * Clicking/focusing the input also
+         * shows matching names.
          */
 
         input.addEventListener(
@@ -1807,7 +1783,7 @@ item.addEventListener(
          *
          * Arrow Down = next result
          * Arrow Up = previous result
-         * Enter = select first result
+         * Enter = select highlighted result
          */
 
         let selectedSuggestion =
@@ -1836,6 +1812,7 @@ item.addEventListener(
 
                         event.preventDefault();
 
+
                         selectedSuggestion =
                             Math.min(
                                 selectedSuggestion + 1,
@@ -1854,6 +1831,28 @@ item.addEventListener(
 
                             }
                         );
+
+
+                        /*
+                         * Keep the selected item visible
+                         * when moving with the keyboard.
+                         */
+
+                        if (
+                            items[
+                                selectedSuggestion
+                            ]
+                        ) {
+
+                            items[
+                                selectedSuggestion
+                            ].scrollIntoView(
+                                {
+                                    block: "nearest"
+                                }
+                            );
+
+                        }
 
                     }
 
@@ -1874,6 +1873,7 @@ item.addEventListener(
 
                         event.preventDefault();
 
+
                         selectedSuggestion =
                             Math.max(
                                 selectedSuggestion - 1,
@@ -1893,6 +1893,23 @@ item.addEventListener(
                             }
                         );
 
+
+                        if (
+                            items[
+                                selectedSuggestion
+                            ]
+                        ) {
+
+                            items[
+                                selectedSuggestion
+                            ].scrollIntoView(
+                                {
+                                    block: "nearest"
+                                }
+                            );
+
+                        }
+
                     }
 
                     return;
@@ -1910,13 +1927,30 @@ item.addEventListener(
                     if (
                         suggestionsBox.style.display ===
                         "block" &&
-                        items.length > 0 &&
-                        selectedSuggestion >= 0
+                        items.length > 0
                     ) {
 
-                        items[
-                            selectedSuggestion
-                        ].click();
+                        /*
+                         * If the user has highlighted
+                         * an item, select that item.
+                         *
+                         * Otherwise select the first result.
+                         */
+
+                        const index =
+                            selectedSuggestion >= 0
+                                ? selectedSuggestion
+                                : 0;
+
+
+                        items[index].dispatchEvent(
+                            new PointerEvent(
+                                "pointerdown",
+                                {
+                                    bubbles: true
+                                }
+                            )
+                        );
 
 
                         selectedSuggestion =
@@ -1937,8 +1971,8 @@ item.addEventListener(
 
 
         /*
-         * Reset keyboard selection
-         * whenever the user types.
+         * Reset keyboard selection whenever
+         * the user changes the search text.
          */
 
         input.addEventListener(
@@ -1953,9 +1987,464 @@ item.addEventListener(
 
 
         /*
-         * Close suggestions when clicking
+         * Close suggestions when clicking/tapping
          * anywhere outside the search area.
+         *
+         * IMPORTANT:
+         *
+         * We listen for pointerdown rather than click
+         * so this works consistently on mobile.
          */
+
+        document.addEventListener(
+            "pointerdown",
+            function(event) {
+
+                if (
+                    !event.target.closest(
+                        ".input-wrapper"
+                    )
+                ) {
+
+                    suggestionsBox.style.display =
+                        "none";
+
+                    selectedSuggestion =
+                        -1;
+
+                }
+
+            }
+        );        /* =========================================================
+           SPOTLE-STYLE SEARCH
+           ========================================================= */
+
+        function showSuggestions() {
+
+            if (gameOver) {
+                return;
+            }
+
+
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            suggestionsBox.innerHTML = "";
+
+
+            if (!query) {
+
+                suggestionsBox.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            /*
+             * Search directly through the figures database.
+             */
+
+            const matches =
+                figures.filter(
+                    function(figure) {
+
+                        return (
+                            figure.name
+                                .toLowerCase()
+                                .includes(query)
+                            &&
+                            !guessedNames.has(
+                                figure.name
+                            )
+                        );
+
+                    }
+                );
+
+
+            if (matches.length === 0) {
+
+                suggestionsBox.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            /*
+             * Show up to 12 matching figures.
+             */
+
+            const visibleMatches =
+                matches.slice(0, 12);
+
+
+            visibleMatches.forEach(
+                function(figure) {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "suggestion-item";
+
+
+                    item.textContent =
+                        figure.name;
+
+
+                    /*
+                     * IMPORTANT:
+                     *
+                     * pointerdown lets the user select
+                     * a name on desktop and mobile.
+                     *
+                     * We are NOT using click here.
+                     *
+                     * This prevents the normal click event
+                     * from interfering with mobile scrolling.
+                     */
+
+                    item.addEventListener(
+                        "pointerdown",
+                        function(event) {
+
+                            /*
+                             * Only select the figure when
+                             * the user actually touches/clicks
+                             * the suggestion.
+                             */
+
+                            event.stopPropagation();
+
+                            selectFigure(
+                                figure
+                            );
+
+                        }
+                    );
+
+
+                    suggestionsBox.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+            suggestionsBox.style.display =
+                "block";
+
+        }
+
+
+        function selectFigure(figure) {
+
+            if (!figure) {
+                return;
+            }
+
+
+            input.value =
+                figure.name;
+
+
+            suggestionsBox.innerHTML =
+                "";
+
+
+            suggestionsBox.style.display =
+                "none";
+
+
+            selectedSuggestion =
+                -1;
+
+
+            input.focus();
+
+        }
+
+
+        /*
+         * Search whenever the user types.
+         */
+
+        input.addEventListener(
+            "input",
+            showSuggestions
+        );
+
+
+        /*
+         * Clicking/focusing the input also
+         * shows matching names.
+         */
+
+        input.addEventListener(
+            "focus",
+            function() {
+
+                if (
+                    input.value.trim() !== ""
+                ) {
+
+                    showSuggestions();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Keyboard support.
+         *
+         * Arrow Down = next result
+         * Arrow Up = previous result
+         * Enter = select highlighted result
+         */
+
+        let selectedSuggestion =
+            -1;
+
+
+        input.addEventListener(
+            "keydown",
+            function(event) {
+
+                const items =
+                    suggestionsBox.querySelectorAll(
+                        ".suggestion-item"
+                    );
+
+
+                if (
+                    event.key === "ArrowDown"
+                ) {
+
+                    if (
+                        suggestionsBox.style.display ===
+                        "block" &&
+                        items.length > 0
+                    ) {
+
+                        event.preventDefault();
+
+
+                        selectedSuggestion =
+                            Math.min(
+                                selectedSuggestion + 1,
+                                items.length - 1
+                            );
+
+
+                        items.forEach(
+                            function(item, index) {
+
+                                item.style.backgroundColor =
+                                    index ===
+                                    selectedSuggestion
+                                        ? "#3a3a3c"
+                                        : "#121213";
+
+                            }
+                        );
+
+
+                        /*
+                         * Keep the selected item visible
+                         * when moving with the keyboard.
+                         */
+
+                        if (
+                            items[
+                                selectedSuggestion
+                            ]
+                        ) {
+
+                            items[
+                                selectedSuggestion
+                            ].scrollIntoView(
+                                {
+                                    block: "nearest"
+                                }
+                            );
+
+                        }
+
+                    }
+
+                    return;
+
+                }
+
+
+                if (
+                    event.key === "ArrowUp"
+                ) {
+
+                    if (
+                        suggestionsBox.style.display ===
+                        "block" &&
+                        items.length > 0
+                    ) {
+
+                        event.preventDefault();
+
+
+                        selectedSuggestion =
+                            Math.max(
+                                selectedSuggestion - 1,
+                                0
+                            );
+
+
+                        items.forEach(
+                            function(item, index) {
+
+                                item.style.backgroundColor =
+                                    index ===
+                                    selectedSuggestion
+                                        ? "#3a3a3c"
+                                        : "#121213";
+
+                            }
+                        );
+
+
+                        if (
+                            items[
+                                selectedSuggestion
+                            ]
+                        ) {
+
+                            items[
+                                selectedSuggestion
+                            ].scrollIntoView(
+                                {
+                                    block: "nearest"
+                                }
+                            );
+
+                        }
+
+                    }
+
+                    return;
+
+                }
+
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+
+                    if (
+                        suggestionsBox.style.display ===
+                        "block" &&
+                        items.length > 0
+                    ) {
+
+                        /*
+                         * If the user has highlighted
+                         * an item, select that item.
+                         *
+                         * Otherwise select the first result.
+                         */
+
+                        const index =
+                            selectedSuggestion >= 0
+                                ? selectedSuggestion
+                                : 0;
+
+
+                        items[index].dispatchEvent(
+                            new PointerEvent(
+                                "pointerdown",
+                                {
+                                    bubbles: true
+                                }
+                            )
+                        );
+
+
+                        selectedSuggestion =
+                            -1;
+
+
+                        return;
+
+                    }
+
+
+                    submitGuess();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Reset keyboard selection whenever
+         * the user changes the search text.
+         */
+
+        input.addEventListener(
+            "input",
+            function() {
+
+                selectedSuggestion =
+                    -1;
+
+            }
+        );
+
+
+        /*
+         * Close suggestions when clicking/tapping
+         * anywhere outside the search area.
+         *
+         * IMPORTANT:
+         *
+         * We listen for pointerdown rather than click
+         * so this works consistently on mobile.
+         */
+
+        document.addEventListener(
+            "pointerdown",
+            function(event) {
+
+                if (
+                    !event.target.closest(
+                        ".input-wrapper"
+                    )
+                ) {
+
+                    suggestionsBox.style.display =
+                        "none";
+
+                    selectedSuggestion =
+                        -1;
+
+                }
+
+            }
+        );
 
         document.addEventListener(
     "click",
