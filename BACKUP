@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Persondle - Daily 21st Century Figures</title>
+    <style>
+        :root {
+            --green: #6aaa64;
+            --yellow: #c9b458;
+            --gray: #242526;
+            --bg-color: #000000;
+            --card-bg: #121213;
+            --text-color: #ffffff;
+            --border-color: #3a3a3c;
+            --red: #8b0000;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 { 
+            margin: 4px 0 2px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #ffffff; 
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .subtitle { 
+            color: #a0a0a2; 
+            margin-bottom: 8px; 
+            font-size: 0.82rem; 
+            text-align: center; 
+            line-height: 1.35;
+            padding: 0 4px;
+        }
+
+        .daily-tracker {
+            color: #6aaa64;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .guess-counter {
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #818384;
+            margin-bottom: 8px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            position: sticky;
+            top: 8px;
+            z-index: 1000;
+            background-color: var(--bg-color);
+            padding-bottom: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 16px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input:focus {
+            border-color: #818384;
+        }
+
+        input:disabled {
+            background-color: #1a1a1c;
+            color: #555555;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            min-height: 44px;
+        }
+
+        .submit-btn:active { 
+            background-color: #cccccc; 
+        }
+
+        .submit-btn:disabled {
+            background-color: #3a3a3c;
+            color: #777777;
+            cursor: not-allowed;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%; 
+            left: 0; 
+            right: 0;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 0 0 8px 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        }
+
+        .suggestion-item {
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            color: #ffffff;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .suggestion-item:active { 
+            background-color: #2a2a2b; 
+        }
+
+        .guess-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .guess-card-header {
+            font-size: 1.05rem;
+            font-weight: bold;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attributes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .cell {
+            background-color: #1a1a1c;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .cell.correct { 
+            background-color: var(--green); 
+            border-color: var(--green); 
+        }
+        
+        .cell.partial { 
+            background-color: var(--yellow); 
+            border-color: var(--yellow); 
+            color: #000000; 
+        }
+
+        .cell.partial .text-label, 
+        .cell.partial .attr-title { 
+            color: #000000; 
+        }
+
+        .cell.wrong { 
+            background-color: #1a1a1c; 
+            border-color: var(--border-color); 
+        }
+
+        .cell .attr-title {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            color: #818384;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .cell .emoji-icon { 
+            font-size: 1.05rem; 
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .cell .text-label { 
+            font-size: 0.68rem;
+            font-weight: 600;
+            width: 100%; 
+            line-height: 1.2;
+        }
+
+        .end-game-message {
+            text-align: center;
+            font-size: 1.05rem;
+            background-color: var(--card-bg);
+            border: 2px solid var(--green);
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .end-game-message.loss {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        .end-game-message.win {
+            border-color: var(--green);
+            color: #ffffff;
+        }
+
+        .next-person-timer {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #a0a0a2;
+            font-weight: normal;
+        }
+
+        .share-btn {
+            background-color: var(--green);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .share-btn:active {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>PERSONDLE</h1>
+    <div class="subtitle">
+        Guess the 21st century figure. They can be from any of these arenas: <br>
+        <strong>Music, Movies, TV, Politics, Sports, Business, Tech & Science, Influencers, Podcasters</strong>
+    </div>
+
+    <div id="daily-number" class="daily-tracker">PERSONDLE #1</div>
+
+    <div class="game-container">
+        <div id="guess-counter" class="guess-counter">Guesses: 0 / 10</div>
+
+        <div class="search-box-row">
+            <div class="input-wrapper">
+                <input
+    type="text"
+    id="guess-input"
+    placeholder="Type a figure's name..."
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="words"
+    spellcheck="false"
+>
+                <div id="suggestions" class="suggestions"></div>
+            </div>
+            <button id="submit-guess-btn" class="submit-btn">Guess</button>
+        </div>
+
+        <div id="end-game-box" class="end-game-message">
+            <div id="end-game-text"></div>
+            <div id="timer-display" class="next-person-timer">Next Person in: <span id="countdown">00:00:00</span></div>
+            <button id="share-button" class="share-btn">Share Result 📋</button>
+        </div>
+
+        <div id="guesses-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <script>
+        const maxGuesses = 10;
+
+        const arenaEmojis = {
+            "Music": "🎵",
+            "Movies": "🎬",
+            "TV": "📺",
+            "Politics": "🏛️",
+            "Sports": "🏆",
+            "Business": "💼",
+            "Tech & Science": "🔬",
+            "Influencers": "📱",
+            "Podcasters": "🎙️"
+        };
+
+        const countryEmojis = {
+            "USA": "🇺🇸", 
+            "South Africa": "🇿🇦", 
+            "UK": "🇬🇧", 
+            "Germany": "🇩🇪", 
+            "India": "🇮🇳", 
+            "Australia": "🇦🇺", 
+            "Canada": "🇨🇦", 
+            "Ukraine": "🇺🇦",
+            "Sweden": "🇸🇪",
+            "Argentina": "🇦🇷",
+            "Portugal": "🇵🇹",
+            "France": "🇫🇷",
+            "Brazil": "🇧🇷",
+            "Norway": "🇳🇴",
+            "Japan": "🇯🇵",
+            "Italy": "🇮🇹"
+        };
+
+        const countryContinents = {
+            "USA": "North America",
+            "Canada": "North America",
+            "UK": "Europe",
+            "Germany": "Europe",
+            "Ukraine": "Europe",
+            "Sweden": "Europe",
+            "Portugal": "Europe",
+            "France": "Europe",
+            "Norway": "Europe",
+            "Italy": "Europe",
+            "India": "Asia",
+            "Japan": "Asia",
+            "South Africa": "Africa",
+            "Australia": "Oceania",
+            "Argentina": "South America",
+            "Brazil": "South America"
+        };
+
+        const genderEmojis = {
+            "Male": "👨",
+            "Female": "👩"
+        };
+
+        function getAgeGroupEmoji(age) {
+            if (age < 40) return "🧑";
+            if (age < 65) return "👨";
+            if (age < 80) return "👴";
+            return "🧙‍♂️";
+        }
+
+        // Master Database 
+        const figures = [
+ {"name": "Steve Jobs", "arena": "Tech & Science", "netWorth": "10,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 56},
+  {"name": "Bill Gates", "arena": "Tech & Science", "netWorth": "130,000,000,000", "country": "US", "followers": 8500000, "gender": "Male", "age": 70},
+  {"name": "Mark Zuckerberg", "arena": "Tech & Science", "netWorth": "170,000,000,000", "country": "US", "followers": 14500000, "gender": "Male", "age": 42},
+  {"name": "Elon Musk", "arena": "Tech & Science", "netWorth": "230,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 55},
+  {"name": "Jeff Bezos", "arena": "Tech & Science", "netWorth": "200,000,000,000", "country": "US", "followers": 4400000, "gender": "Male", "age": 62},
+  {"name": "Tim Cook", "arena": "Tech & Science", "netWorth": "2,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 65},
+  {"name": "Sundar Pichai", "arena": "Tech & Science", "netWorth": "1,300,000,000", "country": "US", "followers": 2400000, "gender": "Male", "age": 54},
+  {"name": "Satya Nadella", "arena": "Tech & Science", "netWorth": "1,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 59},
+  {"name": "Larry Page", "arena": "Tech & Science", "netWorth": "130,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 53},
+  {"name": "Sergey Brin", "arena": "Tech & Science", "netWorth": "120,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 53},
+  {"name": "Sheryl Sandberg", "arena": "Tech & Science", "netWorth": "1,900,000,000", "country": "US", "followers": 1000000, "gender": "Female", "age": 57},
+  {"name": "Susan Wojcicki", "arena": "Tech & Science", "netWorth": "800,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 56},
+  {"name": "Jack Dorsey", "arena": "Tech & Science", "netWorth": "4,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 49},
+  {"name": "Reed Hastings", "arena": "Tech & Science", "netWorth": "4,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 65},
+  {"name": "Peter Thiel", "arena": "Tech & Science", "netWorth": "7,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 58},
+  {"name": "Marc Andreessen", "arena": "Tech & Science", "netWorth": "1,800,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 55},
+  {"name": "Sam Altman", "arena": "Tech & Science", "netWorth": "2,000,000,000", "country": "US", "followers": 1400000, "gender": "Male", "age": 41},
+
+];
+
+// --- HELPER FUNCTIONS ---
+function parseNumericValue(val) {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
+    
+    let multiplier = 1;
+    if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
+        multiplier = 1e9;
+    } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
+        multiplier = 1e6;
+    } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
+        multiplier = 1e3;
+    }
+    
+    const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+    return isNaN(num) ? 0 : num * multiplier;
+}
+
+function createCell(title, value, targetValue, icon, type = 'standard', isReveal = false) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const numValue = parseNumericValue(value);
+    const numTarget = parseNumericValue(targetValue);
+
+    let statusClass = 'wrong'; // Default gray
+
+    if (type === 'country') {
+        if (value === targetValue) {
+            statusClass = 'correct'; 
+        } else if (typeof countryContinents !== 'undefined' && countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
+            statusClass = 'partial'; 
+        }
+    } else if (type === 'age') {
+        if (numValue === numTarget) {
+            statusClass = 'correct';
+        } else if (Math.abs(numValue - numTarget) <= 10) {
+            statusClass = 'partial';
+        }
+    } else if (type === 'followers') {
+        if (numValue === numTarget) {
+            statusClass = 'correct';
+        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 300000) {
+            statusClass = 'partial';
+        }
+    } else if (type === 'netWorth') {
+        if (numValue === numTarget || Math.abs(numValue - numTarget) <= (numTarget * 0.15) || Math.abs(numValue - numTarget) <= 15000000) {
+            statusClass = 'correct';
+        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 40000000) {
+            statusClass = 'partial';
+        }
+    } else {
+        if (String(value).trim().toLowerCase() === String(targetValue).trim().toLowerCase()) {
+            statusClass = 'correct';
+        }
+    }
+
+    cell.classList.add(statusClass);
+
+    let displayVal = value;
+
+    if (type === 'age' && numValue !== numTarget && !isReveal) {
+        displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
+    } else if (type === 'netWorth') {
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            style: 'currency', 
+            currency: 'USD', 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        displayVal = (numValue !== numTarget && !isReveal) ? formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️') : formattedNum;
+    } else if (type === 'followers') {
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        displayVal = (numValue !== numTarget && !isReveal) ? formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️') : formattedNum;
+    }
+
+    const iconHTML = icon ? `${icon} ` : '';
+    cell.innerHTML = `<span>${iconHTML}${displayVal}</span>`;
+
+    return cell;
+}
+
+// --- DAILY SELECTION LOGIC ---
+const epochDate = new Date('2026-01-01T00:00:00Z');
+const now = new Date();
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const day = String(now.getDate()).padStart(2, '0');
+const todayStr = `${year}-${month}-${day}`;
+const localMidnight = new Date(year, now.getMonth(), now.getDate());
+const epochLocal = new Date(2026, 0, 1);
+const daysSinceEpoch = Math.floor((localMidnight - epochLocal) / (1000 * 60 * 60 * 24));
+const dayIndex = Math.max(0, daysSinceEpoch);
+const secretFigure = figures[(dayIndex * 60) % figures.length];
+
+document.getElementById('daily-number').textContent = `PERSONDLE #${dayIndex + 1}`;
+
+const input = document.getElementById('guess-input');
+const suggestionsBox = document.getElementById('suggestions');
+const submitBtn = document.getElementById('submit-guess-btn');
+const guessesContainer = document.getElementById('guesses-container');
+const endGameBox = document.getElementById('end-game-box');
+const endGameText = document.getElementById('end-game-text');
+const shareBtn = document.getElementById('share-button');
+const guessCounterDisplay = document.getElementById('guess-counter');
+
+const guessedNames = new Set();
+const guessHistoryObjects = [];
+let gameOver = false;
+
+// --- LOCAL STORAGE PERSISTENCE ---
+const savedData = JSON.parse(localStorage.getItem('persondle_state') || '{}');
+
+if (savedData.date === todayStr && Array.isArray(savedData.guesses)) {
+    savedData.guesses.forEach(name => {
+        const figureObj = figures.find(f => f.name === name);
+        if (figureObj) {
+            guessedNames.add(figureObj.name);
+            guessHistoryObjects.push(figureObj);
+            renderGuessCard(figureObj);
+        }
+    });
+
+    guessCounterDisplay.textContent = `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+
+    if (guessedNames.has(secretFigure.name)) {
+        triggerGameOver(true, guessedNames.size);
+    } else if (guessedNames.size >= maxGuesses) {
+        triggerGameOver(false, guessedNames.size);
+    }
+} else {
+    localStorage.setItem('persondle_state', JSON.stringify({ date: todayStr, guesses: [] }));
+}
+
+function saveState() {
+    localStorage.setItem('persondle_state', JSON.stringify({
+        date: todayStr,
+        guesses: Array.from(guessedNames)
+    }));
+}
+
+function updateCountdown() {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const diffMs = tomorrow - now;
+
+    const hours = String(Math.floor((diffMs / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+    const minutes = String(Math.floor((diffMs / (1000 * 60)) % 60)).padStart(2, '0');
+    const seconds = String(Math.floor((diffMs / 1000) % 60)).padStart(2, '0');
+
+    document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+function countGreenAttributes(guess, target) {
+    let greenCount = 0;
+    if (guess.arena === target.arena) greenCount++;
+    if (guess.netWorth === target.netWorth) greenCount++;
+    if (guess.country === target.country) greenCount++;
+    if (guess.followers === target.followers) greenCount++;
+    if (guess.gender === target.gender) greenCount++;
+    if (guess.age === target.age) greenCount++;
+    return greenCount;
+}
+
+function buildShareEmojiGrid() {
+    let emojiList = [];
+    guessHistoryObjects.forEach(guess => {
+        if (guess.name === secretFigure.name) {
+            emojiList.push("🟩");
+        } else {
+            const greens = countGreenAttributes(guess, secretFigure);
+            if (greens >= 4) {
+                emojiList.push("🟨");
+            } else {
+                emojiList.push("⬛");
+            }
+        }
+    });
+    return emojiList.join("");
+}
+
+
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.input-wrapper')) {
+        suggestionsBox.style.display = 'none';
+    }
+});
+
+function renderGuessCard(guess, isReveal = false) {
+    const card = document.createElement('div');
+    card.className = 'guess-card';
+
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'guess-card-header';
+    cardHeader.innerHTML = `<span>${isReveal ? 'SECRET FIGURE: ' : ''}${guess.name}</span>`;
+    card.appendChild(cardHeader);
+
+    const grid = document.createElement('div');
+    grid.className = 'attributes-grid';
+
+    grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, (typeof arenaEmojis !== 'undefined' && arenaEmojis[guess.arena]) || '🌟', 'standard', isReveal));
+    grid.appendChild(createCell('Net Worth', guess.netWorth, secretFigure.netWorth, '💵', 'netWorth', isReveal));
+    grid.appendChild(createCell('Country', guess.country, secretFigure.country, (typeof countryEmojis !== 'undefined' && countryEmojis[guess.country]) || '🌐', 'country', isReveal));
+    grid.appendChild(createCell('Followers', guess.followers, secretFigure.followers, "📱", 'followers', isReveal));
+    grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, (typeof genderEmojis !== 'undefined' && genderEmojis[guess.gender]) || '', 'standard', isReveal));
+    grid.appendChild(createCell('Age', guess.age, secretFigure.age, (typeof getAgeGroupEmoji === 'function' ? getAgeGroupEmoji(guess.age) : '👤'), 'age', isReveal));
+
+    card.appendChild(grid);
+    guessesContainer.insertBefore(card, guessesContainer.firstChild);
+}
+
+function getEndGameMessage(attempts, won) {
+    if (!won) {
+        const lossMessages = [
+            "Oof, 0 for 10. Don't worry, reading the news is always an option for tomorrow!",
+            "Tough luck! 10 guesses and still missed. Maybe pop culture just isn't your calling.",
+            "Well, at least you were consistent... consistently wrong! Better luck tomorrow.",
+            "Out of guesses! Go take a quick walk, clear your head, and try again tomorrow.",
+            "10 attempts, zero hits! The secret figure remains in the shadows until tomorrow.",
+            "A swing and a complete miss across all 10 tries! Time to do some light research."
+        ];
+        return lossMessages[Math.floor(Math.random() * lossMessages.length)];
+    }
+
+    if (attempts === 1) {
+        const oneMessages = [
+            "Hole in 1! Either you built this game, or you have telepathic powers.",
+            "On the VERY FIRST TRY?! Okay, genius, save some brain cells for the rest of us.",
+            "1/10! Pure psychic wizardry. You should play the lottery today."
+        ];
+        return oneMessages[Math.floor(Math.random() * oneMessages.length)];
+    } else if (attempts === 2) {
+        const twoMessages = [
+            "Guessed in 2 tries! Absolutely clinical precision.",
+            "In just 2 attempts? That's practically a flex. Outstanding job!",
+            "2 guesses! Narrowed it down and closed the deal in seconds."
+        ];
+        return twoMessages[Math.floor(Math.random() * twoMessages.length)];
+    } else if (attempts >= 3 && attempts <= 4) {
+        const threeFourMessages = [
+            `Got it in ${attempts}! Sharp deduction skills on display today.`,
+            `Winner in ${attempts} tries! Very clean gameplay, no panicking necessary.`,
+            `Only ${attempts} guesses needed! Smooth, logical, and quick.`
+        ];
+        return threeFourMessages[Math.floor(Math.random() * threeFourMessages.length)];
+    } else if (attempts >= 5 && attempts <= 6) {
+        const fiveSixMessages = [
+            `Nail-biter territory! Solved in ${attempts} attempts. Nice recovery!`,
+            `Got there in ${attempts}! Took a few adjustments, but a win is a win.`,
+            `In ${attempts} guesses! Balanced deduction with a hint of dramatic suspense.`
+        ];
+        return fiveSixMessages[Math.floor(Math.random() * fiveSixMessages.length)];
+    } else if (attempts >= 7 && attempts <= 8) {
+        const sevenEightMessages = [
+            `Whew! Solved on try #${attempts}. You were cutting it a bit close there!`,
+            `In ${attempts} attempts! A victory pulled right out of the fire.`,
+            `Took ${attempts} tries! The path was winding, but you reached the finish line.`
+        ];
+        return sevenEightMessages[Math.floor(Math.random() * sevenEightMessages.length)];
+    } else {
+        const lateWinMessages = [
+            `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+            `You got it in ${attempts}! Only took almost every single try you had available.`,
+            `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`,
+            `On attempt #${attempts}! Defeated at the very edge of the cliff!`
+        ];
+        return lateWinMessages[Math.floor(Math.random() * lateWinMessages.length)];
+    }
+}
+
+function triggerGameOver(won, attempts) {
+    gameOver = true;
+    endGameText.textContent = getEndGameMessage(attempts, won);
+    endGameBox.className = `end-game-message ${won ? 'win' : 'loss'}`;
+    endGameBox.style.display = 'block';
+    input.disabled = true;
+    submitBtn.disabled = true;
+
+    if (!won && !document.querySelector('.guess-card-header span')?.textContent.includes('SECRET FIGURE')) {
+        renderGuessCard(secretFigure, true);
+    }
+}
+
+function submitGuess() {
+    if (gameOver) return;
+
+    const guessName = input.value.trim();
+    const figure = figures.find(f => f.name.toLowerCase() === guessName.toLowerCase());
+
+    if (!figure) {
+        alert("Please select a valid figure from the dropdown list.");
+        return;
+    }
+
+    if (guessedNames.has(figure.name)) {
+        alert("You've already guessed this figure!");
+        return;
+    }
+
+    guessedNames.add(figure.name);
+    guessHistoryObjects.push(figure);
+    saveState();
+
+    input.value = '';
+    suggestionsBox.style.display = 'none';
+
+    const currentAttemptCount = guessedNames.size;
+    guessCounterDisplay.textContent = `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+
+    renderGuessCard(figure);
+
+    if (figure.name === secretFigure.name) {
+        triggerGameOver(true, currentAttemptCount);
+        endGameBox.scrollIntoView({ behavior: 'smooth' });
+    } else if (currentAttemptCount >= maxGuesses) {
+        triggerGameOver(false, currentAttemptCount);
+        endGameBox.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+// --- SEARCH / AUTOCOMPLETE ---
+
+input.addEventListener('input', function () {
+
+    if (gameOver) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    const query = this.value.trim().toLowerCase();
+
+    suggestionsBox.innerHTML = '';
+
+    if (query === '') {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    const matches = figures.filter(function (figure) {
+
+        return figure.name
+            .toLowerCase()
+            .includes(query)
+            && !guessedNames.has(figure.name);
+
+    });
+
+    if (matches.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    matches.forEach(function (figure) {
+
+        const suggestionItem = document.createElement('div');
+
+        suggestionItem.className = 'suggestion-item';
+
+        suggestionItem.textContent = figure.name;
+
+        suggestionItem.addEventListener('mousedown', function (event) {
+
+            event.preventDefault();
+
+            input.value = figure.name;
+
+            suggestionsBox.style.display = 'none';
+
+            input.focus();
+        });
+
+        suggestionsBox.appendChild(suggestionItem);
+    });
+
+    suggestionsBox.style.display = 'block';
+});
+        
+submitBtn.addEventListener('click', submitGuess);
+
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        submitGuess();
+    }
+});
+
+shareBtn.addEventListener('click', () => {
+    const resultStatus = guessedNames.has(secretFigure.name) ? `${guessedNames.size}/10` : 'X/10';
+    const emojiBlocks = buildShareEmojiGrid();
+    const gameUrl = window.location.href;
+    const scoreText = `Persondle #${dayIndex + 1}: ${resultStatus}\n${emojiBlocks}\n\nPlay todays round - ${gameUrl}`;
+    
+    if (navigator.share) {
+        navigator.share({ text: scoreText });
+    } else {
+        navigator.clipboard.writeText(scoreText).then(() => {
+            alert("Score copied to clipboard!");
+        }).catch(() => {
+            alert(scoreText);
+        });
+    }
+});
