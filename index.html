@@ -909,37 +909,37 @@
 
             } else if (type === 'followers') {
 
-                if (numValue === numTarget) {
+    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
 
-                    statusClass = 'correct';
+    if (percentDifference <= 0.15) {
+        // Within 15% = GREEN
+        statusClass = 'correct';
 
-                } else if (
-                    Math.abs(numValue - numTarget) <= (numTarget * 0.3) ||
-                    Math.abs(numValue - numTarget) <= 300000
-                ) {
+    } else if (percentDifference <= 0.30) {
+        // Within 30% = YELLOW
+        statusClass = 'partial';
 
-                    statusClass = 'partial';
+    } else {
+        // More than 30% away = GRAY
+        statusClass = 'wrong';
+    }
 
-                }
+} else if (type === 'netWorth') {
 
-            } else if (type === 'netWorth') {
+    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
 
-                if (
-                    numValue === numTarget ||
-                    Math.abs(numValue - numTarget) <= (numTarget * 0.15) ||
-                    Math.abs(numValue - numTarget) <= 15000000
-                ) {
+    if (percentDifference <= 0.15) {
+        // Within 15% = GREEN
+        statusClass = 'correct';
 
-                    statusClass = 'correct';
+    } else if (percentDifference <= 0.30) {
+        // Within 30% = YELLOW
+        statusClass = 'partial';
 
-                } else if (
-                    Math.abs(numValue - numTarget) <= (numTarget * 0.3) ||
-                    Math.abs(numValue - numTarget) <= 40000000
-                ) {
-
-                    statusClass = 'partial';
-
-                }
+    } else {
+        // More than 30% away = GRAY
+        statusClass = 'wrong';
+    }
 
             } else {
 
