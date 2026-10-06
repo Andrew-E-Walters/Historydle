@@ -215,7 +215,11 @@
                 0 8px 20px rgba(0, 0, 0, 0.8);
 
             -webkit-overflow-scrolling: touch;
-        }
+
+    /* IMPORTANT FOR MOBILE SCROLLING */
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+}
 
         .suggestion-item {
             width: 100%;
@@ -1659,7 +1663,7 @@
                 matches.slice(0, 12);
 
 
-            visibleMatches.forEach(
+            vvisibleMatches.forEach(
                 function(figure) {
 
                     const item =
@@ -1682,17 +1686,15 @@
                      */
 
                     item.addEventListener(
-                        "pointerdown",
-                        function(event) {
+    "click",
+    function(event) {
 
-                            event.preventDefault();
+        event.stopPropagation();
 
-                            selectFigure(
-                                figure
-                            );
+        selectFigure(figure);
 
-                        }
-                    );
+    }
+)
 
 
                     /*
@@ -1702,17 +1704,33 @@
                      */
 
                     item.addEventListener(
-                        "click",
-                        function(event) {
+    "click",
+    function(event) {
+item.addEventListener(
+    "click",
+    function(event) {
 
-                            event.preventDefault();
+        event.stopPropagation();
 
-                            selectFigure(
-                                figure
-                            );
+        selectFigure(figure);
 
-                        }
-                    );
+    }
+)item.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        selectFigure(figure);
+
+    }
+)
+        event.stopPropagation();
+
+        selectFigure(figure);
+
+    }
+)
 
 
                     suggestionsBox.appendChild(
@@ -1940,25 +1958,25 @@
          */
 
         document.addEventListener(
-            "pointerdown",
-            function(event) {
+    "click",
+    function(event) {
 
-                if (
-                    !event.target.closest(
-                        ".input-wrapper"
-                    )
-                ) {
+        if (
+            !event.target.closest(
+                ".input-wrapper"
+            )
+        ) {
 
-                    suggestionsBox.style.display =
-                        "none";
+            suggestionsBox.style.display =
+                "none";
 
-                    selectedSuggestion =
-                        -1;
+            selectedSuggestion =
+                -1;
 
-                }
+        }
 
-            }
-        );
+    }
+);
 
 
         /* =========================================================
