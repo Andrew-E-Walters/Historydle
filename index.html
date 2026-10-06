@@ -799,15 +799,110 @@
   {"name": "Brian Williams", "arena": "Journalism", "netWorth": "50,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 67}
 ];
 
+// --- HELPER FUNCTIONS ---
+        function parseNumericValue(val) {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
+            
+            let multiplier = 1;
+            if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
+                multiplier = 1e9;
+            } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
+                multiplier = 1e6;
+            } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
+                multiplier = 1e3;
+            }
+            
+            const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+            return isNaN(num) ? 0 : num * multiplier;
+        }
+
+        function createCell(title, value, targetValue, icon, type = 'standard', isReveal = false) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+
+            const numValue = parseNumericValue(value);
+            const numTarget = parseNumericValue(targetValue);
+
+            let statusClass = 'wrong'; // Default gray
+
+            if (type === 'country') {
+                if (value === targetValue) {
+                    statusClass = 'correct'; // Green
+                } else if (countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
+                    statusClass = 'partial'; // Yellow
+                }
+            } else if (type === 'age') {
+                if (numValue === numTarget) {
+                    statusClass = 'correct';
+                } else if (Math.abs(numValue - numTarget) <= 10) {
+                    statusClass = 'partial';
+                }
+            } else if (type === 'followers') {
+                if (numValue === numTarget) {
+                    statusClass = 'correct';
+                } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 300000) {
+                    statusClass = 'partial';
+                }
+            } else if (type === 'netWorth') {
+                if (numValue === numTarget || Math.abs(numValue - numTarget) <= (numTarget * 0.15) || Math.abs(numValue - numTarget) <= 15000000) {
+                    statusClass = 'correct';
+                } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 40000000) {
+                    statusClass = 'partial';
+                }
+            } else {
+                if (String(value).trim().toLowerCase() === String(targetValue).trim().toLowerCase()) {
+                    statusClass = 'correct';
+                }
+            }
+
+            cell.classList.add(statusClass);
+
+            let displayVal = value;
+
+            if (type === 'age' && numValue !== numTarget && !isReveal) {
+                displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
+            } else if (type === 'netWorth') {
+                let formattedNum = new Intl.NumberFormat('en-US', { 
+                    style: 'currency', 
+                    currency: 'USD', 
+                    notation: "compact", 
+                    maximumFractionDigits: 1 
+                }).format(numValue);
+                
+                if (numValue !== numTarget && !isReveal) {
+                    displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+                } else {
+                    displayVal = formattedNum;
+                }
+            } else if (type === 'followers') {
+                let formattedNum = new Intl.NumberFormat('en-US', { 
+                    notation: "compact", 
+                    maximumFractionDigits: 1 
+                }).format(numValue);
+                
+                if (numValue !== numTarget && !isReveal) {
+                    displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+                } else {
+                    displayVal = formattedNum;
+                }
+            }
+
+            const iconHTML = icon ? `${icon} ` : '';
+            cell.innerHTML = `\({iconHTML}\){displayVal}`;
+
+            return cell;
+        }
+
         // --- DAILY SELECTION LOGIC ---
         const epochDate = new Date('2026-01-01T00:00:00Z');
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        const todayStr = `${year}-${month}-${day}`;
+        const todayStr = `\({year}-\){month}-${day}`;
         
-        // Calculate days relative to local midnight to prevent UTC timezone offset drift
         const localMidnight = new Date(year, now.getMonth(), now.getDate());
         const epochLocal = new Date(2026, 0, 1);
         const daysSinceEpoch = Math.floor((localMidnight - epochLocal) / (1000 * 60 * 60 * 24));
@@ -826,7 +921,7 @@
         const guessCounterDisplay = document.getElementById('guess-counter');
 
         const guessedNames = new Set();
-        const guessHistoryObjects = []; // Stores figure objects in sequential order
+        const guessHistoryObjects = [];
         let gameOver = false;
 
         // --- LOCAL STORAGE PERSISTENCE ---
@@ -842,7 +937,7 @@
                 }
             });
 
-            guessCounterDisplay.textContent = `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+            guessCounterDisplay.textContent = `Guesses: \({guessedNames.size} /\){maxGuesses}`;
 
             if (guessedNames.has(secretFigure.name)) {
                 triggerGameOver(true, guessedNames.size);
@@ -869,12 +964,11 @@
             const minutes = String(Math.floor((diffMs / (1000 * 60)) % 60)).padStart(2, '0');
             const seconds = String(Math.floor((diffMs / 1000) % 60)).padStart(2, '0');
 
-            document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('countdown').textContent = `\({hours}:\){minutes}:${seconds}`;
         }
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // Count exact green matching attributes for a guess
         function countGreenAttributes(guess, target) {
             let greenCount = 0;
             if (guess.arena === target.arena) greenCount++;
@@ -886,7 +980,6 @@
             return greenCount;
         }
 
-// Build emoji grid for sharing
         function buildShareEmojiGrid() {
             let emojiList = [];
             guessHistoryObjects.forEach(guess => {
@@ -894,7 +987,6 @@
                     emojiList.push("🟩");
                 } else {
                     const greens = countGreenAttributes(guess, secretFigure);
-                    // If 4 or 5 attributes are green, it's a yellow box (close call)
                     if (greens >= 4) {
                         emojiList.push("🟨");
                     } else {
@@ -917,7 +1009,6 @@
                 return;
             }
 
-            // Matches if the full name or any word within the name starts with the search query
             const matches = figures.filter(f => {
                 if (guessedNames.has(f.name)) return false;
                 
@@ -946,6 +1037,7 @@
 
             suggestionsBox.style.display = 'block';
         });
+
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.input-wrapper')) {
                 suggestionsBox.style.display = 'none';
@@ -958,125 +1050,23 @@
 
             const cardHeader = document.createElement('div');
             cardHeader.className = 'guess-card-header';
-            cardHeader.innerHTML = `<span>${isReveal ? 'SECRET FIGURE: ' : ''}${guess.name}</span>`;
+            cardHeader.innerHTML = `\({isReveal ? 'SECRET FIGURE: ' : ''}\){guess.name}`;
             card.appendChild(cardHeader);
 
             const grid = document.createElement('div');
             grid.className = 'attributes-grid';
 
-// 1. Global helper for parsing numbers (M, B, K)
-function parseNumericValue(val) {
-    if (typeof val === 'number') return val;
-    if (!val) return 0;
-    const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
-    
-    let multiplier = 1;
-    if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
-        multiplier = 1e9;
-    } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
-        multiplier = 1e6;
-    } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
-        multiplier = 1e3;
-    }
-    
-    const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
-    return isNaN(num) ? 0 : num * multiplier;
-}
-
-function createCell(title, value, targetValue, icon, type = 'standard') {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-
-    // 1. Convert both values into clean numbers using your helper
-    const numValue = parseNumericValue(value);
-    const numTarget = parseNumericValue(targetValue);
-
-    let statusClass = 'wrong'; // Default gray
-
-    if (type === 'country') {
-        if (value === targetValue) {
-            statusClass = 'correct'; // Green
-        } else if (countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
-            statusClass = 'partial'; // Yellow
-        }
-    } else if (type === 'age') {
-        if (numValue === numTarget) {
-            statusClass = 'correct';
-        } else if (Math.abs(numValue - numTarget) <= 10) {
-            statusClass = 'partial';
-        }
-    } else if (type === 'followers') {
-        if (numValue === numTarget) {
-            statusClass = 'correct';
-        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 300000) {
-            statusClass = 'partial';
-        }
-    } else if (type === 'netWorth') {
-        // Green if exact, within 15%, or within $15M
-        if (numValue === numTarget || Math.abs(numValue - numTarget) <= (numTarget * 0.15) || Math.abs(numValue - numTarget) <= 15000000) {
-            statusClass = 'correct';
-        // Yellow if within 30% or within $40M
-        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 40000000) {
-            statusClass = 'partial';
-        }
-    } else {
-        if (String(value).trim().toLowerCase() === String(targetValue).trim().toLowerCase()) {
-            statusClass = 'correct';
-        }
-    }
-
-    cell.classList.add(statusClass);
-
-    let displayVal = value;
-
-    // 2. Format values with abbreviations and arrows
-    if (type === 'age' && numValue !== numTarget && !isReveal) {
-        displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
-    } else if (type === 'netWorth') {
-        let formattedNum = new Intl.NumberFormat('en-US', { 
-            style: 'currency', 
-            currency: 'USD', 
-            notation: "compact", 
-            maximumFractionDigits: 1 
-        }).format(numValue);
-        
-        if (numValue !== numTarget && !isReveal) {
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
-        } else {
-            displayVal = formattedNum;
-        }
-    } else if (type === 'followers') {
-        let formattedNum = new Intl.NumberFormat('en-US', { 
-            notation: "compact", 
-            maximumFractionDigits: 1 
-        }).format(numValue);
-        
-        if (numValue !== numTarget && !isReveal) {
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
-        } else {
-            displayVal = formattedNum;
-        }
-            }
-
-            cell.innerHTML = `
-    // 3. Restore your icons/emojis alongside the value using correct template literal backticks
-    const iconHTML = icon ? `${icon} ` : '';
-    cell.innerHTML = `\({iconHTML}\){displayVal}`;
-
-    return cell;
-}
-            grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
-           grid.appendChild(createCell('Net Worth', guess.netWorth, secretFigure.netWorth, '💵', 'netWorth'));
-            grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
-            grid.appendChild(createCell('Followers', guess.followers, secretFigure.followers, "📱", 'followers'));
-            grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, genderEmojis[guess.gender]));
-            grid.appendChild(createCell('Age', guess.age, secretFigure.age, getAgeGroupEmoji(guess.age), 'age'));
+            grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟', 'standard', isReveal));
+            grid.appendChild(createCell('Net Worth', guess.netWorth, secretFigure.netWorth, '💵', 'netWorth', isReveal));
+            grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country', isReveal));
+            grid.appendChild(createCell('Followers', guess.followers, secretFigure.followers, "📱", 'followers', isReveal));
+            grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, genderEmojis[guess.gender], 'standard', isReveal));
+            grid.appendChild(createCell('Age', guess.age, secretFigure.age, getAgeGroupEmoji(guess.age), 'age', isReveal));
 
             card.appendChild(grid);
             guessesContainer.insertBefore(card, guessesContainer.firstChild);
         }
 
-        // Expanded Robust Outcome Phrases for Each Guess Range
         function getEndGameMessage(attempts, won) {
             if (!won) {
                 const lossMessages = [
@@ -1126,7 +1116,6 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
                 ];
                 return sevenEightMessages[Math.floor(Math.random() * sevenEightMessages.length)];
             } else {
-                // Attempts 9-10
                 const lateWinMessages = [
                     `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
                     `You got it in ${attempts}! Only took almost every single try you had available.`,
@@ -1174,7 +1163,7 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
             suggestionsBox.style.display = 'none';
 
             const currentAttemptCount = guessedNames.size;
-            guessCounterDisplay.textContent = `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+            guessCounterDisplay.textContent = `Guesses: \({currentAttemptCount} /\){maxGuesses}`;
 
             renderGuessCard(figure);
 
@@ -1199,10 +1188,7 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
             const resultStatus = guessedNames.has(secretFigure.name) ? `${guessedNames.size}/10` : 'X/10';
             const emojiBlocks = buildShareEmojiGrid();
             const gameUrl = window.location.href;
-            const scoreText = `Persondle #${dayIndex + 1}: ${resultStatus}
-${emojiBlocks}
-
-Play todays round - ${gameUrl}`;
+            const scoreText = `Persondle #\({dayIndex + 1}:\){resultStatus}\n\({emojiBlocks}\n\nPlay todays round -\){gameUrl}`;
             
             if (navigator.share) {
                 navigator.share({ text: scoreText });
@@ -1214,6 +1200,3 @@ Play todays round - ${gameUrl}`;
                 });
             }
         });
-    </script>
-</body>
-</html>
