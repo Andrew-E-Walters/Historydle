@@ -983,7 +983,7 @@
             const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
             return isNaN(num) ? 0 : num * multiplier;
         }
-            function createCell(title, value, targetValue, icon, type = 'standard') {
+function createCell(title, value, targetValue, icon, type = 'standard') {
     const cell = document.createElement('div');
     cell.className = 'cell';
 
@@ -1025,12 +1025,14 @@
         }
     }
 
-cell.classList.add(statusClass);
+    cell.classList.add(statusClass);
 
     let displayVal = value;
+
     if (type === 'age' && numValue !== numTarget && !isReveal) {
         displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
-    } else if (type === 'followers' || type === 'netWorth') {
+    } else if (type === 'netWorth') {
+        // Abbreviated currency format ($3M, $250M, etc.)
         let formattedNum = new Intl.NumberFormat('en-US', { 
             style: 'currency', 
             currency: 'USD', 
@@ -1039,14 +1041,27 @@ cell.classList.add(statusClass);
         }).format(numValue);
         
         if (numValue !== numTarget && !isReveal) {
-            // Because numValue (3,000,000) < numTarget (250,000,000), this correctly triggers ' ⬆️'
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️️' : ' ⬇️');
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+        } else {
+            displayVal = formattedNum;
+        }
+    } else if (type === 'followers') {
+        // Abbreviated plain number format (3M, 450K, etc. - no dollar sign)
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        if (numValue !== numTarget && !isReveal) {
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
         } else {
             displayVal = formattedNum;
         }
     }
 
-    // ... rest of your element rendering logic
+    // 2. Actually put the text inside the cell element so it displays on screen
+    cell.textContent = displayVal;
+
     return cell;
 }
 
