@@ -7,7 +7,6 @@
     <title>Persondle - Daily 21st Century Figures</title>
 
     <style>
-
         :root {
             --green: #6aaa64;
             --yellow: #c9b458;
@@ -26,25 +25,18 @@
 
         html {
             background: #000;
-            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                Roboto, Helvetica, Arial, sans-serif;
-
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-
             margin: 0;
             padding: 12px;
-
             display: flex;
             flex-direction: column;
             align-items: center;
-
             min-height: 100vh;
-
             overflow-x: hidden;
         }
 
@@ -91,24 +83,19 @@
             gap: 12px;
         }
 
-        /* =========================================
+        /* ================================
            SEARCH AREA
-        ========================================= */
+        ================================= */
 
         .search-box-row {
             display: flex;
             gap: 8px;
             width: 100%;
-
             position: sticky;
-            top: 0;
-
+            top: 8px;
             z-index: 1000;
-
             background-color: var(--bg-color);
-
-            padding-top: 4px;
-            padding-bottom: 8px;
+            padding-bottom: 4px;
         }
 
         .input-wrapper {
@@ -119,23 +106,14 @@
 
         input {
             width: 100%;
-
             padding: 12px 14px;
-
             font-size: 16px;
-
             background-color: var(--card-bg);
-
             border: 2px solid var(--border-color);
-
             color: var(--text-color);
-
             border-radius: 8px;
-
             outline: none;
-
             -webkit-appearance: none;
-            appearance: none;
         }
 
         input:focus {
@@ -151,22 +129,14 @@
         .submit-btn {
             background-color: #ffffff;
             color: #000000;
-
             border: none;
-
             padding: 0 16px;
-
             font-size: 0.95rem;
             font-weight: bold;
-
             border-radius: 8px;
-
             cursor: pointer;
-
             text-transform: uppercase;
-
             min-height: 44px;
-
             flex-shrink: 0;
         }
 
@@ -180,65 +150,73 @@
             cursor: not-allowed;
         }
 
-        /* =========================================
-           SPOTLE STYLE PERSON PICKER
-        ========================================= */
+        /* ================================
+           SCROLLABLE PERSON SEARCH LIST
+        ================================= */
 
         .suggestions {
             position: absolute;
-
-            top: calc(100% + 5px);
+            top: calc(100% + 2px);
             left: 0;
             right: 0;
 
-            background-color: #161617;
+            background-color: #121213;
 
             border: 2px solid var(--border-color);
+            border-radius: 8px;
 
-            border-radius: 10px;
-
+            /*
+             * This is the important part.
+             * The list itself is independently scrollable.
+             */
             max-height: 280px;
-
             overflow-y: auto;
             overflow-x: hidden;
 
-            z-index: 5000;
+            z-index: 2000;
 
             display: none;
 
-            box-shadow:
-                0 12px 30px rgba(0, 0, 0, 0.8),
-                0 3px 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
 
+            /*
+             * Makes scrolling work properly on iPhone/iPad.
+             */
             -webkit-overflow-scrolling: touch;
 
+            /*
+             * Prevent the page itself from stealing
+             * the vertical swipe while scrolling this list.
+             */
             overscroll-behavior: contain;
-
-            scrollbar-width: thin;
-            scrollbar-color: #555 #161617;
         }
 
+        /*
+         * Custom scrollbar
+         */
         .suggestions::-webkit-scrollbar {
-            width: 7px;
+            width: 8px;
         }
 
         .suggestions::-webkit-scrollbar-track {
-            background: #161617;
+            background: #1a1a1c;
+            border-radius: 8px;
         }
 
         .suggestions::-webkit-scrollbar-thumb {
             background: #555;
-            border-radius: 10px;
+            border-radius: 8px;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb:hover {
+            background: #777;
         }
 
         .suggestion-item {
-            min-height: 48px;
-
             padding: 13px 14px;
-
             cursor: pointer;
 
-            border-bottom: 1px solid #2b2b2d;
+            border-bottom: 1px solid var(--border-color);
 
             color: #ffffff;
 
@@ -246,17 +224,19 @@
 
             font-size: 0.95rem;
 
-            display: flex;
+            min-height: 46px;
 
+            display: flex;
             align-items: center;
 
-            transition:
-                background-color 0.12s ease,
-                padding-left 0.12s ease;
-
+            /*
+             * Prevent text from accidentally selecting
+             * while swiping through the list.
+             */
             user-select: none;
-
             -webkit-user-select: none;
+
+            background-color: #121213;
         }
 
         .suggestion-item:last-child {
@@ -264,81 +244,25 @@
         }
 
         .suggestion-item:hover {
-            background-color: #272729;
-        }
-
-        .suggestion-item.highlighted {
-            background-color: #333335;
-            padding-left: 18px;
+            background-color: #252527;
         }
 
         .suggestion-item:active {
-            background-color: #3a3a3c;
+            background-color: #333335;
         }
 
-        .suggestion-name {
-            flex: 1;
-            min-width: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .suggestion-number {
-            color: #666;
-            font-size: 0.72rem;
-            margin-left: 10px;
-        }
-
-        .picker-header {
-            position: sticky;
-            top: 0;
-
-            z-index: 2;
-
-            background: #161617;
-
-            padding: 8px 12px;
-
-            color: #777;
-
-            font-size: 0.7rem;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.8px;
-
-            border-bottom: 1px solid #29292b;
-        }
-
-        .no-results {
-            padding: 18px 14px;
-
-            color: #777;
-
-            text-align: center;
-
-            font-size: 0.85rem;
-        }
-
-        /* =========================================
+        /* ================================
            GUESS CARDS
-        ========================================= */
+        ================================= */
 
         .guess-card {
             background-color: var(--card-bg);
-
             border: 2px solid var(--border-color);
-
             border-radius: 10px;
-
             padding: 10px;
-
             display: flex;
             flex-direction: column;
-
             gap: 8px;
-
             animation: fadeIn 0.3s ease-in-out;
         }
 
@@ -356,49 +280,31 @@
 
         .guess-card-header {
             font-size: 1.05rem;
-
             font-weight: bold;
-
             padding-bottom: 6px;
-
             border-bottom: 1px solid var(--border-color);
-
             color: #ffffff;
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
         }
 
         .attributes-grid {
             display: grid;
-
             grid-template-columns: repeat(3, 1fr);
-
             gap: 6px;
         }
 
         .cell {
             background-color: #1a1a1c;
-
             border: 1px solid var(--border-color);
-
             border-radius: 6px;
-
             min-height: 56px;
-
             display: flex;
-
             flex-direction: column;
-
             align-items: center;
-
             justify-content: center;
-
             padding: 4px;
-
             text-align: center;
         }
 
@@ -425,55 +331,38 @@
 
         .cell .attr-title {
             font-size: 0.62rem;
-
             text-transform: uppercase;
-
             color: #818384;
-
             margin-bottom: 2px;
-
             font-weight: bold;
         }
 
         .cell .emoji-icon {
             font-size: 1.05rem;
-
             line-height: 1;
-
             margin-bottom: 2px;
         }
 
         .cell .text-label {
             font-size: 0.68rem;
-
             font-weight: 600;
-
             width: 100%;
-
             line-height: 1.2;
         }
 
-        /* =========================================
+        /* ================================
            END GAME
-        ========================================= */
+        ================================= */
 
         .end-game-message {
             text-align: center;
-
             font-size: 1.05rem;
-
             background-color: var(--card-bg);
-
             border: 2px solid var(--green);
-
             padding: 16px;
-
             border-radius: 8px;
-
             display: none;
-
             font-weight: bold;
-
             line-height: 1.4;
         }
 
@@ -489,35 +378,22 @@
 
         .next-person-timer {
             margin-top: 10px;
-
             font-size: 0.85rem;
-
             color: #a0a0a2;
-
             font-weight: normal;
         }
 
         .share-btn {
             background-color: var(--green);
-
             color: white;
-
             border: none;
-
             padding: 12px 18px;
-
             font-size: 0.95rem;
-
             font-weight: bold;
-
             border-radius: 6px;
-
             cursor: pointer;
-
             margin-top: 12px;
-
             text-transform: uppercase;
-
             width: 100%;
         }
 
@@ -525,9 +401,9 @@
             opacity: 0.9;
         }
 
-        /* =========================================
+        /* ================================
            MOBILE
-        ========================================= */
+        ================================= */
 
         @media (max-width: 480px) {
 
@@ -535,17 +411,17 @@
                 padding: 10px;
             }
 
-            .game-container {
-                max-width: 100%;
+            h1 {
+                font-size: 1.4rem;
             }
 
             .suggestions {
-                max-height: 320px;
+                max-height: 300px;
             }
 
             .suggestion-item {
-                min-height: 52px;
                 padding: 14px;
+                min-height: 48px;
             }
 
             .attributes-grid {
@@ -553,15 +429,9 @@
             }
 
             .cell {
-                min-height: 58px;
-            }
-
-            .submit-btn {
-                padding-left: 14px;
-                padding-right: 14px;
+                min-height: 54px;
             }
         }
-
     </style>
 </head>
 
@@ -588,8 +458,6 @@
             Guesses: 0 / 10
         </div>
 
-        <!-- SEARCH / PERSON PICKER -->
-
         <div class="search-box-row">
 
             <div class="input-wrapper">
@@ -607,7 +475,6 @@
                 <div
                     id="suggestions"
                     class="suggestions"
-                    role="listbox"
                 ></div>
 
             </div>
@@ -621,13 +488,10 @@
 
         </div>
 
-        <!-- END GAME -->
-
         <div
             id="end-game-box"
             class="end-game-message"
         >
-
             <div id="end-game-text"></div>
 
             <div class="next-person-timer">
@@ -641,1152 +505,1192 @@
             >
                 Share Result 📋
             </button>
-
         </div>
 
         <div
             id="guesses-container"
-            style="
-                display:flex;
-                flex-direction:column;
-                gap:10px;
-            "
+            style="display: flex; flex-direction: column; gap: 10px;"
         ></div>
 
     </div>
 
-
 <script>
 
-    /* =========================================
-       GAME SETTINGS
-    ========================================= */
-
-    const maxGuesses = 10;
-
-
-    /* =========================================
-       EMOJIS
-    ========================================= */
-
-    const arenaEmojis = {
-
-        "Music": "🎵",
-
-        "Movies": "🎬",
-
-        "TV": "📺",
-
-        "Politics": "🏛️",
-
-        "Sports": "🏆",
-
-        "Business": "💼",
-
-        "Tech & Science": "🔬",
-
-        "Influencers": "📱",
-
-        "Podcasters": "🎙️"
-
-    };
-
-
-    const countryEmojis = {
-
-        "USA": "🇺🇸",
-        "US": "🇺🇸",
-
-        "South Africa": "🇿🇦",
-
-        "UK": "🇬🇧",
-
-        "Germany": "🇩🇪",
-
-        "India": "🇮🇳",
-
-        "Australia": "🇦🇺",
-
-        "Canada": "🇨🇦",
-
-        "Ukraine": "🇺🇦",
-
-        "Sweden": "🇸🇪",
-
-        "Argentina": "🇦🇷",
-
-        "Portugal": "🇵🇹",
-
-        "France": "🇫🇷",
-
-        "Brazil": "🇧🇷",
-
-        "Norway": "🇳🇴",
-
-        "Japan": "🇯🇵",
-
-        "Italy": "🇮🇹"
-
-    };
-
-
-    const countryContinents = {
-
-        "USA": "North America",
-        "US": "North America",
-
-        "Canada": "North America",
-
-        "UK": "Europe",
-
-        "Germany": "Europe",
-
-        "Ukraine": "Europe",
-
-        "Sweden": "Europe",
-
-        "Portugal": "Europe",
-
-        "France": "Europe",
-
-        "Norway": "Europe",
-
-        "Italy": "Europe",
-
-        "India": "Asia",
-
-        "Japan": "Asia",
-
-        "South Africa": "Africa",
-
-        "Australia": "Oceania",
-
-        "Argentina": "South America",
-
-        "Brazil": "South America"
-
-    };
-
-
-    const genderEmojis = {
-
-        "Male": "👨",
-
-        "Female": "👩"
-
-    };
-
-
-    function getAgeGroupEmoji(age) {
-
-        if (age < 40) return "🧑";
-
-        if (age < 65) return "👨";
-
-        if (age < 80) return "👴";
-
-        return "🧙‍♂️";
-
+const maxGuesses = 10;
+
+
+/* =========================================================
+   EMOJIS
+========================================================= */
+
+const arenaEmojis = {
+    "Music": "🎵",
+    "Movies": "🎬",
+    "TV": "📺",
+    "Politics": "🏛️",
+    "Sports": "🏆",
+    "Business": "💼",
+    "Tech & Science": "🔬",
+    "Influencers": "📱",
+    "Podcasters": "🎙️"
+};
+
+
+const countryEmojis = {
+    "USA": "🇺🇸",
+    "US": "🇺🇸",
+    "South Africa": "🇿🇦",
+    "UK": "🇬🇧",
+    "Germany": "🇩🇪",
+    "India": "🇮🇳",
+    "Australia": "🇦🇺",
+    "Canada": "🇨🇦",
+    "Ukraine": "🇺🇦",
+    "Sweden": "🇸🇪",
+    "Argentina": "🇦🇷",
+    "Portugal": "🇵🇹",
+    "France": "🇫🇷",
+    "Brazil": "🇧🇷",
+    "Norway": "🇳🇴",
+    "Japan": "🇯🇵",
+    "Italy": "🇮🇹"
+};
+
+
+const countryContinents = {
+    "USA": "North America",
+    "US": "North America",
+    "Canada": "North America",
+    "UK": "Europe",
+    "Germany": "Europe",
+    "Ukraine": "Europe",
+    "Sweden": "Europe",
+    "Portugal": "Europe",
+    "France": "Europe",
+    "Norway": "Europe",
+    "Italy": "Europe",
+    "India": "Asia",
+    "Japan": "Asia",
+    "South Africa": "Africa",
+    "Australia": "Oceania",
+    "Argentina": "South America",
+    "Brazil": "South America"
+};
+
+
+const genderEmojis = {
+    "Male": "👨",
+    "Female": "👩"
+};
+
+
+function getAgeGroupEmoji(age) {
+
+    if (age < 40) return "🧑";
+
+    if (age < 65) return "👨";
+
+    if (age < 80) return "👴";
+
+    return "🧙‍♂️";
+}
+
+
+
+/* =========================================================
+   DATABASE
+========================================================= */
+
+const figures = [
+
+    {
+        "name": "Steve Jobs",
+        "arena": "Tech & Science",
+        "netWorth": "10,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 56
+    },
+
+    {
+        "name": "Bill Gates",
+        "arena": "Tech & Science",
+        "netWorth": "130,000,000,000",
+        "country": "US",
+        "followers": 8500000,
+        "gender": "Male",
+        "age": 70
+    },
+
+    {
+        "name": "Mark Zuckerberg",
+        "arena": "Tech & Science",
+        "netWorth": "170,000,000,000",
+        "country": "US",
+        "followers": 14500000,
+        "gender": "Male",
+        "age": 42
+    },
+
+    {
+        "name": "Elon Musk",
+        "arena": "Tech & Science",
+        "netWorth": "230,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 55
+    },
+
+    {
+        "name": "Jeff Bezos",
+        "arena": "Tech & Science",
+        "netWorth": "200,000,000,000",
+        "country": "US",
+        "followers": 4400000,
+        "gender": "Male",
+        "age": 62
+    },
+
+    {
+        "name": "Tim Cook",
+        "arena": "Tech & Science",
+        "netWorth": "2,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 65
+    },
+
+    {
+        "name": "Sundar Pichai",
+        "arena": "Tech & Science",
+        "netWorth": "1,300,000,000",
+        "country": "US",
+        "followers": 2400000,
+        "gender": "Male",
+        "age": 54
+    },
+
+    {
+        "name": "Satya Nadella",
+        "arena": "Tech & Science",
+        "netWorth": "1,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 59
+    },
+
+    {
+        "name": "Larry Page",
+        "arena": "Tech & Science",
+        "netWorth": "130,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 53
+    },
+
+    {
+        "name": "Sergey Brin",
+        "arena": "Tech & Science",
+        "netWorth": "120,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 53
+    },
+
+    {
+        "name": "Sheryl Sandberg",
+        "arena": "Tech & Science",
+        "netWorth": "1,900,000,000",
+        "country": "US",
+        "followers": 1000000,
+        "gender": "Female",
+        "age": 57
+    },
+
+    {
+        "name": "Susan Wojcicki",
+        "arena": "Tech & Science",
+        "netWorth": "800,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Female",
+        "age": 56
+    },
+
+    {
+        "name": "Jack Dorsey",
+        "arena": "Tech & Science",
+        "netWorth": "4,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 49
+    },
+
+    {
+        "name": "Reed Hastings",
+        "arena": "Tech & Science",
+        "netWorth": "4,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 65
+    },
+
+    {
+        "name": "Peter Thiel",
+        "arena": "Tech & Science",
+        "netWorth": "7,000,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 58
+    },
+
+    {
+        "name": "Marc Andreessen",
+        "arena": "Tech & Science",
+        "netWorth": "1,800,000,000",
+        "country": "US",
+        "followers": 20000,
+        "gender": "Male",
+        "age": 55
+    },
+
+    {
+        "name": "Sam Altman",
+        "arena": "Tech & Science",
+        "netWorth": "2,000,000,000",
+        "country": "US",
+        "followers": 1400000,
+        "gender": "Male",
+        "age": 41
     }
 
-
-    /* =========================================
-       DATABASE
-    ========================================= */
-
-    const figures = [
-
-        {
-            "name": "Steve Jobs",
-            "arena": "Tech & Science",
-            "netWorth": "10,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 56
-        },
-
-        {
-            "name": "Bill Gates",
-            "arena": "Tech & Science",
-            "netWorth": "130,000,000,000",
-            "country": "US",
-            "followers": 8500000,
-            "gender": "Male",
-            "age": 70
-        },
-
-        {
-            "name": "Mark Zuckerberg",
-            "arena": "Tech & Science",
-            "netWorth": "170,000,000,000",
-            "country": "US",
-            "followers": 14500000,
-            "gender": "Male",
-            "age": 42
-        },
-
-        {
-            "name": "Elon Musk",
-            "arena": "Tech & Science",
-            "netWorth": "230,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 55
-        },
-
-        {
-            "name": "Jeff Bezos",
-            "arena": "Tech & Science",
-            "netWorth": "200,000,000,000",
-            "country": "US",
-            "followers": 4400000,
-            "gender": "Male",
-            "age": 62
-        },
-
-        {
-            "name": "Tim Cook",
-            "arena": "Tech & Science",
-            "netWorth": "2,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 65
-        },
-
-        {
-            "name": "Sundar Pichai",
-            "arena": "Tech & Science",
-            "netWorth": "1,300,000,000",
-            "country": "US",
-            "followers": 2400000,
-            "gender": "Male",
-            "age": 54
-        },
-
-        {
-            "name": "Satya Nadella",
-            "arena": "Tech & Science",
-            "netWorth": "1,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 59
-        },
-
-        {
-            "name": "Larry Page",
-            "arena": "Tech & Science",
-            "netWorth": "130,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 53
-        },
-
-        {
-            "name": "Sergey Brin",
-            "arena": "Tech & Science",
-            "netWorth": "120,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 53
-        },
-
-        {
-            "name": "Sheryl Sandberg",
-            "arena": "Tech & Science",
-            "netWorth": "1,900,000,000",
-            "country": "US",
-            "followers": 1000000,
-            "gender": "Female",
-            "age": 57
-        },
-
-        {
-            "name": "Susan Wojcicki",
-            "arena": "Tech & Science",
-            "netWorth": "800,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Female",
-            "age": 56
-        },
-
-        {
-            "name": "Jack Dorsey",
-            "arena": "Tech & Science",
-            "netWorth": "4,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 49
-        },
-
-        {
-            "name": "Reed Hastings",
-            "arena": "Tech & Science",
-            "netWorth": "4,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 65
-        },
-
-        {
-            "name": "Peter Thiel",
-            "arena": "Tech & Science",
-            "netWorth": "7,000,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 58
-        },
-
-        {
-            "name": "Marc Andreessen",
-            "arena": "Tech & Science",
-            "netWorth": "1,800,000,000",
-            "country": "US",
-            "followers": 20000,
-            "gender": "Male",
-            "age": 55
-        },
-
-        {
-            "name": "Sam Altman",
-            "arena": "Tech & Science",
-            "netWorth": "2,000,000,000",
-            "country": "US",
-            "followers": 1400000,
-            "gender": "Male",
-            "age": 41
-        }
-
-    ];
+];
 
 
-    /* =========================================
-       HELPERS
-    ========================================= */
 
-    function parseNumericValue(val) {
+/* =========================================================
+   NUMERIC HELPERS
+========================================================= */
 
-        if (typeof val === 'number') {
-            return val;
-        }
+function parseNumericValue(val) {
 
-        if (!val) {
-            return 0;
-        }
-
-        const str =
-            String(val)
-                .trim()
-                .toUpperCase()
-                .replace(/\s+/g, '');
-
-        let multiplier = 1;
-
-        if (
-            str.endsWith('B') ||
-            str.endsWith('BN') ||
-            str.endsWith('BILLION')
-        ) {
-            multiplier = 1e9;
-
-        } else if (
-            str.endsWith('M') ||
-            str.endsWith('MN') ||
-            str.endsWith('MILLION')
-        ) {
-            multiplier = 1e6;
-
-        } else if (
-            str.endsWith('K') ||
-            str.endsWith('THOUSAND')
-        ) {
-            multiplier = 1e3;
-        }
-
-        const num =
-            parseFloat(
-                str.replace(/[^0-9.-]+/g, "")
-            );
-
-        return isNaN(num)
-            ? 0
-            : num * multiplier;
+    if (typeof val === 'number') {
+        return val;
     }
 
-
-    function createCell(
-        title,
-        value,
-        targetValue,
-        icon,
-        type = 'standard',
-        isReveal = false
-    ) {
-
-        const cell =
-            document.createElement('div');
-
-        cell.className = 'cell';
-
-        const numValue =
-            parseNumericValue(value);
-
-        const numTarget =
-            parseNumericValue(targetValue);
-
-        let statusClass = 'wrong';
-
-
-        if (type === 'country') {
-
-            if (value === targetValue) {
-
-                statusClass = 'correct';
-
-            } else if (
-                countryContinents[value] &&
-                countryContinents[value] ===
-                countryContinents[targetValue]
-            ) {
-
-                statusClass = 'partial';
-
-            }
-
-        }
-
-        else if (type === 'age') {
-
-            if (numValue === numTarget) {
-
-                statusClass = 'correct';
-
-            } else if (
-                Math.abs(numValue - numTarget) <= 10
-            ) {
-
-                statusClass = 'partial';
-
-            }
-
-        }
-
-        else if (type === 'followers') {
-
-            if (numValue === numTarget) {
-
-                statusClass = 'correct';
-
-            } else if (
-                Math.abs(numValue - numTarget) <=
-                    (numTarget * 0.3) ||
-                Math.abs(numValue - numTarget) <=
-                    300000
-            ) {
-
-                statusClass = 'partial';
-
-            }
-
-        }
-
-        else if (type === 'netWorth') {
-
-            if (
-                numValue === numTarget ||
-                Math.abs(numValue - numTarget) <=
-                    (numTarget * 0.15) ||
-                Math.abs(numValue - numTarget) <=
-                    15000000
-            ) {
-
-                statusClass = 'correct';
-
-            } else if (
-                Math.abs(numValue - numTarget) <=
-                    (numTarget * 0.3) ||
-                Math.abs(numValue - numTarget) <=
-                    40000000
-            ) {
-
-                statusClass = 'partial';
-
-            }
-
-        }
-
-        else {
-
-            if (
-                String(value).trim().toLowerCase() ===
-                String(targetValue).trim().toLowerCase()
-            ) {
-
-                statusClass = 'correct';
-
-            }
-
-        }
-
-
-        cell.classList.add(statusClass);
-
-
-        let displayVal = value;
-
-
-        if (
-            type === 'age' &&
-            numValue !== numTarget &&
-            !isReveal
-        ) {
-
-            displayVal +=
-                numValue < numTarget
-                    ? ' ⬆️'
-                    : ' ⬇️';
-
-        }
-
-        else if (type === 'netWorth') {
-
-            const formattedNum =
-                new Intl.NumberFormat(
-                    'en-US',
-                    {
-                        style: 'currency',
-                        currency: 'USD',
-                        notation: 'compact',
-                        maximumFractionDigits: 1
-                    }
-                ).format(numValue);
-
-            displayVal =
-                (
-                    numValue !== numTarget &&
-                    !isReveal
-                )
-                    ? formattedNum +
-                        (
-                            numValue < numTarget
-                                ? ' ⬆️'
-                                : ' ⬇️'
-                        )
-                    : formattedNum;
-
-        }
-
-        else if (type === 'followers') {
-
-            const formattedNum =
-                new Intl.NumberFormat(
-                    'en-US',
-                    {
-                        notation: 'compact',
-                        maximumFractionDigits: 1
-                    }
-                ).format(numValue);
-
-            displayVal =
-                (
-                    numValue !== numTarget &&
-                    !isReveal
-                )
-                    ? formattedNum +
-                        (
-                            numValue < numTarget
-                                ? ' ⬆️'
-                                : ' ⬇️'
-                        )
-                    : formattedNum;
-        }
-
-
-        const iconHTML =
-            icon
-                ? `${icon} `
-                : '';
-
-
-        cell.innerHTML =
-            `<span>${iconHTML}${displayVal}</span>`;
-
-
-        return cell;
+    if (!val) {
+        return 0;
     }
 
+    const str =
+        String(val)
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, '');
 
-    /* =========================================
-       DAILY SELECTION
-    ========================================= */
-
-    const epochLocal =
-        new Date(2026, 0, 1);
-
-    const now =
-        new Date();
-
-    const year =
-        now.getFullYear();
-
-    const month =
-        String(now.getMonth() + 1)
-            .padStart(2, '0');
-
-    const day =
-        String(now.getDate())
-            .padStart(2, '0');
-
-    const todayStr =
-        `${year}-${month}-${day}`;
-
-    const localMidnight =
-        new Date(
-            year,
-            now.getMonth(),
-            now.getDate()
-        );
-
-    const daysSinceEpoch =
-        Math.floor(
-            (
-                localMidnight -
-                epochLocal
-            ) /
-            (1000 * 60 * 60 * 24)
-        );
-
-    const dayIndex =
-        Math.max(0, daysSinceEpoch);
-
-
-    const secretFigure =
-        figures[
-            (dayIndex * 60) %
-            figures.length
-        ];
-
-
-    document
-        .getElementById('daily-number')
-        .textContent =
-            `PERSONDLE #${dayIndex + 1}`;
-
-
-    /* =========================================
-       DOM
-    ========================================= */
-
-    const input =
-        document.getElementById(
-            'guess-input'
-        );
-
-    const suggestionsBox =
-        document.getElementById(
-            'suggestions'
-        );
-
-    const submitBtn =
-        document.getElementById(
-            'submit-guess-btn'
-        );
-
-    const guessesContainer =
-        document.getElementById(
-            'guesses-container'
-        );
-
-    const endGameBox =
-        document.getElementById(
-            'end-game-box'
-        );
-
-    const endGameText =
-        document.getElementById(
-            'end-game-text'
-        );
-
-    const shareBtn =
-        document.getElementById(
-            'share-button'
-        );
-
-    const guessCounterDisplay =
-        document.getElementById(
-            'guess-counter'
-        );
-
-
-    /* =========================================
-       GAME STATE
-    ========================================= */
-
-    const guessedNames =
-        new Set();
-
-    const guessHistoryObjects =
-        [];
-
-    let gameOver = false;
-
-    let currentMatches = [];
-
-    let highlightedIndex = -1;
-
-
-    /* =========================================
-       LOCAL STORAGE
-    ========================================= */
-
-    const savedData =
-        JSON.parse(
-            localStorage.getItem(
-                'persondle_state'
-            ) || '{}'
-        );
-
+    let multiplier = 1;
 
     if (
-        savedData.date === todayStr &&
-        Array.isArray(savedData.guesses)
+        str.endsWith('B') ||
+        str.endsWith('BN') ||
+        str.endsWith('BILLION')
     ) {
+        multiplier = 1e9;
+    }
 
-        savedData.guesses.forEach(name => {
+    else if (
+        str.endsWith('M') ||
+        str.endsWith('MN') ||
+        str.endsWith('MILLION')
+    ) {
+        multiplier = 1e6;
+    }
 
-            const figure =
-                figures.find(
-                    f => f.name === name
-                );
+    else if (
+        str.endsWith('K') ||
+        str.endsWith('THOUSAND')
+    ) {
+        multiplier = 1e3;
+    }
 
-            if (figure) {
+    const num =
+        parseFloat(
+            str.replace(/[^0-9.-]+/g, "")
+        );
 
-                guessedNames.add(
-                    figure.name
-                );
-
-                guessHistoryObjects.push(
-                    figure
-                );
-
-                renderGuessCard(figure);
-            }
-
-        });
+    return isNaN(num)
+        ? 0
+        : num * multiplier;
+}
 
 
-        guessCounterDisplay.textContent =
-            `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+
+/* =========================================================
+   CREATE RESULT CELL
+========================================================= */
+
+function createCell(
+    title,
+    value,
+    targetValue,
+    icon,
+    type = 'standard',
+    isReveal = false
+) {
+
+    const cell =
+        document.createElement('div');
+
+    cell.className = 'cell';
+
+    const numValue =
+        parseNumericValue(value);
+
+    const numTarget =
+        parseNumericValue(targetValue);
+
+    let statusClass = 'wrong';
 
 
-        if (
-            guessedNames.has(
-                secretFigure.name
-            )
-        ) {
+    if (type === 'country') {
 
-            triggerGameOver(
-                true,
-                guessedNames.size
-            );
+        if (value === targetValue) {
+
+            statusClass = 'correct';
 
         }
 
         else if (
-            guessedNames.size >=
-            maxGuesses
+            countryContinents[value] &&
+            countryContinents[value] ===
+            countryContinents[targetValue]
         ) {
 
-            triggerGameOver(
-                false,
-                guessedNames.size
-            );
+            statusClass = 'partial';
+
+        }
+
+    }
+
+    else if (type === 'age') {
+
+        if (numValue === numTarget) {
+
+            statusClass = 'correct';
+
+        }
+
+        else if (
+            Math.abs(numValue - numTarget) <= 10
+        ) {
+
+            statusClass = 'partial';
+
+        }
+
+    }
+
+    else if (type === 'followers') {
+
+        if (numValue === numTarget) {
+
+            statusClass = 'correct';
+
+        }
+
+        else if (
+            Math.abs(numValue - numTarget) <=
+                (numTarget * 0.3) ||
+            Math.abs(numValue - numTarget) <= 300000
+        ) {
+
+            statusClass = 'partial';
+
+        }
+
+    }
+
+    else if (type === 'netWorth') {
+
+        if (
+            numValue === numTarget ||
+            Math.abs(numValue - numTarget) <=
+                (numTarget * 0.15) ||
+            Math.abs(numValue - numTarget) <= 15000000
+        ) {
+
+            statusClass = 'correct';
+
+        }
+
+        else if (
+            Math.abs(numValue - numTarget) <=
+                (numTarget * 0.3) ||
+            Math.abs(numValue - numTarget) <= 40000000
+        ) {
+
+            statusClass = 'partial';
+
         }
 
     }
 
     else {
 
-        localStorage.setItem(
-            'persondle_state',
-            JSON.stringify({
-                date: todayStr,
-                guesses: []
-            })
-        );
+        if (
+            String(value)
+                .trim()
+                .toLowerCase() ===
+
+            String(targetValue)
+                .trim()
+                .toLowerCase()
+        ) {
+
+            statusClass = 'correct';
+
+        }
+
     }
 
 
-    function saveState() {
+    cell.classList.add(statusClass);
 
-        localStorage.setItem(
-            'persondle_state',
-            JSON.stringify({
-                date: todayStr,
-                guesses:
-                    Array.from(guessedNames)
-            })
-        );
+
+    let displayVal = value;
+
+
+    if (
+        type === 'age' &&
+        numValue !== numTarget &&
+        !isReveal
+    ) {
+
+        displayVal +=
+            numValue < numTarget
+                ? ' ⬆️'
+                : ' ⬇️';
+
     }
 
 
-    /* =========================================
-       COUNTDOWN
-    ========================================= */
+    else if (type === 'netWorth') {
 
-    function updateCountdown() {
+        const formattedNum =
+            new Intl.NumberFormat(
+                'en-US',
+                {
+                    style: 'currency',
+                    currency: 'USD',
+                    notation: 'compact',
+                    maximumFractionDigits: 1
+                }
+            ).format(numValue);
 
-        const now =
-            new Date();
-
-        const tomorrow =
-            new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1
-            );
-
-        const diffMs =
-            tomorrow - now;
-
-        const hours =
-            String(
-                Math.floor(
+        displayVal =
+            (
+                numValue !== numTarget &&
+                !isReveal
+            )
+                ? formattedNum +
                     (
-                        diffMs /
-                        (1000 * 60 * 60)
-                    ) % 24
-                )
-            ).padStart(2, '0');
+                        numValue < numTarget
+                            ? ' ⬆️'
+                            : ' ⬇️'
+                    )
+                : formattedNum;
 
-        const minutes =
-            String(
-                Math.floor(
-                    (
-                        diffMs /
-                        (1000 * 60)
-                    ) % 60
-                )
-            ).padStart(2, '0');
-
-        const seconds =
-            String(
-                Math.floor(
-                    diffMs / 1000
-                ) % 60
-            ).padStart(2, '0');
-
-
-        document
-            .getElementById('countdown')
-            .textContent =
-                `${hours}:${minutes}:${seconds}`;
     }
 
 
-    setInterval(
-        updateCountdown,
-        1000
+    else if (type === 'followers') {
+
+        const formattedNum =
+            new Intl.NumberFormat(
+                'en-US',
+                {
+                    notation: 'compact',
+                    maximumFractionDigits: 1
+                }
+            ).format(numValue);
+
+        displayVal =
+            (
+                numValue !== numTarget &&
+                !isReveal
+            )
+                ? formattedNum +
+                    (
+                        numValue < numTarget
+                            ? ' ⬆️'
+                            : ' ⬇️'
+                    )
+                : formattedNum;
+    }
+
+
+    const iconHTML =
+        icon
+            ? `${icon} `
+            : '';
+
+
+    cell.innerHTML =
+        `<span>${iconHTML}${displayVal}</span>`;
+
+
+    return cell;
+}
+
+
+
+/* =========================================================
+   DAILY SELECTION
+========================================================= */
+
+const epochDate =
+    new Date('2026-01-01T00:00:00Z');
+
+const now =
+    new Date();
+
+const year =
+    now.getFullYear();
+
+const month =
+    String(now.getMonth() + 1)
+        .padStart(2, '0');
+
+const day =
+    String(now.getDate())
+        .padStart(2, '0');
+
+const todayStr =
+    `${year}-${month}-${day}`;
+
+const localMidnight =
+    new Date(
+        year,
+        now.getMonth(),
+        now.getDate()
     );
 
-    updateCountdown();
+const epochLocal =
+    new Date(2026, 0, 1);
+
+const daysSinceEpoch =
+    Math.floor(
+        (
+            localMidnight -
+            epochLocal
+        ) /
+        (1000 * 60 * 60 * 24)
+    );
+
+const dayIndex =
+    Math.max(
+        0,
+        daysSinceEpoch
+    );
+
+const secretFigure =
+    figures[
+        (dayIndex * 60) %
+        figures.length
+    ];
 
 
-    /* =========================================
-       GUESS CARD
-    ========================================= */
+document.getElementById(
+    'daily-number'
+).textContent =
+    `PERSONDLE #${dayIndex + 1}`;
 
-    function renderGuessCard(
-        guess,
-        isReveal = false
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const input =
+    document.getElementById(
+        'guess-input'
+    );
+
+const suggestionsBox =
+    document.getElementById(
+        'suggestions'
+    );
+
+const submitBtn =
+    document.getElementById(
+        'submit-guess-btn'
+    );
+
+const guessesContainer =
+    document.getElementById(
+        'guesses-container'
+    );
+
+const endGameBox =
+    document.getElementById(
+        'end-game-box'
+    );
+
+const endGameText =
+    document.getElementById(
+        'end-game-text'
+    );
+
+const shareBtn =
+    document.getElementById(
+        'share-button'
+    );
+
+const guessCounterDisplay =
+    document.getElementById(
+        'guess-counter'
+    );
+
+
+
+/* =========================================================
+   GAME STATE
+========================================================= */
+
+const guessedNames =
+    new Set();
+
+const guessHistoryObjects =
+    [];
+
+let gameOver = false;
+
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+const savedData =
+    JSON.parse(
+        localStorage.getItem(
+            'persondle_state'
+        ) || '{}'
+    );
+
+
+if (
+    savedData.date === todayStr &&
+    Array.isArray(savedData.guesses)
+) {
+
+    savedData.guesses.forEach(
+        name => {
+
+            const figureObj =
+                figures.find(
+                    f => f.name === name
+                );
+
+            if (figureObj) {
+
+                guessedNames.add(
+                    figureObj.name
+                );
+
+                guessHistoryObjects.push(
+                    figureObj
+                );
+
+                renderGuessCard(
+                    figureObj
+                );
+            }
+        }
+    );
+
+
+    guessCounterDisplay.textContent =
+        `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+
+
+    if (
+        guessedNames.has(
+            secretFigure.name
+        )
     ) {
 
-        const card =
-            document.createElement('div');
-
-        card.className =
-            'guess-card';
-
-
-        const cardHeader =
-            document.createElement('div');
-
-        cardHeader.className =
-            'guess-card-header';
-
-
-        cardHeader.innerHTML =
-            `<span>${
-                isReveal
-                    ? 'SECRET FIGURE: '
-                    : ''
-            }${guess.name}</span>`;
-
-
-        card.appendChild(
-            cardHeader
+        triggerGameOver(
+            true,
+            guessedNames.size
         );
 
+    }
 
-        const grid =
-            document.createElement('div');
+    else if (
+        guessedNames.size >= maxGuesses
+    ) {
 
-        grid.className =
-            'attributes-grid';
+        triggerGameOver(
+            false,
+            guessedNames.size
+        );
+
+    }
+
+}
+
+else {
+
+    localStorage.setItem(
+        'persondle_state',
+        JSON.stringify({
+            date: todayStr,
+            guesses: []
+        })
+    );
+}
 
 
-        grid.appendChild(
-            createCell(
-                'Arena',
-                guess.arena,
-                secretFigure.arena,
-                arenaEmojis[guess.arena] || '🌟',
-                'standard',
-                isReveal
+
+function saveState() {
+
+    localStorage.setItem(
+        'persondle_state',
+        JSON.stringify({
+
+            date: todayStr,
+
+            guesses:
+                Array.from(
+                    guessedNames
+                )
+
+        })
+    );
+}
+
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+function updateCountdown() {
+
+    const now =
+        new Date();
+
+    const tomorrow =
+        new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate() + 1
+        );
+
+    const diffMs =
+        tomorrow - now;
+
+
+    const hours =
+        String(
+            Math.floor(
+                (
+                    diffMs /
+                    (1000 * 60 * 60)
+                ) % 24
             )
-        );
+        ).padStart(2, '0');
 
 
-        grid.appendChild(
-            createCell(
-                'Net Worth',
-                guess.netWorth,
-                secretFigure.netWorth,
-                '💵',
-                'netWorth',
-                isReveal
+    const minutes =
+        String(
+            Math.floor(
+                (
+                    diffMs /
+                    (1000 * 60)
+                ) % 60
             )
-        );
+        ).padStart(2, '0');
 
 
-        grid.appendChild(
-            createCell(
-                'Country',
-                guess.country,
-                secretFigure.country,
-                countryEmojis[guess.country] || '🌐',
-                'country',
-                isReveal
+    const seconds =
+        String(
+            Math.floor(
+                diffMs / 1000
+            ) % 60
+        ).padStart(2, '0');
+
+
+    document.getElementById(
+        'countdown'
+    ).textContent =
+        `${hours}:${minutes}:${seconds}`;
+}
+
+
+setInterval(
+    updateCountdown,
+    1000
+);
+
+updateCountdown();
+
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+function countGreenAttributes(
+    guess,
+    target
+) {
+
+    let greenCount = 0;
+
+    if (
+        guess.arena ===
+        target.arena
+    ) greenCount++;
+
+    if (
+        guess.netWorth ===
+        target.netWorth
+    ) greenCount++;
+
+    if (
+        guess.country ===
+        target.country
+    ) greenCount++;
+
+    if (
+        guess.followers ===
+        target.followers
+    ) greenCount++;
+
+    if (
+        guess.gender ===
+        target.gender
+    ) greenCount++;
+
+    if (
+        guess.age ===
+        target.age
+    ) greenCount++;
+
+    return greenCount;
+}
+
+
+
+function buildShareEmojiGrid() {
+
+    let emojiList = [];
+
+    guessHistoryObjects.forEach(
+        guess => {
+
+            if (
+                guess.name ===
+                secretFigure.name
+            ) {
+
+                emojiList.push("🟩");
+
+            }
+
+            else {
+
+                const greens =
+                    countGreenAttributes(
+                        guess,
+                        secretFigure
+                    );
+
+                if (greens >= 4) {
+
+                    emojiList.push("🟨");
+
+                }
+
+                else {
+
+                    emojiList.push("⬛");
+
+                }
+            }
+        }
+    );
+
+    return emojiList.join("");
+}
+
+
+
+/* =========================================================
+   CLOSE SEARCH WHEN CLICKING OUTSIDE
+========================================================= */
+
+document.addEventListener(
+    'click',
+    (e) => {
+
+        if (
+            !e.target.closest(
+                '.input-wrapper'
             )
+        ) {
+
+            suggestionsBox.style.display =
+                'none';
+        }
+    }
+);
+
+
+
+/* =========================================================
+   RENDER GUESS CARD
+========================================================= */
+
+function renderGuessCard(
+    guess,
+    isReveal = false
+) {
+
+    const card =
+        document.createElement(
+            'div'
         );
 
+    card.className =
+        'guess-card';
 
-        grid.appendChild(
-            createCell(
-                'Followers',
-                guess.followers,
-                secretFigure.followers,
-                '📱',
-                'followers',
-                isReveal
+
+    const cardHeader =
+        document.createElement(
+            'div'
+        );
+
+    cardHeader.className =
+        'guess-card-header';
+
+
+    cardHeader.innerHTML =
+        `<span>${
+            isReveal
+                ? 'SECRET FIGURE: '
+                : ''
+        }${guess.name}</span>`;
+
+
+    card.appendChild(
+        cardHeader
+    );
+
+
+    const grid =
+        document.createElement(
+            'div'
+        );
+
+    grid.className =
+        'attributes-grid';
+
+
+    grid.appendChild(
+        createCell(
+            'Arena',
+            guess.arena,
+            secretFigure.arena,
+            arenaEmojis[
+                guess.arena
+            ] || '🌟',
+            'standard',
+            isReveal
+        )
+    );
+
+
+    grid.appendChild(
+        createCell(
+            'Net Worth',
+            guess.netWorth,
+            secretFigure.netWorth,
+            '💵',
+            'netWorth',
+            isReveal
+        )
+    );
+
+
+    grid.appendChild(
+        createCell(
+            'Country',
+            guess.country,
+            secretFigure.country,
+            countryEmojis[
+                guess.country
+            ] || '🌐',
+            'country',
+            isReveal
+        )
+    );
+
+
+    grid.appendChild(
+        createCell(
+            'Followers',
+            guess.followers,
+            secretFigure.followers,
+            '📱',
+            'followers',
+            isReveal
+        )
+    );
+
+
+    grid.appendChild(
+        createCell(
+            'Gender',
+            guess.gender,
+            secretFigure.gender,
+            genderEmojis[
+                guess.gender
+            ] || '',
+            'standard',
+            isReveal
+        )
+    );
+
+
+    grid.appendChild(
+        createCell(
+            'Age',
+            guess.age,
+            secretFigure.age,
+            getAgeGroupEmoji(
+                guess.age
+            ),
+            'age',
+            isReveal
+        )
+    );
+
+
+    card.appendChild(
+        grid
+    );
+
+
+    guessesContainer.insertBefore(
+        card,
+        guessesContainer.firstChild
+    );
+}
+
+
+
+/* =========================================================
+   END GAME MESSAGES
+========================================================= */
+
+function getEndGameMessage(
+    attempts,
+    won
+) {
+
+    if (!won) {
+
+        const lossMessages = [
+
+            "Oof, 0 for 10. Don't worry, reading the news is always an option for tomorrow!",
+
+            "Tough luck! 10 guesses and still missed. Maybe pop culture just isn't your calling.",
+
+            "Well, at least you were consistent... consistently wrong! Better luck tomorrow.",
+
+            "Out of guesses! Go take a quick walk, clear your head, and try again tomorrow.",
+
+            "10 attempts, zero hits! The secret figure remains in the shadows until tomorrow.",
+
+            "A swing and a complete miss across all 10 tries! Time to do some light research."
+
+        ];
+
+        return lossMessages[
+            Math.floor(
+                Math.random() *
+                lossMessages.length
             )
-        );
-
-
-        grid.appendChild(
-            createCell(
-                'Gender',
-                guess.gender,
-                secretFigure.gender,
-                genderEmojis[guess.gender] || '',
-                'standard',
-                isReveal
-            )
-        );
-
-
-        grid.appendChild(
-            createCell(
-                'Age',
-                guess.age,
-                secretFigure.age,
-                getAgeGroupEmoji(guess.age),
-                'age',
-                isReveal
-            )
-        );
-
-
-        card.appendChild(
-            grid
-        );
-
-
-        guessesContainer.insertBefore(
-            card,
-            guessesContainer.firstChild
-        );
+        ];
     }
 
 
-    /* =========================================
-       END GAME MESSAGE
-    ========================================= */
+    if (attempts === 1) {
 
-    function getEndGameMessage(
-        attempts,
-        won
+        const oneMessages = [
+
+            "Hole in 1! Either you built this game, or you have telepathic powers.",
+
+            "On the VERY FIRST TRY?! Okay, genius, save some brain cells for the rest of us.",
+
+            "1/10! Pure psychic wizardry. You should play the lottery today."
+
+        ];
+
+        return oneMessages[
+            Math.floor(
+                Math.random() *
+                oneMessages.length
+            )
+        ];
+    }
+
+
+    else if (attempts === 2) {
+
+        const twoMessages = [
+
+            "Guessed in 2 tries! Absolutely clinical precision.",
+
+            "In just 2 attempts? That's practically a flex. Outstanding job!",
+
+            "2 guesses! Narrowed it down and closed the deal in seconds."
+
+        ];
+
+        return twoMessages[
+            Math.floor(
+                Math.random() *
+                twoMessages.length
+            )
+        ];
+    }
+
+
+    else if (
+        attempts >= 3 &&
+        attempts <= 4
     ) {
-
-        if (!won) {
-
-            const lossMessages = [
-
-                "Oof, 0 for 10. Don't worry, reading the news is always an option for tomorrow!",
-
-                "Tough luck! 10 guesses and still missed. Maybe pop culture just isn't your calling.",
-
-                "Well, at least you were consistent... consistently wrong! Better luck tomorrow.",
-
-                "Out of guesses! Go take a quick walk, clear your head, and try again tomorrow.",
-
-                "10 attempts, zero hits! The secret figure remains in the shadows until tomorrow.",
-
-                "A swing and a complete miss across all 10 tries! Time to do some light research."
-
-            ];
-
-            return lossMessages[
-                Math.floor(
-                    Math.random() *
-                    lossMessages.length
-                )
-            ];
-        }
-
-
-        if (attempts === 1) {
-
-            const messages = [
-
-                "Hole in 1! Either you built this game, or you have telepathic powers.",
-
-                "On the VERY FIRST TRY?! Okay, genius, save some brain cells for the rest of us.",
-
-                "1/10! Pure psychic wizardry. You should play the lottery today."
-
-            ];
-
-            return messages[
-                Math.floor(
-                    Math.random() *
-                    messages.length
-                )
-            ];
-        }
-
-
-        if (attempts === 2) {
-
-            const messages = [
-
-                "Guessed in 2 tries! Absolutely clinical precision.",
-
-                "In just 2 attempts? That's practically a flex. Outstanding job!",
-
-                "2 guesses! Narrowed it down and closed the deal in seconds."
-
-            ];
-
-            return messages[
-                Math.floor(
-                    Math.random() *
-                    messages.length
-                )
-            ];
-        }
-
-
-        if (
-            attempts >= 3 &&
-            attempts <= 4
-        ) {
-
-            const messages = [
-
-                `Got it in ${attempts}! Sharp deduction skills on display today.`,
-
-                `Winner in ${attempts} tries! Very clean gameplay, no panicking necessary.`,
-
-                `Only ${attempts} guesses needed! Smooth, logical, and quick.`
-
-            ];
-
-            return messages[
-                Math.floor(
-                    Math.random() *
-                    messages.length
-                )
-            ];
-        }
-
-
-        if (
-            attempts >= 5 &&
-            attempts <= 6
-        ) {
-
-            const messages = [
-
-                `Nail-biter territory! Solved in ${attempts} attempts. Nice recovery!`,
-
-                `Got there in ${attempts}! Took a few adjustments, but a win is a win.`,
-
-                `In ${attempts} guesses! Balanced deduction with a hint of dramatic suspense.`
-
-            ];
-
-            return messages[
-                Math.floor(
-                    Math.random() *
-                    messages.length
-                )
-            ];
-        }
-
-
-        if (
-            attempts >= 7 &&
-            attempts <= 8
-        ) {
-
-            const messages = [
-
-                `Whew! Solved on try #${attempts}. You were cutting it a bit close there!`,
-
-                `In ${attempts} attempts! A victory pulled right out of the fire.`,
-
-                `Took ${attempts} tries! The path was winding, but you reached the finish line.`
-
-            ];
-
-            return messages[
-                Math.floor(
-                    Math.random() *
-                    messages.length
-                )
-            ];
-        }
-
 
         const messages = [
 
-            `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+            `Got it in ${attempts}! Sharp deduction skills on display today.`,
 
-            `You got it in ${attempts}! Only took almost every single try you had available.`,
+            `Winner in ${attempts} tries! Very clean gameplay, no panicking necessary.`,
 
-            `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`,
-
-            `On attempt #${attempts}! Defeated at the very edge of the cliff!`
+            `Only ${attempts} guesses needed! Smooth, logical, and quick.`
 
         ];
 
@@ -1799,475 +1703,643 @@
     }
 
 
-    function triggerGameOver(
-        won,
-        attempts
+    else if (
+        attempts >= 5 &&
+        attempts <= 6
     ) {
 
-        gameOver = true;
+        const messages = [
 
+            `Nail-biter territory! Solved in ${attempts} attempts. Nice recovery!`,
 
-        endGameText.textContent =
-            getEndGameMessage(
-                attempts,
-                won
-            );
+            `Got there in ${attempts}! Took a few adjustments, but a win is a win.`,
 
+            `In ${attempts} guesses! Balanced deduction with a hint of dramatic suspense.`
 
-        endGameBox.className =
-            `end-game-message ${
-                won
-                    ? 'win'
-                    : 'loss'
-            }`;
+        ];
 
-
-        endGameBox.style.display =
-            'block';
-
-
-        input.disabled = true;
-
-        submitBtn.disabled = true;
-
-
-        closePicker();
-
-
-        if (
-            !won &&
-            !document.querySelector(
-                '.guess-card-header span'
-            )?.textContent
-                .includes(
-                    'SECRET FIGURE'
-                )
-        ) {
-
-            renderGuessCard(
-                secretFigure,
-                true
-            );
-        }
-    }
-
-
-    /* =========================================
-       SUBMIT GUESS
-    ========================================= */
-
-    function submitGuess() {
-
-        if (gameOver) {
-            return;
-        }
-
-
-        const guessName =
-            input.value.trim();
-
-
-        const figure =
-            figures.find(
-                f =>
-                    f.name.toLowerCase() ===
-                    guessName.toLowerCase()
-            );
-
-
-        if (!figure) {
-
-            /*
-             * If there is a highlighted person,
-             * select them automatically.
-             */
-
-            if (
-                currentMatches.length &&
-                highlightedIndex >= 0 &&
-                currentMatches[
-                    highlightedIndex
-                ]
-            ) {
-
-                selectFigure(
-                    currentMatches[
-                        highlightedIndex
-                    ]
-                );
-
-                return;
-            }
-
-
-            /*
-             * Otherwise open the picker.
-             */
-
-            openPicker();
-
-            return;
-        }
-
-
-        makeGuess(
-            figure
-        );
-    }
-
-
-    function makeGuess(figure) {
-
-        if (gameOver) {
-            return;
-        }
-
-
-        if (
-            guessedNames.has(
-                figure.name
+        return messages[
+            Math.floor(
+                Math.random() *
+                messages.length
             )
-        ) {
-
-            alert(
-                "You've already guessed this figure!"
-            );
-
-            return;
-        }
+        ];
+    }
 
 
-        guessedNames.add(
-            figure.name
+    else if (
+        attempts >= 7 &&
+        attempts <= 8
+    ) {
+
+        const messages = [
+
+            `Whew! Solved on try #${attempts}. You were cutting it a bit close there!`,
+
+            `In ${attempts} attempts! A victory pulled right out of the fire.`,
+
+            `Took ${attempts} tries! The path was winding, but you reached the finish line.`
+
+        ];
+
+        return messages[
+            Math.floor(
+                Math.random() *
+                messages.length
+            )
+        ];
+    }
+
+
+    else {
+
+        const lateWinMessages = [
+
+            `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+
+            `You got it in ${attempts}! Only took almost every single try you had available.`,
+
+            `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`,
+
+            `On attempt #${attempts}! Defeated at the very edge of the cliff!`
+
+        ];
+
+        return lateWinMessages[
+            Math.floor(
+                Math.random() *
+                lateWinMessages.length
+            )
+        ];
+    }
+}
+
+
+
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+function triggerGameOver(
+    won,
+    attempts
+) {
+
+    gameOver = true;
+
+    endGameText.textContent =
+        getEndGameMessage(
+            attempts,
+            won
         );
 
-        guessHistoryObjects.push(
-            figure
-        );
+    endGameBox.className =
+        `end-game-message ${
+            won ? 'win' : 'loss'
+        }`;
+
+    endGameBox.style.display =
+        'block';
+
+    input.disabled = true;
+
+    submitBtn.disabled = true;
 
 
-        saveState();
-
-
-        input.value = '';
-
-        closePicker();
-
-
-        const currentAttemptCount =
-            guessedNames.size;
-
-
-        guessCounterDisplay.textContent =
-            `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
-
+    if (
+        !won &&
+        !document.querySelector(
+            '.guess-card-header span'
+        )?.textContent.includes(
+            'SECRET FIGURE'
+        )
+    ) {
 
         renderGuessCard(
-            figure
+            secretFigure,
+            true
         );
+    }
+}
 
 
-        if (
-            figure.name ===
-            secretFigure.name
-        ) {
 
-            triggerGameOver(
-                true,
-                currentAttemptCount
-            );
+/* =========================================================
+   SUBMIT GUESS
+========================================================= */
 
-            endGameBox.scrollIntoView({
-                behavior: 'smooth'
-            });
+function submitGuess() {
 
-        }
-
-        else if (
-            currentAttemptCount >=
-            maxGuesses
-        ) {
-
-            triggerGameOver(
-                false,
-                currentAttemptCount
-            );
-
-            endGameBox.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
+    if (gameOver) {
+        return;
     }
 
 
-    /* =========================================
-       SPOTLE-STYLE PERSON PICKER
-    ========================================= */
+    const guessName =
+        input.value.trim();
 
-    function getAvailableFigures(
-        query = ''
+
+    const figure =
+        figures.find(
+            f =>
+                f.name.toLowerCase() ===
+                guessName.toLowerCase()
+        );
+
+
+    if (!figure) {
+
+        alert(
+            "Please select a valid figure from the list."
+        );
+
+        return;
+    }
+
+
+    if (
+        guessedNames.has(
+            figure.name
+        )
     ) {
 
-        const normalizedQuery =
-            query.trim().toLowerCase();
+        alert(
+            "You've already guessed this figure!"
+        );
+
+        return;
+    }
 
 
-        return figures.filter(
-            figure => {
+    guessedNames.add(
+        figure.name
+    );
 
-                if (
-                    guessedNames.has(
-                        figure.name
-                    )
-                ) {
-                    return false;
-                }
+    guessHistoryObjects.push(
+        figure
+    );
 
-
-                if (
-                    normalizedQuery === ''
-                ) {
-                    return true;
-                }
+    saveState();
 
 
-                return figure.name
-                    .toLowerCase()
-                    .includes(
-                        normalizedQuery
-                    );
-            }
+    input.value = '';
+
+    suggestionsBox.style.display =
+        'none';
+
+
+    const currentAttemptCount =
+        guessedNames.size;
+
+
+    guessCounterDisplay.textContent =
+        `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+
+
+    renderGuessCard(
+        figure
+    );
+
+
+    if (
+        figure.name ===
+        secretFigure.name
+    ) {
+
+        triggerGameOver(
+            true,
+            currentAttemptCount
+        );
+
+        endGameBox.scrollIntoView({
+            behavior: 'smooth'
+        });
+
+    }
+
+    else if (
+        currentAttemptCount >=
+        maxGuesses
+    ) {
+
+        triggerGameOver(
+            false,
+            currentAttemptCount
+        );
+
+        endGameBox.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+}
+
+
+
+/* =========================================================
+   SEARCH SYSTEM
+=========================================================
+
+   IMPORTANT:
+
+   This does NOT use .includes(query).
+
+   Instead, the search checks the beginning of
+   each word in the person's name.
+
+   Example:
+
+   "G" matches:
+       George Clooney
+       Gordon Ramsay
+
+   "G" does NOT match:
+       Larry Page
+       Steve Jobs
+
+   "La" matches:
+       Larry Page
+
+   "Page" matches:
+       Larry Page
+
+   This is much closer to a Spotle-style search.
+========================================================= */
+
+
+/*
+ * Normalizes a person's name.
+ *
+ * Removes punctuation and converts everything
+ * to lowercase.
+ */
+function normalizeName(name) {
+
+    return name
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s'-]/gu, '')
+        .trim();
+}
+
+
+/*
+ * Determines whether the search query matches
+ * the beginning of ANY word in the person's name.
+ *
+ * Example:
+ *
+ * "g"
+ *
+ * "George Clooney"
+ *       YES
+ *
+ * "Larry Page"
+ *       NO
+ *
+ * "la"
+ *
+ * "Larry Page"
+ *       YES
+ */
+function nameMatchesQuery(
+    name,
+    query
+) {
+
+    const normalizedName =
+        normalizeName(name);
+
+    const normalizedQuery =
+        normalizeName(query);
+
+
+    if (!normalizedQuery) {
+        return true;
+    }
+
+
+    /*
+     * Split both the name and search query
+     * into individual words.
+     */
+    const nameWords =
+        normalizedName
+            .split(/\s+/)
+            .filter(Boolean);
+
+
+    const queryWords =
+        normalizedQuery
+            .split(/\s+/)
+            .filter(Boolean);
+
+
+    /*
+     * Single-word search.
+     *
+     * "g"
+     *
+     * checks whether ANY name word
+     * begins with "g".
+     */
+    if (queryWords.length === 1) {
+
+        const searchWord =
+            queryWords[0];
+
+        return nameWords.some(
+            word =>
+                word.startsWith(
+                    searchWord
+                )
         );
     }
 
 
-    function openPicker() {
+    /*
+     * Multi-word search.
+     *
+     * "ge clo"
+     *
+     * can match:
+     *
+     * George Clooney
+     */
+    let nameIndex = 0;
 
-        if (gameOver) {
-            return;
+
+    for (
+        const queryWord
+        of queryWords
+    ) {
+
+        let found = false;
+
+
+        for (
+            let i = nameIndex;
+            i < nameWords.length;
+            i++
+        ) {
+
+            if (
+                nameWords[i].startsWith(
+                    queryWord
+                )
+            ) {
+
+                found = true;
+
+                nameIndex =
+                    i + 1;
+
+                break;
+            }
         }
 
 
-        renderSuggestions(
-            input.value
-        );
-
-
-        suggestionsBox.style.display =
-            'block';
+        if (!found) {
+            return false;
+        }
     }
 
 
-    function closePicker() {
+    return true;
+}
+
+
+
+/* =========================================================
+   SEARCH / AUTOCOMPLETE
+========================================================= */
+
+function updateSuggestions() {
+
+    if (gameOver) {
 
         suggestionsBox.style.display =
             'none';
 
-        currentMatches = [];
-
-        highlightedIndex = -1;
+        return;
     }
 
 
-    function renderSuggestions(
-        query = ''
+    const query =
+        input.value.trim();
+
+
+    suggestionsBox.innerHTML = '';
+
+
+    /*
+     * If nothing has been typed,
+     * show the full list.
+     *
+     * This is what makes the list
+     * scrollable like Spotle.
+     */
+    let matches;
+
+
+    if (!query) {
+
+        matches =
+            figures.filter(
+                figure =>
+                    !guessedNames.has(
+                        figure.name
+                    )
+            );
+
+    }
+
+    else {
+
+        matches =
+            figures.filter(
+                figure => {
+
+                    if (
+                        guessedNames.has(
+                            figure.name
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    return nameMatchesQuery(
+                        figure.name,
+                        query
+                    );
+                }
+            );
+    }
+
+
+    /*
+     * No results.
+     */
+    if (
+        matches.length === 0
     ) {
+
+        suggestionsBox.style.display =
+            'none';
+
+        return;
+    }
+
+
+    /*
+     * Create the scrollable list.
+     */
+    matches.forEach(
+        figure => {
+
+            const suggestionItem =
+                document.createElement(
+                    'div'
+                );
+
+
+            suggestionItem.className =
+                'suggestion-item';
+
+
+            /*
+             * IMPORTANT:
+             *
+             * We only display the person's name.
+             *
+             * No #1
+             * No ranking
+             * No result number.
+             */
+            suggestionItem.textContent =
+                figure.name;
+
+
+            /*
+             * Use mousedown for desktop
+             * and touch-friendly pointer events.
+             */
+            suggestionItem.addEventListener(
+                'mousedown',
+                function(event) {
+
+                    event.preventDefault();
+
+                    selectSuggestion(
+                        figure
+                    );
+                }
+            );
+
+
+            suggestionItem.addEventListener(
+                'touchstart',
+                function(event) {
+
+                    event.preventDefault();
+
+                    selectSuggestion(
+                        figure
+                    );
+
+                },
+                {
+                    passive: false
+                }
+            );
+
+
+            suggestionsBox.appendChild(
+                suggestionItem
+            );
+        }
+    );
+
+
+    suggestionsBox.style.display =
+        'block';
+}
+
+
+
+/* =========================================================
+   SELECT PERSON FROM LIST
+========================================================= */
+
+function selectSuggestion(
+    figure
+) {
+
+    if (gameOver) {
+        return;
+    }
+
+
+    input.value =
+        figure.name;
+
+
+    suggestionsBox.style.display =
+        'none';
+
+
+    /*
+     * Put cursor back into the search box.
+     */
+    input.focus();
+}
+
+
+
+/* =========================================================
+   INPUT EVENT
+========================================================= */
+
+input.addEventListener(
+    'input',
+    function() {
+
+        updateSuggestions();
+
+    }
+);
+
+
+
+/*
+ * When the user focuses the search box,
+ * show the entire scrollable list.
+ *
+ * This is the Spotle-style behavior.
+ */
+input.addEventListener(
+    'focus',
+    function() {
 
         if (gameOver) {
             return;
         }
 
+        updateSuggestions();
 
-        currentMatches =
-            getAvailableFigures(
-                query
-            );
-
-
-        highlightedIndex = -1;
-
-
-        suggestionsBox.innerHTML =
-            '';
-
-
-        /*
-         * Header makes the list feel like
-         * a proper searchable selector.
-         */
-
-        const header =
-            document.createElement(
-                'div'
-            );
-
-        header.className =
-            'picker-header';
-
-        header.textContent =
-            query.trim()
-                ? `${currentMatches.length} result${
-                    currentMatches.length === 1
-                        ? ''
-                        : 's'
-                }`
-                : `${currentMatches.length} figures`;
-
-        suggestionsBox.appendChild(
-            header
-        );
-
-
-        if (
-            currentMatches.length === 0
-        ) {
-
-            const noResults =
-                document.createElement(
-                    'div'
-                );
-
-            noResults.className =
-                'no-results';
-
-            noResults.textContent =
-                'No figures found';
-
-            suggestionsBox.appendChild(
-                noResults
-            );
-
-            suggestionsBox.style.display =
-                'block';
-
-            return;
-        }
-
-
-        currentMatches.forEach(
-            (figure, index) => {
-
-                const item =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                item.className =
-                    'suggestion-item';
-
-
-                item.setAttribute(
-                    'role',
-                    'option'
-                );
-
-
-                item.dataset.index =
-                    index;
-
-
-                const name =
-                    document.createElement(
-                        'span'
-                    );
-
-                name.className =
-                    'suggestion-name';
-
-                name.textContent =
-                    figure.name;
-
-
-                const number =
-                    document.createElement(
-                        'span'
-                    );
-
-                number.className =
-                    'suggestion-number';
-
-                number.textContent =
-                    index + 1;
-
-
-                item.appendChild(
-                    name
-                );
-
-                item.appendChild(
-                    number
-                );
-
-
-                /*
-                 * Pointerdown is more reliable than
-                 * click on mobile because it avoids
-                 * the input losing focus first.
-                 */
-
-                item.addEventListener(
-                    'pointerdown',
-                    function(event) {
-
-                        event.preventDefault();
-
-                        selectFigure(
-                            figure
-                        );
-                    }
-                );
-
-
-                item.addEventListener(
-                    'mouseenter',
-                    function() {
-
-                        setHighlight(
-                            index
-                        );
-                    }
-                );
-
-
-                suggestionsBox.appendChild(
-                    item
-                );
-            }
-        );
-
-
-        suggestionsBox.style.display =
-            'block';
     }
+);
 
 
-    function selectFigure(
-        figure
-    ) {
 
-        if (
-            !figure ||
-            gameOver
-        ) {
-            return;
-        }
+/* =========================================================
+   KEYBOARD NAVIGATION
+========================================================= */
+
+let selectedSuggestionIndex = -1;
 
 
-        input.value =
-            figure.name;
-
-
-        closePicker();
-
-
-        input.focus();
-    }
-
-
-    function setHighlight(
-        index
-    ) {
+input.addEventListener(
+    'keydown',
+    function(e) {
 
         const items =
             suggestionsBox.querySelectorAll(
@@ -2275,457 +2347,285 @@
             );
 
 
-        items.forEach(
-            item =>
-                item.classList.remove(
-                    'highlighted'
-                )
-        );
-
-
+        /*
+         * Arrow DOWN
+         */
         if (
-            index < 0 ||
-            index >= items.length
+            e.key === 'ArrowDown'
         ) {
 
-            highlightedIndex = -1;
+            if (
+                suggestionsBox.style.display ===
+                'none'
+            ) {
+                return;
+            }
 
-            return;
+
+            e.preventDefault();
+
+
+            if (
+                items.length === 0
+            ) {
+                return;
+            }
+
+
+            selectedSuggestionIndex++;
+
+
+            if (
+                selectedSuggestionIndex >=
+                items.length
+            ) {
+
+                selectedSuggestionIndex =
+                    0;
+            }
+
+
+            highlightSuggestion(
+                items
+            );
         }
 
 
-        highlightedIndex =
-            index;
+        /*
+         * Arrow UP
+         */
+        else if (
+            e.key === 'ArrowUp'
+        ) {
+
+            if (
+                suggestionsBox.style.display ===
+                'none'
+            ) {
+                return;
+            }
 
 
-        const item =
-            items[index];
+            e.preventDefault();
 
 
-        item.classList.add(
-            'highlighted'
-        );
+            if (
+                items.length === 0
+            ) {
+                return;
+            }
+
+
+            selectedSuggestionIndex--;
+
+
+            if (
+                selectedSuggestionIndex < 0
+            ) {
+
+                selectedSuggestionIndex =
+                    items.length - 1;
+            }
+
+
+            highlightSuggestion(
+                items
+            );
+        }
 
 
         /*
-         * Makes keyboard navigation work
-         * naturally with the scrollable list.
+         * ENTER
          */
+        else if (
+            e.key === 'Enter'
+        ) {
 
+            e.preventDefault();
+
+
+            if (
+                selectedSuggestionIndex >= 0 &&
+                items[selectedSuggestionIndex]
+            ) {
+
+                const selectedName =
+                    items[
+                        selectedSuggestionIndex
+                    ].textContent;
+
+
+                const selectedFigure =
+                    figures.find(
+                        figure =>
+                            figure.name ===
+                            selectedName
+                    );
+
+
+                if (selectedFigure) {
+
+                    selectSuggestion(
+                        selectedFigure
+                    );
+
+                    selectedSuggestionIndex =
+                        -1;
+
+                    return;
+                }
+            }
+
+
+            /*
+             * If nothing is selected,
+             * submit the typed name.
+             */
+            submitGuess();
+        }
+
+
+        /*
+         * ESCAPE
+         */
+        else if (
+            e.key === 'Escape'
+        ) {
+
+            suggestionsBox.style.display =
+                'none';
+
+            selectedSuggestionIndex =
+                -1;
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   HIGHLIGHT KEYBOARD SELECTION
+========================================================= */
+
+function highlightSuggestion(
+    items
+) {
+
+    items.forEach(
+        item => {
+
+            item.style.backgroundColor =
+                '#121213';
+        }
+    );
+
+
+    if (
+        items[selectedSuggestionIndex]
+    ) {
+
+        const item =
+            items[
+                selectedSuggestionIndex
+            ];
+
+
+        item.style.backgroundColor =
+            '#2a2a2b';
+
+
+        /*
+         * Automatically scroll the
+         * selected person into view.
+         */
         item.scrollIntoView({
             block: 'nearest'
         });
     }
+}
 
 
-    /* =========================================
-       SEARCH INPUT
-    ========================================= */
 
-    input.addEventListener(
-        'focus',
-        function() {
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
 
-            if (gameOver) {
-                return;
-            }
+submitBtn.addEventListener(
+    'click',
+    submitGuess
+);
 
 
-            /*
-             * Opening the picker with no query
-             * gives the user a complete scrollable
-             * list, just like a player selector.
-             */
 
-            renderSuggestions(
-                input.value
-            );
+/* =========================================================
+   SHARE BUTTON
+========================================================= */
 
-            suggestionsBox.style.display =
-                'block';
-        }
-    );
+shareBtn.addEventListener(
+    'click',
+    () => {
 
+        const resultStatus =
+            guessedNames.has(
+                secretFigure.name
+            )
+                ? `${guessedNames.size}/10`
+                : 'X/10';
 
-    input.addEventListener(
-        'input',
-        function() {
 
-            if (gameOver) {
-                closePicker();
-                return;
-            }
+        const emojiBlocks =
+            buildShareEmojiGrid();
 
 
-            renderSuggestions(
-                this.value
-            );
-        }
-    );
+        const gameUrl =
+            window.location.href;
 
 
-    /* =========================================
-       KEYBOARD NAVIGATION
-    ========================================= */
-
-    input.addEventListener(
-        'keydown',
-        function(event) {
-
-            if (gameOver) {
-                return;
-            }
-
-
-            const isOpen =
-                suggestionsBox.style.display ===
-                'block';
-
-
-            /*
-             * Arrow Down
-             */
-
-            if (
-                event.key === 'ArrowDown'
-            ) {
-
-                event.preventDefault();
-
-
-                if (!isOpen) {
-
-                    openPicker();
-
-                    return;
-                }
-
-
-                if (
-                    currentMatches.length === 0
-                ) {
-                    return;
-                }
-
-
-                let nextIndex =
-                    highlightedIndex + 1;
-
-
-                if (
-                    nextIndex >=
-                    currentMatches.length
-                ) {
-
-                    nextIndex = 0;
-                }
-
-
-                setHighlight(
-                    nextIndex
-                );
-
-                return;
-            }
-
-
-            /*
-             * Arrow Up
-             */
-
-            if (
-                event.key === 'ArrowUp'
-            ) {
-
-                event.preventDefault();
-
-
-                if (!isOpen) {
-
-                    openPicker();
-
-                    return;
-                }
-
-
-                if (
-                    currentMatches.length === 0
-                ) {
-                    return;
-                }
-
-
-                let nextIndex =
-                    highlightedIndex - 1;
-
-
-                if (
-                    nextIndex < 0
-                ) {
-
-                    nextIndex =
-                        currentMatches.length - 1;
-                }
-
-
-                setHighlight(
-                    nextIndex
-                );
-
-                return;
-            }
-
-
-            /*
-             * Enter
-             */
-
-            if (
-                event.key === 'Enter'
-            ) {
-
-                event.preventDefault();
-
-
-                if (
-                    highlightedIndex >= 0 &&
-                    currentMatches[
-                        highlightedIndex
-                    ]
-                ) {
-
-                    selectFigure(
-                        currentMatches[
-                            highlightedIndex
-                        ]
-                    );
-
-                    return;
-                }
-
-
-                submitGuess();
-            }
-
-
-            /*
-             * Escape
-             */
-
-            if (
-                event.key === 'Escape'
-            ) {
-
-                closePicker();
-
-                input.blur();
-            }
-        }
-    );
-
-
-    /* =========================================
-       CLICK OUTSIDE
-    ========================================= */
-
-    document.addEventListener(
-        'pointerdown',
-        function(event) {
-
-            if (
-                !event.target.closest(
-                    '.input-wrapper'
-                )
-            ) {
-
-                closePicker();
-            }
-        }
-    );
-
-
-    /* =========================================
-       SUBMIT BUTTON
-    ========================================= */
-
-    submitBtn.addEventListener(
-        'click',
-        function() {
-
-            submitGuess();
-        }
-    );
-
-
-    /* =========================================
-       SHARE
-    ========================================= */
-
-    function countGreenAttributes(
-        guess,
-        target
-    ) {
-
-        let greenCount = 0;
-
-
-        if (
-            guess.arena ===
-            target.arena
-        ) greenCount++;
-
-
-        if (
-            guess.netWorth ===
-            target.netWorth
-        ) greenCount++;
-
-
-        if (
-            guess.country ===
-            target.country
-        ) greenCount++;
-
-
-        if (
-            guess.followers ===
-            target.followers
-        ) greenCount++;
-
-
-        if (
-            guess.gender ===
-            target.gender
-        ) greenCount++;
-
-
-        if (
-            guess.age ===
-            target.age
-        ) greenCount++;
-
-
-        return greenCount;
-    }
-
-
-    function buildShareEmojiGrid() {
-
-        const emojiList = [];
-
-
-        guessHistoryObjects.forEach(
-            guess => {
-
-                if (
-                    guess.name ===
-                    secretFigure.name
-                ) {
-
-                    emojiList.push(
-                        "🟩"
-                    );
-
-                } else {
-
-                    const greens =
-                        countGreenAttributes(
-                            guess,
-                            secretFigure
-                        );
-
-
-                    if (greens >= 4) {
-
-                        emojiList.push(
-                            "🟨"
-                        );
-
-                    } else {
-
-                        emojiList.push(
-                            "⬛"
-                        );
-                    }
-                }
-            }
-        );
-
-
-        return emojiList.join('');
-    }
-
-
-    shareBtn.addEventListener(
-        'click',
-        function() {
-
-            const resultStatus =
-                guessedNames.has(
-                    secretFigure.name
-                )
-                    ? `${guessedNames.size}/10`
-                    : 'X/10';
-
-
-            const emojiBlocks =
-                buildShareEmojiGrid();
-
-
-            const gameUrl =
-                window.location.href;
-
-
-            const scoreText =
-                `Persondle #${dayIndex + 1}: ${resultStatus}
+        const scoreText =
+            `Persondle #${dayIndex + 1}: ${resultStatus}
 ${emojiBlocks}
 
 Play today's round - ${gameUrl}`;
 
 
-            if (
-                navigator.share
-            ) {
+        if (
+            navigator.share
+        ) {
 
-                navigator.share({
-                    text: scoreText
-                });
+            navigator.share({
+                text: scoreText
+            });
 
-            }
-
-            else if (
-                navigator.clipboard
-            ) {
-
-                navigator.clipboard
-                    .writeText(
-                        scoreText
-                    )
-                    .then(
-                        () => {
-                            alert(
-                                "Score copied to clipboard!"
-                            );
-                        }
-                    )
-                    .catch(
-                        () => {
-                            alert(
-                                scoreText
-                            );
-                        }
-                    );
-
-            }
-
-            else {
-
-                alert(
-                    scoreText
-                );
-            }
         }
-    );
+
+        else {
+
+            navigator.clipboard
+                .writeText(
+                    scoreText
+                )
+                .then(
+                    () => {
+
+                        alert(
+                            "Score copied to clipboard!"
+                        );
+
+                    }
+                )
+                .catch(
+                    () => {
+
+                        alert(
+                            scoreText
+                        );
+
+                    }
+                );
+        }
+    }
+);
 
 </script>
 
