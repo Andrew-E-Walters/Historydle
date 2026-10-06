@@ -965,24 +965,24 @@
             grid.className = 'attributes-grid';
 
 // 1. Global helper for parsing numbers (M, B, K)
-        function parseNumericValue(val) {
-            if (typeof val === 'number') return val;
-            if (!val) return 0;
-        const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
-            
-            let multiplier = 1;
-            if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
-                multiplier = 1e9;
-            } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
-                multiplier = 1e6;
-            } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
-                multiplier = 1e3;
-            }
-            
-            // Extract the numeric portion safely
-            const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
-            return isNaN(num) ? 0 : num * multiplier;
-        }
+function parseNumericValue(val) {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
+    
+    let multiplier = 1;
+    if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
+        multiplier = 1e9;
+    } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
+        multiplier = 1e6;
+    } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
+        multiplier = 1e3;
+    }
+    
+    const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+    return isNaN(num) ? 0 : num * multiplier;
+}
+
 function createCell(title, value, targetValue, icon, type = 'standard') {
     const cell = document.createElement('div');
     cell.className = 'cell';
@@ -991,13 +991,13 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
     const numValue = parseNumericValue(value);
     const numTarget = parseNumericValue(targetValue);
 
-    let statusClass = 'wrong';
+    let statusClass = 'wrong'; // Default gray
 
     if (type === 'country') {
         if (value === targetValue) {
-            statusClass = 'correct';
-        } else if (countryContinents[value] === countryContinents[targetValue]) {
-            statusClass = 'partial';
+            statusClass = 'correct'; // Green
+        } else if (countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
+            statusClass = 'partial'; // Yellow (Note: check your CSS if this needs to be 'present' or 'yellow')
         }
     } else if (type === 'age') {
         if (numValue === numTarget) {
@@ -1020,7 +1020,7 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
             statusClass = 'partial';
         }
     } else {
-        if (value === targetValue) {
+        if (String(value).trim().toLowerCase() === String(targetValue).trim().toLowerCase()) {
             statusClass = 'correct';
         }
     }
@@ -1028,9 +1028,11 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
     cell.classList.add(statusClass);
 
     let displayVal = value;
+
+    // 2. Format values with abbreviations and arrows
     if (type === 'age' && numValue !== numTarget && !isReveal) {
         displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
-    } else if (type === 'followers' || type === 'netWorth') {
+    } else if (type === 'netWorth') {
         let formattedNum = new Intl.NumberFormat('en-US', { 
             style: 'currency', 
             currency: 'USD', 
@@ -1039,14 +1041,27 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         }).format(numValue);
         
         if (numValue !== numTarget && !isReveal) {
-            // Because numValue (3,000,000) < numTarget (250,000,000), this correctly triggers ' ⬆️'
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️️' : ' ⬇️');
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+        } else {
+            displayVal = formattedNum;
+        }
+    } else if (type === 'followers') {
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        if (numValue !== numTarget && !isReveal) {
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
         } else {
             displayVal = formattedNum;
         }
     }
 
-    // ... rest of your element rendering logic
+    // 3. Restore your icons/emojis alongside the value
+    const iconHTML = icon ? `${icon} ` : '';
+    cell.innerHTML = `\({iconHTML}\){displayVal}`;
+
     return cell;
 }
 
