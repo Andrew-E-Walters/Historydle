@@ -755,38 +755,54 @@ function submitGuess() {
         endGameBox.scrollIntoView({ behavior: 'smooth' });
     }
 }
-input.addEventListener('input', () => {
-    if (gameOver) return;
+// --- SEARCH / AUTOCOMPLETE ---
 
-    // Don't remove spaces from the actual input value.
-    const query = input.value.toLowerCase();
+input.addEventListener('input', function () {
 
-    suggestionsBox.innerHTML = '';
-
-    if (query.trim().length === 0) {
+    if (gameOver) {
         suggestionsBox.style.display = 'none';
         return;
     }
 
-    const matches = figures.filter(f =>
-        f.name.toLowerCase().includes(query.trim()) &&
-        !guessedNames.has(f.name)
-    );
+    const query = this.value.trim().toLowerCase();
+
+    suggestionsBox.innerHTML = '';
+
+    if (query === '') {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    const matches = figures.filter(function (figure) {
+
+        return figure.name
+            .toLowerCase()
+            .includes(query)
+            && !guessedNames.has(figure.name);
+
+    });
 
     if (matches.length === 0) {
         suggestionsBox.style.display = 'none';
         return;
     }
 
-    matches.forEach(figure => {
+    matches.forEach(function (figure) {
+
         const suggestionItem = document.createElement('div');
 
         suggestionItem.className = 'suggestion-item';
+
         suggestionItem.textContent = figure.name;
 
-        suggestionItem.addEventListener('click', () => {
+        suggestionItem.addEventListener('mousedown', function (event) {
+
+            event.preventDefault();
+
             input.value = figure.name;
+
             suggestionsBox.style.display = 'none';
+
             input.focus();
         });
 
