@@ -1,5 +1,4 @@
-        // Master Database 
-        const figures = [
+const figures = [
  {"name": "Steve Jobs", "arena": "Tech & Science", "netWorth": "10,000,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 56},
   {"name": "Bill Gates", "arena": "Tech & Science", "netWorth": "130,000,000,000", "country": "US", "followers": 8500000, "gender": "Male", "age": 70},
   {"name": "Mark Zuckerberg", "arena": "Tech & Science", "netWorth": "170,000,000,000", "country": "US", "followers": 14500000, "gender": "Male", "age": 42},
