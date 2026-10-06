@@ -1922,338 +1922,165 @@
         }
 
 
-        /* =========================================================
-           SEARCH / AUTOCOMPLETE
-           ========================================================= */
+// --- SEARCH / AUTOCOMPLETE ---
 
-        input.addEventListener(
-            'input',
-            function() {
+function getNameParts(name) {
+    return name.trim().toLowerCase().split(/\s+/);
+}
 
-                if (gameOver) {
+function nameMatchesSearch(name, query) {
+    const cleanQuery = query.trim().toLowerCase();
 
-                    suggestionsBox.style.display =
-                        'none';
+    if (cleanQuery === '') {
+        return true;
+    }
 
-                    return;
+    const nameParts = getNameParts(name);
 
-                }
+    // If the user types multiple words, match the beginning
+    // of the corresponding first/last name parts.
+    const queryParts = cleanQuery.split(/\s+/);
 
+    if (queryParts.length > 1) {
+        return queryParts.every((queryPart, index) => {
+            return nameParts[index] &&
+                   nameParts[index].startsWith(queryPart);
+        });
+    }
 
-                const query =
-                    this.value
-                        .trim()
-                        .toLowerCase();
+    // Single letter/word:
+    // Match the START of either the first name OR last name.
+    return nameParts.some(part => part.startsWith(cleanQuery));
+}
 
 
-                suggestionsBox.innerHTML =
-                    '';
+function showSuggestions() {
 
+    if (gameOver) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
 
-                if (query === '') {
+    const query = input.value.trim().toLowerCase();
 
-                    suggestionsBox.style.display =
-                        'none';
+    suggestionsBox.innerHTML = '';
 
-                    return;
+    const matches = figures.filter(function (figure) {
 
-                }
+        return !guessedNames.has(figure.name) &&
+               nameMatchesSearch(figure.name, query);
 
+    });
 
-                /*
-                    Break the search into words.
+    if (matches.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
 
-                    "g"
-                    "lar"
-                    "george c"
-                    "larry p"
-                */
+    matches.forEach(function (figure) {
 
-                const queryParts =
-                    query
-                        .split(/\s+/)
-                        .filter(Boolean);
+        const suggestionItem = document.createElement('div');
 
+        suggestionItem.className = 'suggestion-item';
 
-                const matches =
-                    figures.filter(
-                        function(figure) {
+        // Only display the person's name.
+        suggestionItem.textContent = figure.name;
 
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT use mousedown here.
+         *
+         * On mobile, mousedown fires immediately when the
+         * user's finger touches the screen. That prevents
+         * normal scrolling.
+         *
+         * Using click allows the browser to distinguish
+         * between a tap and a swipe/scroll.
+         */
 
-                            /*
-                                Never show a person
-                                who has already been guessed.
-                            */
+        suggestionItem.addEventListener('click', function (event) {
 
-                            if (
-                                guessedNames.has(
-                                    figure.name
-                                )
-                            ) {
+            event.stopPropagation();
 
-                                return false;
+            input.value = figure.name;
 
-                            }
+            suggestionsBox.style.display = 'none';
 
+            input.focus();
 
-                            const nameParts =
-                                figure.name
-                                    .toLowerCase()
-                                    .split(/\s+/)
-                                    .filter(Boolean);
+        });
 
+        suggestionsBox.appendChild(suggestionItem);
+    });
 
-                            /*
-                                We require at least a first
-                                and last name.
-                            */
+    suggestionsBox.style.display = 'block';
+}
 
-                            if (
-                                nameParts.length < 2
-                            ) {
 
-                                return false;
+// Typing in the search box
+input.addEventListener('input', function () {
 
-                            }
+    if (gameOver) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
 
+    showSuggestions();
 
-                            /*
-                                ONE WORD SEARCH
+});
 
-                                Example:
 
-                                "g"
+// Tapping/focusing the search box opens the full list.
+//
+// This is what allows the player to simply tap the box
+// and scroll through all available people without typing.
+input.addEventListener('focus', function () {
 
-                                Matches:
+    if (gameOver) return;
 
-                                George Clooney
-                                Gordon Ramsay
-                                Greta Thunberg
+    showSuggestions();
 
-                                Does NOT match:
+});
 
-                                Larry Page
 
-                                because neither "Larry"
-                                nor "Page" starts with G.
-                            */
+// Clicking the input again should keep the list available.
+input.addEventListener('click', function () {
 
-                            if (
-                                queryParts.length === 1
-                            ) {
+    if (gameOver) return;
 
-                                const searchTerm =
-                                    queryParts[0];
+    showSuggestions();
 
+});
 
-                                return (
-                                    nameParts[0]
-                                        .startsWith(
-                                            searchTerm
-                                        ) ||
 
-                                    nameParts[1]
-                                        .startsWith(
-                                            searchTerm
-                                        )
-                                );
+// Close the dropdown when clicking outside the search area.
+document.addEventListener('click', function (e) {
 
-                            }
+    if (!e.target.closest('.input-wrapper')) {
+        suggestionsBox.style.display = 'none';
+    }
 
+});
 
-                            /*
-                                TWO OR MORE WORD SEARCH
 
-                                Example:
+// Submit button
+submitBtn.addEventListener('click', submitGuess);
 
-                                "lar p"
 
-                                Matches:
+// Enter key
+input.addEventListener('keydown', function (e) {
 
-                                Larry Page
+    if (e.key === 'Enter') {
 
-                                "geo c"
+        e.preventDefault();
 
-                                Matches:
+        submitGuess();
 
-                                George Clooney
-                            */
+    }
 
-                            return queryParts.every(
-                                function(
-                                    part,
-                                    index
-                                ) {
+});
 
-                                    if (
-                                        !nameParts[index]
-                                    ) {
-
-                                        return false;
-
-                                    }
-
-
-                                    return nameParts[index]
-                                        .startsWith(
-                                            part
-                                        );
-
-                                }
-                            );
-
-                        }
-                    );
-
-
-                if (
-                    matches.length === 0
-                ) {
-
-                    suggestionsBox.style.display =
-                        'none';
-
-                    return;
-
-                }
-
-
-                /*
-                    Create each person in the
-                    scrollable dropdown.
-                */
-
-                matches.forEach(
-                    function(figure) {
-
-                        const suggestionItem =
-                            document.createElement(
-                                'div'
-                            );
-
-
-                        suggestionItem.className =
-                            'suggestion-item';
-
-
-                        /*
-                            IMPORTANT:
-
-                            Only the person's name is shown.
-
-                            There are NO numbers.
-                        */
-
-                        suggestionItem.textContent =
-                            figure.name;
-
-
-                        /*
-                            MOBILE SUPPORT
-
-                            touchstart makes selecting
-                            a person much more reliable
-                            on iPhone and Android.
-                        */
-
-                        suggestionItem.addEventListener(
-                            'touchstart',
-                            function(event) {
-
-                                event.preventDefault();
-
-                                input.value =
-                                    figure.name;
-
-                                suggestionsBox.style.display =
-                                    'none';
-
-                            },
-                            {
-                                passive: false
-                            }
-                        );
-
-
-                        /*
-                            DESKTOP SUPPORT
-                        */
-
-                        suggestionItem.addEventListener(
-                            'mousedown',
-                            function(event) {
-
-                                event.preventDefault();
-
-                                input.value =
-                                    figure.name;
-
-                                suggestionsBox.style.display =
-                                    'none';
-
-                                input.focus();
-
-                            }
-                        );
-
-
-                        suggestionsBox.appendChild(
-                            suggestionItem
-                        );
-
-                    }
-                );
-
-
-                /*
-                    Open the dropdown.
-                */
-
-                suggestionsBox.style.display =
-                    'block';
-
-
-                /*
-                    Start at the top every time
-                    a new search is performed.
-                */
-
-                suggestionsBox.scrollTop = 0;
-
-            }
-        );
-
-
-        /* =========================================================
-           SUBMIT BUTTON
-           ========================================================= */
-
-        submitBtn.addEventListener(
-            'click',
-            submitGuess
-        );
-
-
-        /* =========================================================
-           ENTER KEY
-           ========================================================= */
-
-        input.addEventListener(
-            'keydown',
-            function(e) {
-
-                if (
-                    e.key === 'Enter'
-                ) {
-
-                    e.preventDefault();
-
-                    submitGuess();
-
-                }
-
-            }
-        );
 
 
         /* =========================================================
