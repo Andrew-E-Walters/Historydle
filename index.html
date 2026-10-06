@@ -1028,10 +1028,9 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
     cell.classList.add(statusClass);
 
     let displayVal = value;
-
     if (type === 'age' && numValue !== numTarget && !isReveal) {
         displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
-    } else if (type === 'netWorth') {
+    } else if (type === 'followers' || type === 'netWorth') {
         let formattedNum = new Intl.NumberFormat('en-US', { 
             style: 'currency', 
             currency: 'USD', 
@@ -1040,27 +1039,14 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         }).format(numValue);
         
         if (numValue !== numTarget && !isReveal) {
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
-        } else {
-            displayVal = formattedNum;
-        }
-    } else if (type === 'followers') {
-        let formattedNum = new Intl.NumberFormat('en-US', { 
-            notation: "compact", 
-            maximumFractionDigits: 1 
-        }).format(numValue);
-        
-        if (numValue !== numTarget && !isReveal) {
-            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+            // Because numValue (3,000,000) < numTarget (250,000,000), this correctly triggers ' ⬆️'
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️️' : ' ⬇️');
         } else {
             displayVal = formattedNum;
         }
     }
 
-    // 2. Render both the icon (if you use it) and the value safely
-    const iconSpan = icon ? `${icon} ` : '';
-    cell.innerHTML = `\({iconSpan}\){displayVal}`;
-
+    // ... rest of your element rendering logic
     return cell;
 }
 
