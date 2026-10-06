@@ -1,0 +1,419 @@
+
+        // --- DAILY SELECTION LOGIC ---
+        const epochDate = new Date('2026-01-01T00:00:00Z');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+        
+        // Calculate days relative to local midnight to prevent UTC timezone offset drift
+        const localMidnight = new Date(year, now.getMonth(), now.getDate());
+        const epochLocal = new Date(2026, 0, 1);
+        const daysSinceEpoch = Math.floor((localMidnight - epochLocal) / (1000 * 60 * 60 * 24));
+        const dayIndex = Math.max(0, daysSinceEpoch);
+        const secretFigure = figures[(dayIndex * 60) % figures.length];
+
+        document.getElementById('daily-number').textContent = `PERSONDLE #${dayIndex + 1}`;
+
+        const input = document.getElementById('guess-input');
+        const suggestionsBox = document.getElementById('suggestions');
+        const submitBtn = document.getElementById('submit-guess-btn');
+        const guessesContainer = document.getElementById('guesses-container');
+        const endGameBox = document.getElementById('end-game-box');
+        const endGameText = document.getElementById('end-game-text');
+        const shareBtn = document.getElementById('share-button');
+        const guessCounterDisplay = document.getElementById('guess-counter');
+
+        const guessedNames = new Set();
+        const guessHistoryObjects = []; // Stores figure objects in sequential order
+        let gameOver = false;
+
+        // --- LOCAL STORAGE PERSISTENCE ---
+        const savedData = JSON.parse(localStorage.getItem('persondle_state') || '{}');
+
+        if (savedData.date === todayStr && Array.isArray(savedData.guesses)) {
+            savedData.guesses.forEach(name => {
+                const figureObj = figures.find(f => f.name === name);
+                if (figureObj) {
+                    guessedNames.add(figureObj.name);
+                    guessHistoryObjects.push(figureObj);
+                    renderGuessCard(figureObj);
+                }
+            });
+
+            guessCounterDisplay.textContent = `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+
+            if (guessedNames.has(secretFigure.name)) {
+                triggerGameOver(true, guessedNames.size);
+            } else if (guessedNames.size >= maxGuesses) {
+                triggerGameOver(false, guessedNames.size);
+            }
+        } else {
+            localStorage.setItem('persondle_state', JSON.stringify({ date: todayStr, guesses: [] }));
+        }
+
+        function saveState() {
+            localStorage.setItem('persondle_state', JSON.stringify({
+                date: todayStr,
+                guesses: Array.from(guessedNames)
+            }));
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const diffMs = tomorrow - now;
+
+            const hours = String(Math.floor((diffMs / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const minutes = String(Math.floor((diffMs / (1000 * 60)) % 60)).padStart(2, '0');
+            const seconds = String(Math.floor((diffMs / 1000) % 60)).padStart(2, '0');
+
+            document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Count exact green matching attributes for a guess
+        function countGreenAttributes(guess, target) {
+            let greenCount = 0;
+            if (guess.arena === target.arena) greenCount++;
+            if (guess.netWorth === target.netWorth) greenCount++;
+            if (guess.country === target.country) greenCount++;
+            if (guess.followers === target.followers) greenCount++;
+            if (guess.gender === target.gender) greenCount++;
+            if (guess.age === target.age) greenCount++;
+            return greenCount;
+        }
+
+// Build emoji grid for sharing
+        function buildShareEmojiGrid() {
+            let emojiList = [];
+            guessHistoryObjects.forEach(guess => {
+                if (guess.name === secretFigure.name) {
+                    emojiList.push("🟩");
+                } else {
+                    const greens = countGreenAttributes(guess, secretFigure);
+                    // If 4 or 5 attributes are green, it's a yellow box (close call)
+                    if (greens >= 4) {
+                        emojiList.push("🟨");
+                    } else {
+                        emojiList.push("⬛");
+                    }
+                }
+            });
+            return emojiList.join("");
+        }
+
+        // Autocomplete suggestions
+        input.addEventListener('input', () => {
+            if (gameOver) return;
+
+            const query = input.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = '';
+
+            if (!query) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            // Matches if the full name or any word within the name starts with the search query
+            const matches = figures.filter(f => {
+                if (guessedNames.has(f.name)) return false;
+                
+                const nameLower = f.name.toLowerCase();
+                const words = nameLower.split(/\s+/);
+                return words.some(word => word.startsWith(query));
+            });
+
+            if (matches.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            matches.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = item.name;
+                
+                div.addEventListener('click', () => {
+                    input.value = item.name;
+                    suggestionsBox.style.display = 'none';
+                });
+
+                suggestionsBox.appendChild(div);
+            });
+
+            suggestionsBox.style.display = 'block';
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.input-wrapper')) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        function renderGuessCard(guess, isReveal = false) {
+            const card = document.createElement('div');
+            card.className = 'guess-card';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'guess-card-header';
+            cardHeader.innerHTML = `<span>${isReveal ? 'SECRET FIGURE: ' : ''}${guess.name}</span>`;
+            card.appendChild(cardHeader);
+
+            const grid = document.createElement('div');
+            grid.className = 'attributes-grid';
+
+// 1. Global helper for parsing numbers (M, B, K)
+function parseNumericValue(val) {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
+    
+    let multiplier = 1;
+    if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
+        multiplier = 1e9;
+    } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
+        multiplier = 1e6;
+    } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
+        multiplier = 1e3;
+    }
+    
+    const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+    return isNaN(num) ? 0 : num * multiplier;
+}
+
+function createCell(title, value, targetValue, icon, type = 'standard') {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    // 1. Convert both values into clean numbers using your helper
+    const numValue = parseNumericValue(value);
+    const numTarget = parseNumericValue(targetValue);
+
+    let statusClass = 'wrong'; // Default gray
+
+    if (type === 'country') {
+        if (value === targetValue) {
+            statusClass = 'correct'; // Green
+        } else if (countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
+            statusClass = 'partial'; // Yellow
+        }
+    } else if (type === 'age') {
+        if (numValue === numTarget) {
+            statusClass = 'correct';
+        } else if (Math.abs(numValue - numTarget) <= 10) {
+            statusClass = 'partial';
+        }
+    } else if (type === 'followers') {
+        if (numValue === numTarget) {
+            statusClass = 'correct';
+        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 300000) {
+            statusClass = 'partial';
+        }
+    } else if (type === 'netWorth') {
+        // Green if exact, within 15%, or within $15M
+        if (numValue === numTarget || Math.abs(numValue - numTarget) <= (numTarget * 0.15) || Math.abs(numValue - numTarget) <= 15000000) {
+            statusClass = 'correct';
+        // Yellow if within 30% or within $40M
+        } else if (Math.abs(numValue - numTarget) <= (numTarget * 0.3) || Math.abs(numValue - numTarget) <= 40000000) {
+            statusClass = 'partial';
+        }
+    } else {
+        if (String(value).trim().toLowerCase() === String(targetValue).trim().toLowerCase()) {
+            statusClass = 'correct';
+        }
+    }
+
+    cell.classList.add(statusClass);
+
+    let displayVal = value;
+
+    // 2. Format values with abbreviations and arrows
+    if (type === 'age' && numValue !== numTarget && !isReveal) {
+        displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
+    } else if (type === 'netWorth') {
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            style: 'currency', 
+            currency: 'USD', 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        if (numValue !== numTarget && !isReveal) {
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+        } else {
+            displayVal = formattedNum;
+        }
+    } else if (type === 'followers') {
+        let formattedNum = new Intl.NumberFormat('en-US', { 
+            notation: "compact", 
+            maximumFractionDigits: 1 
+        }).format(numValue);
+        
+        if (numValue !== numTarget && !isReveal) {
+            displayVal = formattedNum + (numValue < numTarget ? ' ⬆️' : ' ⬇️');
+        } else {
+            displayVal = formattedNum;
+        }
+            }
+
+            cell.innerHTML = `
+    // 3. Restore your icons/emojis alongside the value using correct template literal backticks
+    const iconHTML = icon ? `${icon} ` : '';
+    cell.innerHTML = `\({iconHTML}\){displayVal}`;
+
+    return cell;
+}
+            grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
+           grid.appendChild(createCell('Net Worth', guess.netWorth, secretFigure.netWorth, '💵', 'netWorth'));
+            grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
+            grid.appendChild(createCell('Followers', guess.followers, secretFigure.followers, "📱", 'followers'));
+            grid.appendChild(createCell('Gender', guess.gender, secretFigure.gender, genderEmojis[guess.gender]));
+            grid.appendChild(createCell('Age', guess.age, secretFigure.age, getAgeGroupEmoji(guess.age), 'age'));
+
+            card.appendChild(grid);
+            guessesContainer.insertBefore(card, guessesContainer.firstChild);
+        }
+
+        // Expanded Robust Outcome Phrases for Each Guess Range
+        function getEndGameMessage(attempts, won) {
+            if (!won) {
+                const lossMessages = [
+                    "Oof, 0 for 10. Don't worry, reading the news is always an option for tomorrow!",
+                    "Tough luck! 10 guesses and still missed. Maybe pop culture just isn't your calling.",
+                    "Well, at least you were consistent... consistently wrong! Better luck tomorrow.",
+                    "Out of guesses! Go take a quick walk, clear your head, and try again tomorrow.",
+                    "10 attempts, zero hits! The secret figure remains in the shadows until tomorrow.",
+                    "A swing and a complete miss across all 10 tries! Time to do some light research."
+                ];
+                return lossMessages[Math.floor(Math.random() * lossMessages.length)];
+            }
+
+            if (attempts === 1) {
+                const oneMessages = [
+                    "Hole in 1! Either you built this game, or you have telepathic powers.",
+                    "On the VERY FIRST TRY?! Okay, genius, save some brain cells for the rest of us.",
+                    "1/10! Pure psychic wizardry. You should play the lottery today."
+                ];
+                return oneMessages[Math.floor(Math.random() * oneMessages.length)];
+            } else if (attempts === 2) {
+                const twoMessages = [
+                    "Guessed in 2 tries! Absolutely clinical precision.",
+                    "In just 2 attempts? That's practically a flex. Outstanding job!",
+                    "2 guesses! Narrowed it down and closed the deal in seconds."
+                ];
+                return twoMessages[Math.floor(Math.random() * twoMessages.length)];
+            } else if (attempts >= 3 && attempts <= 4) {
+                const threeFourMessages = [
+                    `Got it in ${attempts}! Sharp deduction skills on display today.`,
+                    `Winner in ${attempts} tries! Very clean gameplay, no panicking necessary.`,
+                    `Only ${attempts} guesses needed! Smooth, logical, and quick.`
+                ];
+                return threeFourMessages[Math.floor(Math.random() * threeFourMessages.length)];
+            } else if (attempts >= 5 && attempts <= 6) {
+                const fiveSixMessages = [
+                    `Nail-biter territory! Solved in ${attempts} attempts. Nice recovery!`,
+                    `Got there in ${attempts}! Took a few adjustments, but a win is a win.`,
+                    `In ${attempts} guesses! Balanced deduction with a hint of dramatic suspense.`
+                ];
+                return fiveSixMessages[Math.floor(Math.random() * fiveSixMessages.length)];
+            } else if (attempts >= 7 && attempts <= 8) {
+                const sevenEightMessages = [
+                    `Whew! Solved on try #${attempts}. You were cutting it a bit close there!`,
+                    `In ${attempts} attempts! A victory pulled right out of the fire.`,
+                    `Took ${attempts} tries! The path was winding, but you reached the finish line.`
+                ];
+                return sevenEightMessages[Math.floor(Math.random() * sevenEightMessages.length)];
+            } else {
+                // Attempts 9-10
+                const lateWinMessages = [
+                    `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+                    `You got it in ${attempts}! Only took almost every single try you had available.`,
+                    `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`,
+                    `On attempt #${attempts}! Defeated at the very edge of the cliff!`
+                ];
+                return lateWinMessages[Math.floor(Math.random() * lateWinMessages.length)];
+            }
+        }
+
+        function triggerGameOver(won, attempts) {
+            gameOver = true;
+            endGameText.textContent = getEndGameMessage(attempts, won);
+            endGameBox.className = `end-game-message ${won ? 'win' : 'loss'}`;
+            endGameBox.style.display = 'block';
+            input.disabled = true;
+            submitBtn.disabled = true;
+
+            if (!won && !document.querySelector('.guess-card-header span')?.textContent.includes('SECRET FIGURE')) {
+                renderGuessCard(secretFigure, true);
+            }
+        }
+
+        function submitGuess() {
+            if (gameOver) return;
+
+            const guessName = input.value.trim();
+            const figure = figures.find(f => f.name.toLowerCase() === guessName.toLowerCase());
+
+            if (!figure) {
+                alert("Please select a valid figure from the dropdown list.");
+                return;
+            }
+
+            if (guessedNames.has(figure.name)) {
+                alert("You've already guessed this figure!");
+                return;
+            }
+
+            guessedNames.add(figure.name);
+            guessHistoryObjects.push(figure);
+            saveState();
+
+            input.value = '';
+            suggestionsBox.style.display = 'none';
+
+            const currentAttemptCount = guessedNames.size;
+            guessCounterDisplay.textContent = `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+
+            renderGuessCard(figure);
+
+            if (figure.name === secretFigure.name) {
+                triggerGameOver(true, currentAttemptCount);
+                endGameBox.scrollIntoView({ behavior: 'smooth' });
+            } else if (currentAttemptCount >= maxGuesses) {
+                triggerGameOver(false, currentAttemptCount);
+                endGameBox.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        submitBtn.addEventListener('click', submitGuess);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                submitGuess();
+            }
+        });
+
+        shareBtn.addEventListener('click', () => {
+            const resultStatus = guessedNames.has(secretFigure.name) ? `${guessedNames.size}/10` : 'X/10';
+            const emojiBlocks = buildShareEmojiGrid();
+            const gameUrl = window.location.href;
+            const scoreText = `Persondle #${dayIndex + 1}: ${resultStatus}
+${emojiBlocks}
+
+Play todays round - ${gameUrl}`;
+            
+            if (navigator.share) {
+                navigator.share({ text: scoreText });
+            } else {
+                navigator.clipboard.writeText(scoreText).then(() => {
+                    alert("Score copied to clipboard!");
+                }).catch(() => {
+                    alert(scoreText);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
