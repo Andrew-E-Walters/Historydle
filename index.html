@@ -964,6 +964,18 @@
             const grid = document.createElement('div');
             grid.className = 'attributes-grid';
 
+// 1. Global helper for parsing numbers (M, B, K)
+        function parseNumericValue(val) {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            const str = String(val).trim().toUpperCase();
+            let multiplier = 1;
+            if (str.endsWith('B')) multiplier = 1e9;
+            else if (str.endsWith('M')) multiplier = 1e6;
+            else if (str.endsWith('K')) multiplier = 1e3;
+            const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+            return isNaN(num) ? 0 : num * multiplier;
+        }
             function createCell(title, value, targetValue, icon, type = 'standard') {
             const cell = document.createElement('div');
             cell.className = 'cell';
