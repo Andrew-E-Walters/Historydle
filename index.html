@@ -1032,7 +1032,6 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
     if (type === 'age' && numValue !== numTarget && !isReveal) {
         displayVal += numValue < numTarget ? ' ⬆️' : ' ⬇️';
     } else if (type === 'netWorth') {
-        // Abbreviated currency format ($3M, $250M, etc.)
         let formattedNum = new Intl.NumberFormat('en-US', { 
             style: 'currency', 
             currency: 'USD', 
@@ -1046,7 +1045,6 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
             displayVal = formattedNum;
         }
     } else if (type === 'followers') {
-        // Abbreviated plain number format (3M, 450K, etc. - no dollar sign)
         let formattedNum = new Intl.NumberFormat('en-US', { 
             notation: "compact", 
             maximumFractionDigits: 1 
@@ -1059,8 +1057,9 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         }
     }
 
-    // 2. Actually put the text inside the cell element so it displays on screen
-    cell.textContent = displayVal;
+    // 2. Render both the icon (if you use it) and the value safely
+    const iconSpan = icon ? `${icon} ` : '';
+    cell.innerHTML = `\({iconSpan}\){displayVal}`;
 
     return cell;
 }
