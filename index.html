@@ -997,7 +997,7 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         if (value === targetValue) {
             statusClass = 'correct'; // Green
         } else if (countryContinents[value] && countryContinents[value] === countryContinents[targetValue]) {
-            statusClass = 'partial'; // Yellow (Note: check your CSS if this needs to be 'present' or 'yellow')
+            statusClass = 'partial'; // Yellow
         }
     } else if (type === 'age') {
         if (numValue === numTarget) {
@@ -1058,13 +1058,12 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         }
     }
 
-    // 3. Restore your icons/emojis alongside the value
+    // 3. Restore your icons/emojis alongside the value using correct template literal backticks
     const iconHTML = icon ? `${icon} ` : '';
     cell.innerHTML = `\({iconHTML}\){displayVal}`;
 
     return cell;
 }
-
             grid.appendChild(createCell('Arena', guess.arena, secretFigure.arena, arenaEmojis[guess.arena] || '🌟'));
            grid.appendChild(createCell('Net Worth', guess.netWorth, secretFigure.netWorth, '💵', 'netWorth'));
             grid.appendChild(createCell('Country', guess.country, secretFigure.country, countryEmojis[guess.country] || '🌐', 'country'));
