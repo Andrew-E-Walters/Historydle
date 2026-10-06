@@ -273,7 +273,7 @@
   {"name": "Cory Booker", "arena": "Politics", "netWorth": "3M", "country": "US", "followers": 1500000, "gender": "Male", "age": 57},
   {"name": "Ted Cruz", "arena": "Politics", "netWorth": "4M", "country": "US", "followers": 1200000, "gender": "Male", "age": 55},
   {"name": "Marco Rubio", "arena": "Politics", "netWorth": "1.5M", "country": "US", "followers": 600000, "gender": "Male", "age": 55},
-  {"name": "Lindsey Graham", "arena": "Politics", "netWorth": "3M", "country": "US", "followers": 200000, "gender": "Female", "age": 71},
+  {"name": "Lindsey Graham", "arena": "Politics", "netWorth": "3M", "country": "US", "followers": 200000, "gender": "Male", "age": 71},
   {"name": "Rand Paul", "arena": "Politics", "netWorth": "2.5M", "country": "US", "followers": 300000, "gender": "Male", "age": 63},
   {"name": "Chris Christie", "arena": "Politics", "netWorth": "5M", "country": "US", "followers": 100000, "gender": "Male", "age": 64},
   {"name": "Andrew Cuomo", "arena": "Politics", "netWorth": "5M", "country": "US", "followers": 400000, "gender": "Male", "age": 68},
