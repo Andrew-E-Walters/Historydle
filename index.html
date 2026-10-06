@@ -1056,8 +1056,9 @@ function createCell(title, value, targetValue, icon, type = 'standard') {
         } else {
             displayVal = formattedNum;
         }
-    }
+            }
 
+            cell.innerHTML = `
     // 3. Restore your icons/emojis alongside the value using correct template literal backticks
     const iconHTML = icon ? `${icon} ` : '';
     cell.innerHTML = `\({iconHTML}\){displayVal}`;
