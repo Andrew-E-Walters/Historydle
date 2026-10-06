@@ -968,11 +968,18 @@
         function parseNumericValue(val) {
             if (typeof val === 'number') return val;
             if (!val) return 0;
-            const str = String(val).trim().toUpperCase();
+        const str = String(val).trim().toUpperCase().replace(/\s+/g, '');
+            
             let multiplier = 1;
-            if (str.endsWith('B')) multiplier = 1e9;
-            else if (str.endsWith('M')) multiplier = 1e6;
-            else if (str.endsWith('K')) multiplier = 1e3;
+            if (str.endsWith('B') || str.endsWith('BN') || str.endsWith('BILLION')) {
+                multiplier = 1e9;
+            } else if (str.endsWith('M') || str.endsWith('MN') || str.endsWith('MILLION')) {
+                multiplier = 1e6;
+            } else if (str.endsWith('K') || str.endsWith('THOUSAND')) {
+                multiplier = 1e3;
+            }
+            
+            // Extract the numeric portion safely
             const num = parseFloat(str.replace(/[^0-9.-]+/g, ""));
             return isNaN(num) ? 0 : num * multiplier;
         }
