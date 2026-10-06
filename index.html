@@ -789,7 +789,45 @@ function submitGuess() {
         endGameBox.scrollIntoView({ behavior: 'smooth' });
     }
 }
+input.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase();
+    suggestionsBox.innerHTML = ''; // Clear previous suggestions on every keystroke
 
+    if (query.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    // Filter figures that match the text and haven't been guessed yet
+    const matches = figures.filter(f => 
+        f.name.toLowerCase().includes(query) && !guessedNames.has(f.name)
+    );
+
+    if (matches.length > 0) {
+        suggestionsBox.style.display = 'block';
+        
+        matches.forEach(figure => {
+            const suggestionItem = document.createElement('div');
+            // Ensure this class matches the styling in your CSS for the dropdown rows
+            suggestionItem.className = 'suggestion-item'; 
+            suggestionItem.textContent = figure.name;
+
+            // When a suggestion is clicked, fill the input and hide the dropdown
+            suggestionItem.addEventListener('click', () => {
+                input.value = figure.name;
+                suggestionsBox.style.display = 'none';
+                
+                // You can optionally uncomment the line below to auto-submit when clicked
+                // submitGuess(); 
+            });
+
+            suggestionsBox.appendChild(suggestionItem);
+        });
+    } else {
+        suggestionsBox.style.display = 'none';
+    }
+});
+        
 submitBtn.addEventListener('click', submitGuess);
 
 input.addEventListener('keydown', (e) => {
