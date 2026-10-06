@@ -248,11 +248,10 @@
         }
 
         .cell .text-label { 
-    font-size: 0.68rem; /* Slightly smaller to fit better */
-    font-weight: 600;
-    width: 100%; 
-    line-height: 1.2;
-}
+            font-size: 0.68rem;
+            font-weight: 600;
+            width: 100%; 
+            line-height: 1.2;
         }
 
         .end-game-message {
@@ -318,7 +317,15 @@
 
         <div class="search-box-row">
             <div class="input-wrapper">
-                <input type="text" id="guess-input" placeholder="Type a figure's name..." autocomplete="off" autocorrect="off">
+                <input
+    type="text"
+    id="guess-input"
+    placeholder="Type a figure's name..."
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="words"
+    spellcheck="false"
+>
                 <div id="suggestions" class="suggestions"></div>
             </div>
             <button id="submit-guess-btn" class="submit-btn">Guess</button>
@@ -516,7 +523,7 @@ const month = String(now.getMonth() + 1).padStart(2, '0');
 const day = String(now.getDate()).padStart(2, '0');
 const todayStr = `${year}-${month}-${day}`;
 
-const maxGuesses = typeof maxGuesses !== 'undefined' ? maxGuesses : 10;
+const maxGuesses = 10;
 const localMidnight = new Date(year, now.getMonth(), now.getDate());
 const epochLocal = new Date(2026, 0, 1);
 const daysSinceEpoch = Math.floor((localMidnight - epochLocal) / (1000 * 60 * 60 * 24));
@@ -611,46 +618,7 @@ function buildShareEmojiGrid() {
     return emojiList.join("");
 }
 
-// Autocomplete suggestions
-input.addEventListener('input', () => {
-    if (gameOver) return;
 
-    const query = input.value.trim().toLowerCase();
-    suggestionsBox.innerHTML = '';
-
-    if (!query) {
-        suggestionsBox.style.display = 'none';
-        return;
-    }
-
-    const matches = figures.filter(f => {
-        if (guessedNames.has(f.name)) return false;
-        
-        const nameLower = f.name.toLowerCase();
-        const words = nameLower.split(/\s+/);
-        return words.some(word => word.startsWith(query));
-    });
-
-    if (matches.length === 0) {
-        suggestionsBox.style.display = 'none';
-        return;
-    }
-
-    matches.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'suggestion-item';
-        div.textContent = item.name;
-        
-        div.addEventListener('click', () => {
-            input.value = item.name;
-            suggestionsBox.style.display = 'none';
-        });
-
-        suggestionsBox.appendChild(div);
-    });
-
-    suggestionsBox.style.display = 'block';
-});
 
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.input-wrapper')) {
@@ -790,8 +758,45 @@ function submitGuess() {
     }
 }
 input.addEventListener('input', () => {
-    const query = input.value.trim().toLowerCase();
-    suggestionsBox.innerHTML = ''; // Clear previous suggestions on every keystroke
+    if (gameOver) return;
+
+    // Don't remove spaces from the actual input value.
+    const query = input.value.toLowerCase();
+
+    suggestionsBox.innerHTML = '';
+
+    if (query.trim().length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    const matches = figures.filter(f =>
+        f.name.toLowerCase().includes(query.trim()) &&
+        !guessedNames.has(f.name)
+    );
+
+    if (matches.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    matches.forEach(figure => {
+        const suggestionItem = document.createElement('div');
+
+        suggestionItem.className = 'suggestion-item';
+        suggestionItem.textContent = figure.name;
+
+        suggestionItem.addEventListener('click', () => {
+            input.value = figure.name;
+            suggestionsBox.style.display = 'none';
+            input.focus();
+        });
+
+        suggestionsBox.appendChild(suggestionItem);
+    });
+
+    suggestionsBox.style.display = 'block';
+});
 
     if (query.length === 0) {
         suggestionsBox.style.display = 'none';
@@ -832,6 +837,7 @@ submitBtn.addEventListener('click', submitGuess);
 
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
+        e.preventDefault();
         submitGuess();
     }
 });
