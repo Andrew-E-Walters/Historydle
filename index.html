@@ -375,8 +375,8 @@
         .secret-photo {
             display: block;
             width: 100%;
-            max-width: 320px;
-            max-height: 380px;
+            max-width: 340px;
+            max-height: 420px;
             object-fit: cover;
             border-radius: 10px;
             border: 2px solid var(--border-color);
@@ -523,6 +523,8 @@
         >
 
             <div id="end-game-text"></div>
+
+            <div id="secret-photo-slot" class="secret-photo-slot" aria-live="polite"></div>
 
             <div class="next-person-timer">
                 Next Person in:
@@ -1696,25 +1698,30 @@ const figures = [
 
         function getPersonPhotoUrl(figure) {
             if (!figure || !figure.photoUrl) return '';
-
             const photoUrl = String(figure.photoUrl).trim();
-
-            // Support both the repaired Wikimedia image URLs and any older
-            // Wikipedia media-page URLs that may still be pasted in later.
             if (photoUrl.includes('#/media/File:')) {
                 const fileName = photoUrl.split('#/media/File:')[1];
-                if (fileName) {
-                    return `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(decodeURIComponent(fileName))}`;
-                }
+                if (fileName) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
             }
-
             return photoUrl;
         }
 
-        function renderSecretPhoto() {
-            const existingPhoto = document.getElementById('secret-photo-reveal');
-            if (existingPhoto) existingPhoto.remove();
+        function getPersonPhotoFallbackUrl(figure) {
+            if (!figure || !figure.photoUrl) return '';
+            const photoUrl = String(figure.photoUrl).trim();
+            const marker = '/Special:Redirect/file/';
+            const markerIndex = photoUrl.indexOf(marker);
+            if (markerIndex !== -1) {
+                const fileName = photoUrl.slice(markerIndex + marker.length);
+                return `https://commons.wikimedia.org/wiki/Special:FilePath/${fileName}?width=600`;
+            }
+            return '';
+        }
 
+        function renderSecretPhoto() {
+            const photoSlot = document.getElementById('secret-photo-slot');
+            if (!photoSlot) return;
+            photoSlot.innerHTML = '';
             const photoUrl = getPersonPhotoUrl(secretFigure);
             if (!photoUrl) return;
 
@@ -1729,25 +1736,28 @@ const figures = [
             photo.decoding = 'async';
             photo.src = photoUrl;
 
-            photo.onerror = function () {
-                photoContainer.remove();
-            };
-
             const caption = document.createElement('div');
             caption.className = 'secret-photo-caption';
             caption.textContent = 'Person of the Day';
 
+            const fallbackMessage = document.createElement('div');
+            fallbackMessage.className = 'secret-photo-fallback';
+
+            photo.onerror = function () {
+                const fallbackUrl = getPersonPhotoFallbackUrl(secretFigure);
+                if (fallbackUrl && photo.src !== fallbackUrl) {
+                    photo.src = fallbackUrl;
+                    return;
+                }
+                photoContainer.classList.add('photo-load-failed');
+                photo.removeAttribute('src');
+                fallbackMessage.textContent = `Photo unavailable for ${secretFigure.name}`;
+            };
+
             photoContainer.appendChild(photo);
             photoContainer.appendChild(caption);
-
-            // Keep the Person of the Day photo inside the game-over panel,
-            // immediately after the performance message and before the timer.
-            const nextPersonTimer = endGameBox.querySelector('.next-person-timer');
-            if (nextPersonTimer) {
-                endGameBox.insertBefore(photoContainer, nextPersonTimer);
-            } else {
-                endGameBox.appendChild(photoContainer);
-            }
+            photoContainer.appendChild(fallbackMessage);
+            photoSlot.appendChild(photoContainer);
         }
 
         /* =========================================================
