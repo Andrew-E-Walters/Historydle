@@ -374,13 +374,29 @@
 
         .secret-photo {
             display: block;
-            width: 100%;
-            max-width: 340px;
+            width: 330px;
+            max-width: 100%;
+            height: auto;
             max-height: 420px;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 10px;
             border: 2px solid var(--border-color);
             background-color: #1a1a1c;
+        }
+
+        .secret-photo-fallback {
+            margin-top: 6px;
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .secret-photo-container.photo-load-failed .secret-photo {
+            display: none;
+        }
+
+        .secret-photo-container.photo-validating .secret-photo {
+            opacity: 0.7;
         }
 
         .secret-photo-caption {
@@ -988,7 +1004,7 @@ const figures = [
 {"name": "Floyd Mayweather Jr.", "arena": "Sports", "netWorth": "400,000,000", "country": "US", "followers": 29000000, "gender": "Male", "age": 49, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Floyd_Mayweather_Jr._2021.jpg"},
 {"name": "Manny Pacquiao", "arena": "Sports", "netWorth": "220,000,000", "country": "US", "followers": 7500000, "gender": "Male", "age": 47, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Manny_Pacquiao_2021.jpg"},
 {"name": "Mike Tyson", "arena": "Sports", "netWorth": "10,000,000", "country": "US", "followers": 30000000, "gender": "Male", "age": 60, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mike_Tyson_2024.jpg"},
-{"name": "Conor McGregor", "arena": "Sports", "netWorth": "200,000,000", "country": "US", "followers": 47000000, "gender": "Male", "age": 38, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Conor_McGregor_2021.jpg"},
+{"name": "Conor McGregor", "arena": "Sports", "netWorth": "200,000,000", "country": "US", "followers": 47000000, "gender": "Male", "age": 38, "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Conor_McGregor%2C_UFC_189_World_Tour_London_%282%29.jpg"},
 {"name": "Ronda Rousey", "arena": "Sports", "netWorth": "14,000,000", "country": "US", "followers": 17000000, "gender": "Female", "age": 39, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ronda_Rousey_2019.jpg"},
 {"name": "Jon Jones", "arena": "Sports", "netWorth": "3,000,000", "country": "US", "followers": 8000000, "gender": "Male", "age": 39, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jon_Jones_2023.jpg"},
 {"name": "Lewis Hamilton", "arena": "Sports", "netWorth": "300,000,000", "country": "UK", "followers": 37000000, "gender": "Male", "age": 41, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Lewis_Hamilton_2024.jpg"},
@@ -1329,7 +1345,6 @@ const figures = [
                 (dayIndex * 60) %
                 figures.length
             ];
-
 
         document.getElementById(
             'daily-number'
@@ -1698,25 +1713,379 @@ const figures = [
 
         function getPersonPhotoUrl(figure) {
             if (!figure || !figure.photoUrl) return '';
+
+            // v7 prefers a URL that was already validated during the
+            // background database pre-check. This means the end-game reveal
+            // does not have to discover a broken Wikimedia filename first.
+            if (resolvedPersonPhotoCache.has(figure.name)) {
+                return resolvedPersonPhotoCache.get(figure.name);
+            }
+
             const photoUrl = String(figure.photoUrl).trim();
+
+            // Convert Wikimedia "Redirect/file" URLs into the more reliable
+            // Special:FilePath endpoint and properly encode the filename.
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+            if (redirectIndex !== -1) {
+                const fileName = photoUrl.slice(redirectIndex + redirectMarker.length);
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
+                }
+            }
+
             if (photoUrl.includes('#/media/File:')) {
                 const fileName = photoUrl.split('#/media/File:')[1];
-                if (fileName) return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
+                }
             }
+
             return photoUrl;
         }
 
         function getPersonPhotoFallbackUrl(figure) {
             if (!figure || !figure.photoUrl) return '';
             const photoUrl = String(figure.photoUrl).trim();
-            const marker = '/Special:Redirect/file/';
-            const markerIndex = photoUrl.indexOf(marker);
-            if (markerIndex !== -1) {
-                const fileName = photoUrl.slice(markerIndex + marker.length);
-                return `https://commons.wikimedia.org/wiki/Special:FilePath/${fileName}?width=600`;
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+
+            if (redirectIndex !== -1) {
+                const fileName = photoUrl.slice(redirectIndex + redirectMarker.length);
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(decodeURIComponent(fileName))}`;
+                }
             }
+
             return '';
         }
+
+        // Photo validation/repair cache. A broken Wikimedia filename is repaired
+        // automatically the first time that person is revealed. Successful
+        // resolutions are cached for the rest of the session.
+        const resolvedPersonPhotoCache = new Map();
+        const failedPersonPhotoCache = new Set();
+
+        function getCommonsFileName(figure) {
+            if (!figure || !figure.photoUrl) return '';
+            const photoUrl = String(figure.photoUrl).trim();
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+
+            if (redirectIndex !== -1) {
+                return decodeURIComponent(photoUrl.slice(redirectIndex + redirectMarker.length));
+            }
+
+            if (photoUrl.includes('#/media/File:')) {
+                return decodeURIComponent(photoUrl.split('#/media/File:')[1]);
+            }
+
+            return '';
+        }
+
+        function normalizePhotoSearchText(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/[_-]+/g, ' ')
+                .replace(/[^a-z0-9]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        async function lookupCommonsExactPhoto(fileName) {
+            if (!fileName) return '';
+
+            const apiUrl =
+                'https://commons.wikimedia.org/w/api.php' +
+                '?action=query' +
+                '&format=json' +
+                '&origin=*' +
+                '&prop=imageinfo' +
+                '&iiprop=url|mime' +
+                '&iiurlwidth=600' +
+                `&titles=${encodeURIComponent('File:' + fileName)}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
+                const page = pages.find(item => item && item.imageinfo && item.imageinfo[0]);
+                const imageInfo = page && page.imageinfo && page.imageinfo[0];
+                if (!imageInfo) return '';
+                if (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/')) return '';
+                return imageInfo.thumburl || imageInfo.url || '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        async function searchCommonsPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+
+            const apiUrl =
+                'https://commons.wikimedia.org/w/api.php' +
+                '?action=query' +
+                '&format=json' +
+                '&origin=*' +
+                '&generator=search' +
+                '&gsrnamespace=6' +
+                '&gsrlimit=10' +
+                `&gsrsearch=${encodeURIComponent('"' + figure.name + '"')}` +
+                '&prop=imageinfo' +
+                '&iiprop=url|mime' +
+                '&iiurlwidth=600';
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
+                const nameTokens = normalizePhotoSearchText(figure.name)
+                    .split(' ')
+                    .filter(token => token.length > 2);
+
+                const candidates = pages
+                    .map(page => {
+                        const imageInfo = page && page.imageinfo && page.imageinfo[0];
+                        if (!imageInfo || (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))) return null;
+                        const title = normalizePhotoSearchText(page.title || '');
+                        const tokenMatches = nameTokens.filter(token => title.includes(token)).length;
+                        const exactNameMatch = normalizePhotoSearchText(page.title || '').includes(normalizePhotoSearchText(figure.name));
+                        return {
+                            url: imageInfo.thumburl || imageInfo.url || '',
+                            score: tokenMatches + (exactNameMatch ? 10 : 0),
+                            title
+                        };
+                    })
+                    .filter(Boolean)
+                    .filter(candidate => candidate.url && candidate.score >= Math.max(1, nameTokens.length));
+
+                candidates.sort((a, b) => b.score - a.score);
+                return candidates.length ? candidates[0].url : '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        async function repairPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            if (resolvedPersonPhotoCache.has(figure.name)) return resolvedPersonPhotoCache.get(figure.name);
+            if (failedPersonPhotoCache.has(figure.name)) return '';
+
+            const fileName = getCommonsFileName(figure);
+            let repairedUrl = await lookupCommonsExactPhoto(fileName);
+
+            // If the stored filename no longer exists, search Commons for a
+            // likely image whose title matches the Persondle figure's name.
+            if (!repairedUrl) {
+                repairedUrl = await searchCommonsPersonPhoto(figure);
+            }
+
+            if (repairedUrl) {
+                resolvedPersonPhotoCache.set(figure.name, repairedUrl);
+                return repairedUrl;
+            }
+
+            failedPersonPhotoCache.add(figure.name);
+            return '';
+        }
+
+        /*
+         * v7 DATABASE PHOTO PRE-CHECK
+         *
+         * The full Persondle database is checked in the background as soon as
+         * the game loads. Wikimedia filenames are checked in batches through
+         * the Commons API, rather than loading 397 images into the page.
+         * Any filename that no longer exists is then repaired by searching
+         * Commons for a likely image matching the figure's name.
+         *
+         * This runs independently of gameplay, so it never delays the first
+         * screen or blocks the player from starting a round.
+         */
+        let allPersonPhotosPrevalidated = false;
+        let allPersonPhotosPrevalidationPromise = null;
+
+        function chunkArray(items, size) {
+            const chunks = [];
+            for (let i = 0; i < items.length; i += size) {
+                chunks.push(items.slice(i, i + size));
+            }
+            return chunks;
+        }
+
+        async function validateCommonsPhotoBatch(figuresBatch) {
+            const entries = figuresBatch
+                .map(figure => ({
+                    figure,
+                    fileName: getCommonsFileName(figure)
+                }))
+                .filter(entry => entry.fileName);
+
+            if (!entries.length) return [];
+
+            const titles = entries.map(entry => `File:${entry.fileName}`).join('|');
+            const apiUrl =
+                'https://commons.wikimedia.org/w/api.php' +
+                '?action=query' +
+                '&format=json' +
+                '&origin=*' +
+                '&prop=imageinfo' +
+                '&iiprop=url|mime' +
+                '&iiurlwidth=600' +
+                `&titles=${encodeURIComponent(titles)}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return entries.map(entry => ({ ...entry, url: '' }));
+
+                const data = await response.json();
+                const pages = data && data.query && data.query.pages
+                    ? Object.values(data.query.pages)
+                    : [];
+
+                const pageByTitle = new Map(
+                    pages
+                        .filter(page => page && page.imageinfo && page.imageinfo[0])
+                        .map(page => [normalizePhotoSearchText(page.title || ''), page])
+                );
+
+                return entries.map(entry => {
+                    const normalizedTitle = normalizePhotoSearchText(`File:${entry.fileName}`);
+                    const page = pageByTitle.get(normalizedTitle);
+                    const imageInfo = page && page.imageinfo && page.imageinfo[0];
+
+                    if (
+                        !imageInfo ||
+                        (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))
+                    ) {
+                        return { ...entry, url: '' };
+                    }
+
+                    return {
+                        ...entry,
+                        url: imageInfo.thumburl || imageInfo.url || ''
+                    };
+                });
+            } catch (error) {
+                return entries.map(entry => ({ ...entry, url: '' }));
+            }
+        }
+
+        function probeImageUrl(url, timeoutMs = 9000) {
+            if (!url) return Promise.resolve(false);
+
+            return new Promise(resolve => {
+                const image = new Image();
+                let settled = false;
+
+                const finish = result => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timeoutId);
+                    image.onload = null;
+                    image.onerror = null;
+                    resolve(result);
+                };
+
+                const timeoutId = setTimeout(() => finish(false), timeoutMs);
+
+                image.onload = () => finish(true);
+                image.onerror = () => finish(false);
+                image.src = url;
+            });
+        }
+
+        async function prevalidateAllPersonPhotos() {
+            if (allPersonPhotosPrevalidated) return;
+            if (allPersonPhotosPrevalidationPromise) {
+                return allPersonPhotosPrevalidationPromise;
+            }
+
+            allPersonPhotosPrevalidationPromise = (async () => {
+                const commonsFigures = figures.filter(figure => getCommonsFileName(figure));
+                const directUrlFigures = figures.filter(figure => !getCommonsFileName(figure));
+
+                let validatedCount = 0;
+                let repairedCount = 0;
+                let failedCount = 0;
+
+                // 50 Commons titles per API request keeps the startup work small
+                // while still checking the entire database.
+                const batches = chunkArray(commonsFigures, 50);
+
+                for (const batch of batches) {
+                    const results = await validateCommonsPhotoBatch(batch);
+
+                    const missing = [];
+
+                    results.forEach(result => {
+                        if (result.url) {
+                            resolvedPersonPhotoCache.set(result.figure.name, result.url);
+                            validatedCount++;
+                        } else {
+                            missing.push(result.figure);
+                        }
+                    });
+
+                    // Repair only the filenames that failed the exact lookup.
+                    // This avoids unnecessary Commons searches for healthy photos.
+                    if (missing.length) {
+                        const repairResults = await Promise.all(
+                            missing.map(figure => repairPersonPhoto(figure))
+                        );
+
+                        repairResults.forEach(url => {
+                            if (url) {
+                                repairedCount++;
+                            } else {
+                                failedCount++;
+                            }
+                        });
+                    }
+                }
+
+                // Validate any non-Wikimedia URLs (currently this covers the
+                // direct Conor McGregor image) without requiring CORS access.
+                if (directUrlFigures.length) {
+                    const directResults = await Promise.all(
+                        directUrlFigures.map(async figure => ({
+                            figure,
+                            valid: await probeImageUrl(String(figure.photoUrl || '').trim())
+                        }))
+                    );
+
+                    directResults.forEach(result => {
+                        if (result.valid) {
+                            resolvedPersonPhotoCache.set(
+                                result.figure.name,
+                                String(result.figure.photoUrl || '').trim()
+                            );
+                            validatedCount++;
+                        } else {
+                            failedCount++;
+                        }
+                    });
+                }
+
+                allPersonPhotosPrevalidated = true;
+
+                // Keep diagnostics in the console for development/debugging,
+                // without showing startup messages to players.
+                console.info(
+                    `[Persondle] Photo pre-check complete: ${validatedCount} validated, ` +
+                    `${repairedCount} repaired, ${failedCount} unavailable.`
+                );
+            })().catch(error => {
+                console.warn('[Persondle] Photo pre-check could not complete:', error);
+            });
+
+            return allPersonPhotosPrevalidationPromise;
+        }
+
+        // Start the full database photo pre-check once all photo-validation
+        // helpers and caches have been initialized. Gameplay does not wait.
+        prevalidateAllPersonPhotos();
 
         function renderSecretPhoto() {
             const photoSlot = document.getElementById('secret-photo-slot');
@@ -1743,12 +2112,38 @@ const figures = [
             const fallbackMessage = document.createElement('div');
             fallbackMessage.className = 'secret-photo-fallback';
 
-            photo.onerror = function () {
+            let repairAttempted = false;
+            photo.onload = function () {
+                photoContainer.classList.remove('photo-load-failed');
+                fallbackMessage.textContent = '';
+            };
+
+            photo.onerror = async function () {
+                if (repairAttempted) {
+                    photoContainer.classList.add('photo-load-failed');
+                    photo.removeAttribute('src');
+                    fallbackMessage.textContent = `Photo unavailable for ${secretFigure.name}`;
+                    return;
+                }
+
+                repairAttempted = true;
+                photoContainer.classList.add('photo-validating');
+                fallbackMessage.textContent = 'Validating photo…';
+
                 const fallbackUrl = getPersonPhotoFallbackUrl(secretFigure);
                 if (fallbackUrl && photo.src !== fallbackUrl) {
                     photo.src = fallbackUrl;
                     return;
                 }
+
+                const repairedUrl = await repairPersonPhoto(secretFigure);
+                photoContainer.classList.remove('photo-validating');
+
+                if (repairedUrl && photo.src !== repairedUrl) {
+                    photo.src = repairedUrl;
+                    return;
+                }
+
                 photoContainer.classList.add('photo-load-failed');
                 photo.removeAttribute('src');
                 fallbackMessage.textContent = `Photo unavailable for ${secretFigure.name}`;
