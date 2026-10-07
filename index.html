@@ -86,19 +86,17 @@
             gap: 12px;
         }
 
-        /* SEARCH BAR */
+        /* =========================================================
+           SEARCH BAR
+           ========================================================= */
 
         .search-box-row {
             display: flex;
             gap: 8px;
             width: 100%;
-
             position: sticky;
             top: 8px;
-
-            /* Keep the search and dropdown above everything */
             z-index: 10000;
-
             background-color: var(--bg-color);
             padding-bottom: 4px;
         }
@@ -157,7 +155,7 @@
         }
 
         /* =========================================================
-           MOBILE-FRIENDLY SCROLLABLE SUGGESTIONS DROPDOWN
+           MOBILE-FRIENDLY SCROLLABLE SUGGESTIONS
            ========================================================= */
 
         .suggestions {
@@ -172,33 +170,16 @@
             border: 2px solid var(--border-color);
             border-radius: 8px;
 
-            /*
-                Fixed height is important.
-
-                Instead of expanding the page to show every person,
-                the dropdown becomes its own scrollable area.
-            */
             height: 280px;
             max-height: 280px;
 
-            /*
-                IMPORTANT FOR MOBILE:
-                The dropdown itself handles vertical touch movement.
-            */
             overflow-y: scroll;
             overflow-x: hidden;
 
             -webkit-overflow-scrolling: touch;
 
-            /*
-                Prevents the browser from passing the swipe
-                through to the page.
-            */
             overscroll-behavior: contain;
 
-            /*
-                Allows vertical finger scrolling.
-            */
             touch-action: pan-y;
 
             z-index: 99999;
@@ -207,16 +188,8 @@
 
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
 
-            /*
-                Make sure the dropdown starts at the top
-                every time it opens.
-            */
             scrollbar-width: thin;
         }
-
-        /*
-            Make the scrollbar visible on desktop.
-        */
 
         .suggestions::-webkit-scrollbar {
             width: 8px;
@@ -237,23 +210,13 @@
 
         .suggestion-item {
             padding: 14px;
-
             min-height: 48px;
-
             cursor: pointer;
-
             border-bottom: 1px solid var(--border-color);
-
             color: #ffffff;
-
             text-align: left;
-
             font-size: 0.95rem;
 
-            /*
-                Allows touch interaction with individual
-                suggestions without breaking the dropdown scroll.
-            */
             touch-action: manipulation;
 
             user-select: none;
@@ -272,7 +235,9 @@
             background-color: #3a3a3c;
         }
 
-        /* GUESS CARDS */
+        /* =========================================================
+           GUESS CARDS
+           ========================================================= */
 
         .guess-card {
             background-color: var(--card-bg);
@@ -369,7 +334,9 @@
             line-height: 1.2;
         }
 
-        /* END GAME */
+        /* =========================================================
+           END GAME
+           ========================================================= */
 
         .end-game-message {
             text-align: center;
@@ -391,6 +358,43 @@
         .end-game-message.win {
             border-color: var(--green);
             color: #ffffff;
+        }
+
+        /* =========================================================
+           PERSON OF THE DAY PHOTO
+           ========================================================= */
+
+        .secret-photo-container {
+            margin-top: 14px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .secret-photo {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            max-height: 380px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            background-color: #1a1a1c;
+        }
+
+        .secret-photo-caption {
+            margin-top: 6px;
+            color: #818384;
+            font-size: 0.72rem;
+            font-weight: normal;
+        }
+
+        .secret-person-name {
+            margin-top: 10px;
+            color: #ffffff;
+            font-size: 1.15rem;
+            font-weight: bold;
         }
 
         .next-person-timer {
@@ -418,7 +422,9 @@
             opacity: 0.9;
         }
 
-        /* EXTRA MOBILE TUNING */
+        /* =========================================================
+           MOBILE
+           ========================================================= */
 
         @media (max-width: 500px) {
 
@@ -447,6 +453,11 @@
 
             .cell {
                 min-height: 54px;
+            }
+
+            .secret-photo {
+                max-width: 100%;
+                max-height: 400px;
             }
         }
 
@@ -562,6 +573,7 @@
         const countryEmojis = {
 
             "USA": "🇺🇸",
+            "US": "🇺🇸",
             "South Africa": "🇿🇦",
             "UK": "🇬🇧",
             "Germany": "🇩🇪",
@@ -584,6 +596,7 @@
         const countryContinents = {
 
             "USA": "North America",
+            "US": "North America",
             "Canada": "North America",
             "UK": "Europe",
             "Germany": "Europe",
@@ -622,6 +635,7 @@
             return "🧙‍♂️";
 
         }
+
 
 
         /* =========================================================
