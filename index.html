@@ -1750,7 +1750,9 @@ const figures = [
                 const imageInfo = page && page.imageinfo && page.imageinfo[0];
                 if (!imageInfo) return '';
                 if (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/')) return '';
-                return imageInfo.thumburl || imageInfo.url || '';
+                const candidateUrl = imageInfo.thumburl || imageInfo.url || '';
+                if (!candidateUrl) return '';
+                return await probeImageUrl(candidateUrl, 7000) ? candidateUrl : '';
             } catch (error) {
                 return '';
             }
@@ -1798,7 +1800,17 @@ const figures = [
                     .filter(candidate => candidate.url && candidate.score >= Math.max(1, nameTokens.length));
 
                 candidates.sort((a, b) => b.score - a.score);
-                return candidates.length ? candidates[0].url : '';
+
+                // Do not assume that a Commons search result is actually
+                // loadable. Probe candidates in score order and keep the first
+                // image that the browser can successfully fetch.
+                for (const candidate of candidates) {
+                    if (await probeImageUrl(candidate.url, 7000)) {
+                        return candidate.url;
+                    }
+                }
+
+                return '';
             } catch (error) {
                 return '';
             }
@@ -1816,6 +1828,23 @@ const figures = [
             // likely image whose title matches the Persondle figure's name.
             if (!repairedUrl) {
                 repairedUrl = await searchCommonsPersonPhoto(figure);
+            }
+
+            // A second, broader search helps names that Commons indexes under
+            // a stage name, nickname, punctuation variant, or maiden name.
+            if (!repairedUrl && figure.name) {
+                const broadQuery = normalizePhotoSearchText(figure.name)
+                    .split(' ')
+                    .filter(token => token.length > 2)
+                    .slice(0, 4)
+                    .join(' ');
+
+                if (broadQuery) {
+                    repairedUrl = await searchCommonsPersonPhoto({
+                        ...figure,
+                        name: broadQuery
+                    });
+                }
             }
 
             if (repairedUrl) {
@@ -2019,27 +2048,89 @@ const figures = [
             return allPersonPhotosPrevalidationPromise;
         }
 
+        // Optional browser-side audit for development. Run
+        // window.persondlePhotoAudit() from the console to verify every
+        // database image from the player's actual network connection.
+        // This is intentionally not run automatically because it would make
+        // a large number of image requests during normal gameplay.
+        window.persondlePhotoAudit = async function () {
+            const results = [];
+
+            for (const figure of figures) {
+                const url = await getReliablePersonPhotoUrl(figure);
+                const isFallback = url === PERSON_PHOTO_ERROR_FALLBACK;
+                results.push({
+                    name: figure.name,
+                    photoUrl: isFallback ? '' : url,
+                    working: !isFallback
+                });
+            }
+
+            const failed = results.filter(result => !result.working);
+            console.table(results);
+            console.info(
+                `[Persondle] Browser photo audit: ${results.length - failed.length}/${results.length} working, ${failed.length} fallback.`
+            );
+            return results;
+        };
+
         // Start the full database photo pre-check once all photo-validation
         // helpers and caches have been initialized. Gameplay does not wait.
         prevalidateAllPersonPhotos();
+
+        // Universal emergency image used whenever the intended Person of the Day
+        // photo cannot be loaded or repaired. This guarantees the reveal never
+        // ends with a broken-image icon.
+        const PERSON_PHOTO_ERROR_FALLBACK =
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyJaNfcZdqzlz_TGnol1A9SsvU94pPy37QVQY_a-mHiGrkPM6toSo4E24M&s=10';
+
+        async function getReliablePersonPhotoUrl(figure) {
+            if (!figure || !figure.name) return PERSON_PHOTO_ERROR_FALLBACK;
+
+            // Use a URL that has already been verified when available.
+            if (resolvedPersonPhotoCache.has(figure.name)) {
+                return resolvedPersonPhotoCache.get(figure.name);
+            }
+
+            // Give the original Wikimedia filename one direct, reliable chance.
+            const directUrl = getPersonPhotoUrl(figure);
+            if (directUrl) {
+                const directWorks = await probeImageUrl(directUrl, 7000);
+                if (directWorks) {
+                    resolvedPersonPhotoCache.set(figure.name, directUrl);
+                    return directUrl;
+                }
+            }
+
+            // Then use the Commons API/repair system to find a verified image.
+            const repairedUrl = await repairPersonPhoto(figure);
+            if (repairedUrl) return repairedUrl;
+
+            // Final Wikimedia Redirect endpoint fallback.
+            const fallbackUrl = getPersonPhotoFallbackUrl(figure);
+            if (fallbackUrl && await probeImageUrl(fallbackUrl, 7000)) {
+                resolvedPersonPhotoCache.set(figure.name, fallbackUrl);
+                return fallbackUrl;
+            }
+
+            // Last resort: use the universal technical-difficulties image.
+            return PERSON_PHOTO_ERROR_FALLBACK;
+        }
 
         function renderSecretPhoto() {
             const photoSlot = document.getElementById('secret-photo-slot');
             if (!photoSlot) return;
             photoSlot.innerHTML = '';
-            const photoUrl = getPersonPhotoUrl(secretFigure);
-            if (!photoUrl) return;
 
             const photoContainer = document.createElement('div');
             photoContainer.id = 'secret-photo-reveal';
-            photoContainer.className = 'secret-photo-container';
+            photoContainer.className = 'secret-photo-container photo-validating';
 
             const photo = document.createElement('img');
             photo.className = 'secret-photo';
             photo.alt = `${secretFigure.name} — Person of the Day`;
             photo.loading = 'eager';
             photo.decoding = 'async';
-            photo.src = photoUrl;
 
             const caption = document.createElement('div');
             caption.className = 'secret-photo-caption';
@@ -2047,24 +2138,59 @@ const figures = [
 
             const fallbackMessage = document.createElement('div');
             fallbackMessage.className = 'secret-photo-fallback';
+            fallbackMessage.textContent = 'Loading photo…';
+
+            photoContainer.appendChild(photo);
+            photoContainer.appendChild(caption);
+            photoContainer.appendChild(fallbackMessage);
+            photoSlot.appendChild(photoContainer);
 
             let repairAttempted = false;
-            photo.onload = function () {
-                photoContainer.classList.remove('photo-load-failed');
+
+            const failPhoto = () => {
+                photoContainer.classList.remove('photo-validating');
+                photoContainer.classList.add('photo-load-failed');
+                fallbackMessage.textContent = '';
+
+                // Never leave a broken image on screen. If the intended person
+                // photo fails through every repair path, show the supplied
+                // technical-difficulties image instead.
+                if (photo.src !== PERSON_PHOTO_ERROR_FALLBACK) {
+                    photo.src = PERSON_PHOTO_ERROR_FALLBACK;
+                }
+            };
+
+            // IMPORTANT: attach handlers BEFORE assigning src. A cached image can
+            // finish loading immediately, which can otherwise bypass onload/onerror.
+            photo.onload = () => {
+                photoContainer.classList.remove('photo-validating', 'photo-load-failed');
                 fallbackMessage.textContent = '';
             };
 
-            photo.onerror = async function () {
-                if (repairAttempted) {
-                    photoContainer.classList.add('photo-load-failed');
+            photo.onerror = async () => {
+                if (photo.src === PERSON_PHOTO_ERROR_FALLBACK) {
+                    // The emergency image itself failed. There is nothing more
+                    // reliable to display, so avoid an endless retry loop.
                     photo.removeAttribute('src');
-                    fallbackMessage.textContent = `Photo unavailable for ${secretFigure.name}`;
+                    photoContainer.classList.remove('photo-validating');
+                    return;
+                }
+
+                if (repairAttempted) {
+                    failPhoto();
                     return;
                 }
 
                 repairAttempted = true;
                 photoContainer.classList.add('photo-validating');
-                fallbackMessage.textContent = 'Validating photo…';
+                fallbackMessage.textContent = 'Repairing photo…';
+
+                const repairedUrl = await repairPersonPhoto(secretFigure);
+
+                if (repairedUrl) {
+                    photo.src = repairedUrl;
+                    return;
+                }
 
                 const fallbackUrl = getPersonPhotoFallbackUrl(secretFigure);
                 if (fallbackUrl && photo.src !== fallbackUrl) {
@@ -2072,23 +2198,20 @@ const figures = [
                     return;
                 }
 
-                const repairedUrl = await repairPersonPhoto(secretFigure);
-                photoContainer.classList.remove('photo-validating');
-
-                if (repairedUrl && photo.src !== repairedUrl) {
-                    photo.src = repairedUrl;
-                    return;
-                }
-
-                photoContainer.classList.add('photo-load-failed');
-                photo.removeAttribute('src');
-                fallbackMessage.textContent = `Photo unavailable for ${secretFigure.name}`;
+                failPhoto();
             };
 
-            photoContainer.appendChild(photo);
-            photoContainer.appendChild(caption);
-            photoContainer.appendChild(fallbackMessage);
-            photoSlot.appendChild(photoContainer);
+            // Resolve the photo asynchronously, but always keep the reveal area
+            // present so a slow Commons response cannot make the game appear broken.
+            getReliablePersonPhotoUrl(secretFigure)
+                .then(url => {
+                    if (url) {
+                        photo.src = url;
+                    } else {
+                        failPhoto();
+                    }
+                })
+                .catch(() => failPhoto());
         }
 
         /* =========================================================
