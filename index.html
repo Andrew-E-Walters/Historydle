@@ -395,7 +395,18 @@
             display: none;
         }
 
-        .secret-photo-container.photo-validating .secret-photo {
+        
+        .secret-photo-container.photo-loading-visible {
+            min-height: 180px;
+        }
+
+        .secret-photo-container.photo-loading-visible .secret-photo-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+.secret-photo-container.photo-validating .secret-photo {
             opacity: 0.7;
         }
 
@@ -1489,6 +1500,17 @@ const figures = [
 
 
         /* =========================================================
+           PHOTO STATE (must exist before saved-game restoration)
+           ========================================================= */
+
+        // These caches must be initialized before localStorage restoration.
+        // Otherwise a refresh of an already-completed game can call
+        // renderSecretPhoto() before the photo resolver is ready.
+        const resolvedPersonPhotoCache = new Map();
+        const failedPersonPhotoCache = new Set();
+
+
+        /* =========================================================
            LOCAL STORAGE
            ========================================================= */
 
@@ -1504,6 +1526,16 @@ const figures = [
             savedData.date === todayStr &&
             Array.isArray(savedData.guesses)
         ) {
+
+            // Reuse the verified photo from the previous session when present.
+            // It is still probed before display, and the normal repair pipeline
+            // remains available if the URL has expired or stopped working.
+            if (savedData.photoUrl) {
+                resolvedPersonPhotoCache.set(
+                    secretFigure.name,
+                    String(savedData.photoUrl)
+                );
+            }
 
             savedData.guesses.forEach(
                 name => {
@@ -1580,7 +1612,8 @@ const figures = [
                     date: todayStr,
                     guesses: Array.from(
                         guessedNames
-                    )
+                    ),
+                    photoUrl: resolvedPersonPhotoCache.get(secretFigure.name) || savedData.photoUrl || ''
                 })
             );
 
@@ -1843,12 +1876,6 @@ const figures = [
 
             return '';
         }
-
-        // Photo validation/repair cache. A broken Wikimedia filename is repaired
-        // automatically the first time that person is revealed. Successful
-        // resolutions are cached for the rest of the session.
-        const resolvedPersonPhotoCache = new Map();
-        const failedPersonPhotoCache = new Set();
 
         function getCommonsFileName(figure) {
             if (!figure || !figure.photoUrl) return '';
@@ -2371,6 +2398,7 @@ const figures = [
             if (directUrl) {
                 if (await probeImageUrl(directUrl, 7000)) {
                     resolvedPersonPhotoCache.set(figure.name, directUrl);
+                    if (figure.name === secretFigure.name) saveState();
                     return directUrl;
                 }
             }
@@ -2384,6 +2412,7 @@ const figures = [
             const fallbackUrl = getPersonPhotoFallbackUrl(figure);
             if (fallbackUrl && await probeImageUrl(fallbackUrl, 7000)) {
                 resolvedPersonPhotoCache.set(figure.name, fallbackUrl);
+                if (figure.name === secretFigure.name) saveState();
                 return fallbackUrl;
             }
 
@@ -2400,7 +2429,7 @@ const figures = [
 
             const photoContainer = document.createElement('div');
             photoContainer.id = 'secret-photo-reveal';
-            photoContainer.className = 'secret-photo-container photo-validating';
+            photoContainer.className = 'secret-photo-container photo-validating photo-loading-visible';
 
             const photo = document.createElement('img');
             photo.className = 'secret-photo';
@@ -2438,7 +2467,7 @@ const figures = [
             // IMPORTANT: attach handlers BEFORE assigning src. A cached image can
             // finish loading immediately, which can otherwise bypass onload/onerror.
             photo.onload = () => {
-                photoContainer.classList.remove('photo-validating', 'photo-load-failed');
+                photoContainer.classList.remove('photo-validating', 'photo-load-failed', 'photo-loading-visible');
                 fallbackMessage.textContent = '';
             };
 
@@ -2459,6 +2488,8 @@ const figures = [
                 const repairedUrl = await repairPersonPhoto(secretFigure);
 
                 if (repairedUrl) {
+                    resolvedPersonPhotoCache.set(secretFigure.name, repairedUrl);
+                    saveState();
                     photo.src = repairedUrl;
                     return;
                 }
@@ -2473,6 +2504,8 @@ const figures = [
             getReliablePersonPhotoUrl(secretFigure)
                 .then(url => {
                     if (url) {
+                        resolvedPersonPhotoCache.set(secretFigure.name, url);
+                        saveState();
                         photo.src = url;
                     } else {
                         failPhoto();
