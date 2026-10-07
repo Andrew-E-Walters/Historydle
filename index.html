@@ -584,7 +584,7 @@
 
             <div class="faq-row">
                 <span class="faq-swatch faq-yellow"></span>
-                <span><strong>Yellow</strong> = close match or same arena cluster.</span>
+                <span><strong>Yellow</strong> = close match.</span>
             </div>
 
             <div class="faq-row">
@@ -1222,37 +1222,9 @@ const figures = [
 
                 }
 
-            } else if (type === 'arena') {
-
-                const normalizedValue = String(value || '').trim().toLowerCase();
-                const normalizedTarget = String(targetValue || '').trim().toLowerCase();
-
-                if (normalizedValue === normalizedTarget) {
-                    statusClass = 'correct';
-                } else {
-                    const arenaClusters = [
-                        ['movies', 'tv', 'reality tv', 'movies & tv'],
-                        ['politics', 'business', 'tech & science', 'journalism'],
-                        ['music', 'literature'],
-                        ['writer/director'],
-                        ['influencers', 'podcasters'],
-                        ['sports']
-                    ];
-
-                    const sameCluster = arenaClusters.some(
-                        cluster =>
-                            cluster.includes(normalizedValue) &&
-                            cluster.includes(normalizedTarget)
-                    );
-
-                    if (sameCluster) {
-                        statusClass = 'partial';
-                    }
-                }
-
             } else if (type === 'followers') {
 
-                const percentDifference = Math.abs(numValue - numTarget) / numTarget;
+    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
 
     if (percentDifference <= 0.15) {
         // Within 15% = GREEN
@@ -1318,6 +1290,35 @@ const figures = [
                     numValue < numTarget
                         ? ' ⬆️'
                         : ' ⬇️';
+
+            } else if (type === 'arena') {
+
+                if (value === targetValue) {
+
+                    statusClass = 'correct';
+
+                } else {
+
+                    const arenaClusters = [
+                        ['Music', 'Literature', 'Writer/Director'],
+                        ['Movies', 'TV', 'Reality TV'],
+                        ['Podcasters', 'Influencers'],
+                        ['Tech & Science', 'Business', 'Politics', 'Journalism'],
+                        ['Sports']
+                    ];
+
+                    // Bidirectional cluster match: yellow whenever the guessed
+                    // Arena and the daily person's Arena share a cluster.
+                    const sameCluster = arenaClusters.some(cluster =>
+                        cluster.includes(String(value).trim()) &&
+                        cluster.includes(String(targetValue).trim())
+                    );
+
+                    if (sameCluster) {
+                        statusClass = 'partial';
+                    }
+
+                }
 
             } else if (type === 'netWorth') {
 
@@ -2065,7 +2066,10 @@ const figures = [
         async function repairPersonPhoto(figure) {
             if (!figure || !figure.name) return '';
             if (resolvedPersonPhotoCache.has(figure.name)) return resolvedPersonPhotoCache.get(figure.name);
-            if (failedPersonPhotoCache.has(figure.name)) return '';
+            // A failed lookup is never treated as permanent. A refresh can
+            // race the background audit or a provider can briefly time out.
+            // Always allow the current reveal to retry the real photo sources.
+            failedPersonPhotoCache.delete(figure.name);
 
             // 1. Wikipedia page image — preferred source.
             let repairedUrl = await lookupWikipediaPersonPhoto(figure);
@@ -2305,9 +2309,20 @@ const figures = [
                 return resolvedPersonPhotoCache.get(figure.name);
             }
 
-            // Prefer the repair pipeline: Wikipedia first, then Commons, then
-            // the optional Google Images provider. This prevents a stale stored
-            // Commons filename from blocking a valid Wikipedia image.
+            // First try the figure's known photo URL directly. This is important
+            // on refresh: the background audit may still be running, and there is
+            // no reason to replace a known-good image with the emergency image
+            // just because an API lookup has not finished yet.
+            const directUrl = getPersonPhotoUrl(figure);
+            if (directUrl && directUrl !== PERSON_PHOTO_ERROR_FALLBACK) {
+                if (await probeImageUrl(directUrl, 7000)) {
+                    resolvedPersonPhotoCache.set(figure.name, directUrl);
+                    return directUrl;
+                }
+            }
+
+            // Then use the repair pipeline: Wikipedia first, then Commons, then
+            // the optional Google Images provider.
             const repairedUrl = await repairPersonPhoto(figure);
             if (repairedUrl) return repairedUrl;
 
@@ -2412,6 +2427,8 @@ const figures = [
 
             // Resolve the photo asynchronously, but always keep the reveal area
             // present so a slow Commons response cannot make the game appear broken.
+            // The resolver now retries real sources instead of trusting a stale
+            // failed-cache entry from the background pre-check.
             getReliablePersonPhotoUrl(secretFigure)
                 .then(url => {
                     if (url) {
