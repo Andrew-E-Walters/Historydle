@@ -1222,9 +1222,37 @@ const figures = [
 
                 }
 
+            } else if (type === 'arena') {
+
+                const normalizedValue = String(value || '').trim().toLowerCase();
+                const normalizedTarget = String(targetValue || '').trim().toLowerCase();
+
+                if (normalizedValue === normalizedTarget) {
+                    statusClass = 'correct';
+                } else {
+                    const arenaClusters = [
+                        ['movies', 'tv', 'reality tv', 'movies & tv'],
+                        ['politics', 'business', 'tech & science', 'journalism'],
+                        ['music', 'literature'],
+                        ['writer/director'],
+                        ['influencers', 'podcasters'],
+                        ['sports']
+                    ];
+
+                    const sameCluster = arenaClusters.some(
+                        cluster =>
+                            cluster.includes(normalizedValue) &&
+                            cluster.includes(normalizedTarget)
+                    );
+
+                    if (sameCluster) {
+                        statusClass = 'partial';
+                    }
+                }
+
             } else if (type === 'followers') {
 
-    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
+                const percentDifference = Math.abs(numValue - numTarget) / numTarget;
 
     if (percentDifference <= 0.15) {
         // Within 15% = GREEN
@@ -1290,34 +1318,6 @@ const figures = [
                     numValue < numTarget
                         ? ' ⬆️'
                         : ' ⬇️';
-
-            } else if (type === 'arena') {
-
-                if (value === targetValue) {
-
-                    statusClass = 'correct';
-
-                } else {
-
-                    const arenaClusters = [
-                        ['Movies', 'TV', 'Reality TV', 'Movies & TV'],
-                        ['Politics', 'Business', 'Tech & Science', 'Journalism'],
-                        ['Music', 'Literature', 'Writer/Director'],
-                        ['Influencers', 'Podcasters'],
-                        ['Sports']
-                    ];
-
-                    const sameCluster = arenaClusters.some(
-                        cluster =>
-                            cluster.includes(value) &&
-                            cluster.includes(targetValue)
-                    );
-
-                    if (sameCluster) {
-                        statusClass = 'partial';
-                    }
-
-                }
 
             } else if (type === 'netWorth') {
 
