@@ -1222,6 +1222,33 @@ const figures = [
 
                 }
 
+            } else if (type === 'arena') {
+
+                const guessedArena = String(value).trim();
+                const targetArena = String(targetValue).trim();
+
+                if (guessedArena === targetArena) {
+                    statusClass = 'correct';
+                } else {
+                    const arenaClusters = [
+                        ['Music', 'Literature', 'Writer/Director'],
+                        ['Movies', 'TV', 'Movies & TV', 'Reality TV'],
+                        ['Podcasters', 'Influencers'],
+                        ['Tech & Science', 'Business', 'Politics', 'Journalism'],
+                        ['Sports']
+                    ];
+
+                    // Bidirectional cluster match: sharing a cluster is yellow.
+                    const sameCluster = arenaClusters.some(cluster =>
+                        cluster.includes(guessedArena) &&
+                        cluster.includes(targetArena)
+                    );
+
+                    if (sameCluster) {
+                        statusClass = 'partial';
+                    }
+                }
+
             } else if (type === 'followers') {
 
     const percentDifference = Math.abs(numValue - numTarget) / numTarget;
@@ -1290,35 +1317,6 @@ const figures = [
                     numValue < numTarget
                         ? ' ⬆️'
                         : ' ⬇️';
-
-            } else if (type === 'arena') {
-
-                if (value === targetValue) {
-
-                    statusClass = 'correct';
-
-                } else {
-
-                    const arenaClusters = [
-                        ['Music', 'Literature', 'Writer/Director'],
-                        ['Movies', 'TV', 'Reality TV'],
-                        ['Podcasters', 'Influencers'],
-                        ['Tech & Science', 'Business', 'Politics', 'Journalism'],
-                        ['Sports']
-                    ];
-
-                    // Bidirectional cluster match: yellow whenever the guessed
-                    // Arena and the daily person's Arena share a cluster.
-                    const sameCluster = arenaClusters.some(cluster =>
-                        cluster.includes(String(value).trim()) &&
-                        cluster.includes(String(targetValue).trim())
-                    );
-
-                    if (sameCluster) {
-                        statusClass = 'partial';
-                    }
-
-                }
 
             } else if (type === 'netWorth') {
 
@@ -1908,62 +1906,72 @@ const figures = [
             }
         }
 
-        async function searchCommonsPersonPhoto(figure) {
+        async function searchCommonsPersonPhoto(figure, extraQueries = []) {
             if (!figure || !figure.name) return '';
 
-            const apiUrl =
-                'https://commons.wikimedia.org/w/api.php' +
-                '?action=query' +
-                '&format=json' +
-                '&origin=*' +
-                '&generator=search' +
-                '&gsrnamespace=6' +
-                '&gsrlimit=10' +
-                `&gsrsearch=${encodeURIComponent('"' + figure.name + '"')}` +
-                '&prop=imageinfo' +
-                '&iiprop=url|mime' +
-                '&iiurlwidth=600';
+            const baseName = String(figure.name).trim();
+            const queries = [
+                `"${baseName}"`,
+                `${baseName} portrait`,
+                `${baseName} photo`,
+                `${baseName} headshot`,
+                ...extraQueries
+            ];
 
-            try {
-                const response = await fetch(apiUrl, { cache: 'no-store' });
-                if (!response.ok) return '';
-                const data = await response.json();
-                const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
-                const nameTokens = normalizePhotoSearchText(figure.name)
-                    .split(' ')
-                    .filter(token => token.length > 2);
+            const seenUrls = new Set();
+            const nameTokens = normalizePhotoSearchText(baseName)
+                .split(' ')
+                .filter(token => token.length > 2);
 
-                const candidates = pages
-                    .map(page => {
-                        const imageInfo = page && page.imageinfo && page.imageinfo[0];
-                        if (!imageInfo || (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))) return null;
-                        const title = normalizePhotoSearchText(page.title || '');
-                        const tokenMatches = nameTokens.filter(token => title.includes(token)).length;
-                        const exactNameMatch = normalizePhotoSearchText(page.title || '').includes(normalizePhotoSearchText(figure.name));
-                        return {
-                            url: imageInfo.thumburl || imageInfo.url || '',
-                            score: tokenMatches + (exactNameMatch ? 10 : 0),
-                            title
-                        };
-                    })
-                    .filter(Boolean)
-                    .filter(candidate => candidate.url && candidate.score >= Math.max(1, nameTokens.length));
+            for (const query of queries) {
+                const apiUrl =
+                    'https://commons.wikimedia.org/w/api.php' +
+                    '?action=query' +
+                    '&format=json' +
+                    '&origin=*' +
+                    '&generator=search' +
+                    '&gsrnamespace=6' +
+                    '&gsrlimit=25' +
+                    `&gsrsearch=${encodeURIComponent(query)}` +
+                    '&prop=imageinfo' +
+                    '&iiprop=url|mime' +
+                    '&iiurlwidth=700';
 
-                candidates.sort((a, b) => b.score - a.score);
+                try {
+                    const response = await fetch(apiUrl, { cache: 'no-store' });
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    const pages = data?.query?.pages ? Object.values(data.query.pages) : [];
 
-                // Do not assume that a Commons search result is actually
-                // loadable. Probe candidates in score order and keep the first
-                // image that the browser can successfully fetch.
-                for (const candidate of candidates) {
-                    if (await probeImageUrl(candidate.url, 7000)) {
-                        return candidate.url;
+                    const candidates = pages
+                        .map(page => {
+                            const imageInfo = page?.imageinfo?.[0];
+                            if (!imageInfo || (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))) return null;
+                            const title = normalizePhotoSearchText(page.title || '');
+                            const tokenMatches = nameTokens.filter(token => title.includes(token)).length;
+                            const exactNameMatch = title.includes(normalizePhotoSearchText(baseName));
+                            const portraitBonus = /portrait|headshot|photo|actor|actress|writer|director|journalist|musician|singer|comedian|host|television|film/.test(title) ? 2 : 0;
+                            return {
+                                url: imageInfo.thumburl || imageInfo.url || '',
+                                score: tokenMatches * 2 + (exactNameMatch ? 20 : 0) + portraitBonus,
+                                title
+                            };
+                        })
+                        .filter(Boolean)
+                        .filter(candidate => candidate.url && !seenUrls.has(candidate.url) && candidate.score >= Math.max(2, nameTokens.length));
+
+                    candidates.sort((a, b) => b.score - a.score);
+
+                    for (const candidate of candidates) {
+                        seenUrls.add(candidate.url);
+                        if (await probeImageUrl(candidate.url, 9000)) return candidate.url;
                     }
+                } catch (error) {
+                    // Try the next query/provider rather than giving up.
                 }
-
-                return '';
-            } catch (error) {
-                return '';
             }
+
+            return '';
         }
 
         async function lookupWikipediaPersonPhoto(figure) {
@@ -2023,6 +2031,44 @@ const figures = [
             return '';
         }
 
+        async function lookupWikidataPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            const name = String(figure.name).trim();
+            const searchUrl =
+                'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*' +
+                '&language=en&uselang=en&limit=5&search=' + encodeURIComponent(name);
+
+            try {
+                const searchResponse = await fetch(searchUrl, { cache: 'no-store' });
+                if (!searchResponse.ok) return '';
+                const searchData = await searchResponse.json();
+                const ids = Array.isArray(searchData?.search) ? searchData.search.map(item => item.id).filter(Boolean) : [];
+                if (!ids.length) return '';
+
+                const entityUrl =
+                    'https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*' +
+                    '&props=claims&ids=' + encodeURIComponent(ids.join('|'));
+                const entityResponse = await fetch(entityUrl, { cache: 'no-store' });
+                if (!entityResponse.ok) return '';
+                const entityData = await entityResponse.json();
+
+                for (const id of ids) {
+                    const entity = entityData?.entities?.[id];
+                    const claims = entity?.claims?.P18;
+                    if (!Array.isArray(claims)) continue;
+                    for (const claim of claims) {
+                        const value = claim?.mainsnak?.datavalue?.value;
+                        if (!value) continue;
+                        const candidate = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(value)}?width=700`;
+                        if (await probeImageUrl(candidate, 9000)) return candidate;
+                    }
+                }
+            } catch (error) {
+                // Continue to other image providers.
+            }
+            return '';
+        }
+
         // Optional Google Images fallback. A static HTML file cannot safely
         // scrape Google Images directly because Google's results page is HTML,
         // not a stable image URL, and browser cross-origin rules prevent the
@@ -2066,48 +2112,63 @@ const figures = [
         async function repairPersonPhoto(figure) {
             if (!figure || !figure.name) return '';
             if (resolvedPersonPhotoCache.has(figure.name)) return resolvedPersonPhotoCache.get(figure.name);
-            // A failed lookup is never treated as permanent. A refresh can
-            // race the background audit or a provider can briefly time out.
-            // Always allow the current reveal to retry the real photo sources.
             failedPersonPhotoCache.delete(figure.name);
 
-            // 1. Wikipedia page image — preferred source.
-            let repairedUrl = await lookupWikipediaPersonPhoto(figure);
+            // Aggressive real-photo recovery: try several independent sources and
+            // several query formulations before declaring the photo unavailable.
+            const attempts = [];
+            const addAttempt = async fn => {
+                try {
+                    const result = await fn();
+                    if (result) attempts.push(result);
+                } catch (error) {}
+                return attempts[attempts.length - 1] || '';
+            };
 
-            // 2. Existing Wikimedia Commons filename / Commons search.
-            if (!repairedUrl) {
-                const fileName = getCommonsFileName(figure);
-                repairedUrl = await lookupCommonsExactPhoto(fileName);
+            // 1. Exact Wikipedia page/search.
+            await addAttempt(() => lookupWikipediaPersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 2. Wikidata P18 often succeeds when the Wikipedia page/image is missing.
+            await addAttempt(() => lookupWikidataPersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 3. Exact existing Commons filename.
+            const fileName = getCommonsFileName(figure);
+            if (fileName) {
+                await addAttempt(() => lookupCommonsExactPhoto(fileName));
+                if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
             }
 
-            if (!repairedUrl) {
-                repairedUrl = await searchCommonsPersonPhoto(figure);
+            // 4. Multiple Commons MediaSearch-style queries.
+            const name = String(figure.name).trim();
+            const extraQueries = [
+                `"${name}" person`,
+                `"${name}" celebrity`,
+                `"${name}" public figure`,
+                `"${name}" television`,
+                `"${name}" film`,
+                `"${name}" music`,
+                `"${name}" writer`,
+                `"${name}" journalist`
+            ];
+            await addAttempt(() => searchCommonsPersonPhoto(figure, extraQueries));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 5. Search using meaningful name tokens for stage names/punctuation.
+            const broadQuery = normalizePhotoSearchText(name)
+                .split(' ')
+                .filter(token => token.length > 2)
+                .slice(0, 5)
+                .join(' ');
+            if (broadQuery && broadQuery !== normalizePhotoSearchText(name)) {
+                await addAttempt(() => searchCommonsPersonPhoto({ ...figure, name: broadQuery }));
+                if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
             }
 
-            if (!repairedUrl && figure.name) {
-                const broadQuery = normalizePhotoSearchText(figure.name)
-                    .split(' ')
-                    .filter(token => token.length > 2)
-                    .slice(0, 4)
-                    .join(' ');
-
-                if (broadQuery) {
-                    repairedUrl = await searchCommonsPersonPhoto({
-                        ...figure,
-                        name: broadQuery
-                    });
-                }
-            }
-
-            // 3. Optional Google Images API fallback.
-            if (!repairedUrl) {
-                repairedUrl = await searchGooglePersonPhoto(figure);
-            }
-
-            if (repairedUrl) {
-                resolvedPersonPhotoCache.set(figure.name, repairedUrl);
-                return repairedUrl;
-            }
+            // 6. Optional Google Images API, only if credentials are configured.
+            await addAttempt(() => searchGooglePersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
 
             failedPersonPhotoCache.add(figure.name);
             return '';
@@ -2275,11 +2336,10 @@ const figures = [
 
             for (const figure of figures) {
                 const url = await getReliablePersonPhotoUrl(figure);
-                const isFallback = url === PERSON_PHOTO_ERROR_FALLBACK;
                 results.push({
                     name: figure.name,
-                    photoUrl: isFallback ? '' : url,
-                    working: !isFallback
+                    photoUrl: url || '',
+                    working: !!url
                 });
             }
 
@@ -2295,14 +2355,8 @@ const figures = [
         // helpers and caches have been initialized. Gameplay does not wait.
         prevalidateAllPersonPhotos();
 
-        // Universal emergency image used whenever the intended Person of the Day
-        // photo cannot be loaded or repaired. This guarantees the reveal never
-        // ends with a broken-image icon.
-        const PERSON_PHOTO_ERROR_FALLBACK =
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyJaNfcZdqzlz_TGnol1A9SsvU94pPy37QVQY_a-mHiGrkPM6toSo4E24M&s=10';
-
         async function getReliablePersonPhotoUrl(figure) {
-            if (!figure || !figure.name) return PERSON_PHOTO_ERROR_FALLBACK;
+            if (!figure || !figure.name) return '';
 
             // Use a URL that has already been verified when available.
             if (resolvedPersonPhotoCache.has(figure.name)) {
@@ -2314,7 +2368,7 @@ const figures = [
             // no reason to replace a known-good image with the emergency image
             // just because an API lookup has not finished yet.
             const directUrl = getPersonPhotoUrl(figure);
-            if (directUrl && directUrl !== PERSON_PHOTO_ERROR_FALLBACK) {
+            if (directUrl) {
                 if (await probeImageUrl(directUrl, 7000)) {
                     resolvedPersonPhotoCache.set(figure.name, directUrl);
                     return directUrl;
@@ -2333,8 +2387,10 @@ const figures = [
                 return fallbackUrl;
             }
 
-            // Last resort: use the universal technical-difficulties image.
-            return PERSON_PHOTO_ERROR_FALLBACK;
+            // Do not substitute a generic image for the person.
+            // An unavailable photo should remain unavailable rather than
+            // displaying an image that could be mistaken for the person.
+            return '';
         }
 
         function renderSecretPhoto() {
@@ -2372,12 +2428,11 @@ const figures = [
                 photoContainer.classList.add('photo-load-failed');
                 fallbackMessage.textContent = '';
 
-                // Never leave a broken image on screen. If the intended person
-                // photo fails through every repair path, show the supplied
-                // technical-difficulties image instead.
-                if (photo.src !== PERSON_PHOTO_ERROR_FALLBACK) {
-                    photo.src = PERSON_PHOTO_ERROR_FALLBACK;
-                }
+                // Never substitute the user's generic fallback image.
+                // If no verified photo can be found, leave the image absent and
+                // clearly identify that the photo is unavailable.
+                photo.removeAttribute('src');
+                fallbackMessage.textContent = 'Photo unavailable';
             };
 
             // IMPORTANT: attach handlers BEFORE assigning src. A cached image can
@@ -2388,14 +2443,6 @@ const figures = [
             };
 
             photo.onerror = async () => {
-                if (photo.src === PERSON_PHOTO_ERROR_FALLBACK) {
-                    // The emergency image itself failed. There is nothing more
-                    // reliable to display, so avoid an endless retry loop.
-                    photo.removeAttribute('src');
-                    photoContainer.classList.remove('photo-validating');
-                    return;
-                }
-
                 if (repairAttempted) {
                     failPhoto();
                     return;
@@ -2413,12 +2460,6 @@ const figures = [
 
                 if (repairedUrl) {
                     photo.src = repairedUrl;
-                    return;
-                }
-
-                const fallbackUrl = getPersonPhotoFallbackUrl(secretFigure);
-                if (fallbackUrl && photo.src !== fallbackUrl) {
-                    photo.src = fallbackUrl;
                     return;
                 }
 
