@@ -477,10 +477,125 @@
             }
         }
 
+
+        /* =========================================================
+           FAQ MODAL
+           ========================================================= */
+
+        .faq-button {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 11000;
+            padding: 7px 11px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .faq-button:hover {
+            border-color: #818384;
+        }
+
+        .faq-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.72);
+        }
+
+        .faq-overlay.show {
+            display: flex;
+        }
+
+        .faq-box {
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            background: #121213;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .faq-box h2 {
+            margin: 0 0 16px;
+            font-size: 1.15rem;
+            text-align: center;
+        }
+
+        .faq-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 11px 0;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .faq-swatch {
+            flex: 0 0 24px;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .faq-green { background: var(--green); }
+        .faq-yellow { background: var(--yellow); }
+        .faq-gray { background: var(--gray); }
+
+        .faq-close {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            padding: 9px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text-color);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
 <body>
+    <button id="faq-button" class="faq-button" type="button" aria-label="Open FAQ">FAQ</button>
+
+    <div id="faq-overlay" class="faq-overlay" role="dialog" aria-modal="true" aria-labelledby="faq-title">
+        <div class="faq-box" role="document">
+            <h2 id="faq-title">How the squares work</h2>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-green"></span>
+                <span><strong>Green</strong> = exact match.</span>
+            </div>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-yellow"></span>
+                <span><strong>Yellow</strong> = close match or same arena cluster.</span>
+            </div>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-gray"></span>
+                <span><strong>Gray</strong> = no match.</span>
+            </div>
+
+            <button id="faq-close" class="faq-close" type="button">Close</button>
+        </div>
+    </div>
+
 
     <h1>PERSONDLE</h1>
 
@@ -577,6 +692,7 @@
 
             "Music": "🎵",
             "Movies": "🎬",
+            "Writer/Director": "🎬✍️",
             "TV": "📺",
             "Politics": "🏛️",
             "Sports": "🏆",
@@ -584,7 +700,10 @@
             "Tech & Science": "🔬",
             "Influencers": "📱",
             "Podcasters": "🎙️",
-            "Reality TV": "📺"
+            "Reality TV": "📺",
+            "Journalism": "📰",
+            "Literature": "📚",
+            "Movies & TV": "🎬📺"
 
         };
 
@@ -788,7 +907,7 @@ const figures = [
 {"name": "Chris Evans", "arena": "Movies", "netWorth": "110,000,000", "country": "US", "followers": 15000000, "gender": "Male", "age": 45, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Evans_2023.jpg"},
 {"name": "Chris Hemsworth", "arena": "Movies", "netWorth": "130,000,000", "country": "US", "followers": 58000000, "gender": "Male", "age": 43, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Hemsworth_2024.jpg"},
 {"name": "Christian Bale", "arena": "Movies", "netWorth": "120,000,000", "country": "UK", "followers": 20000, "gender": "Male", "age": 52, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Christian_Bale_2022.jpg"},
-{"name": "Christopher Nolan", "arena": "Movies", "netWorth": "250,000,000", "country": "UK", "followers": 20000, "gender": "Male", "age": 56, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Christopher_Nolan_2024.jpg"},
+{"name": "Christopher Nolan", "arena": "Writer/Director", "netWorth": "250,000,000", "country": "UK", "followers": 20000, "gender": "Male", "age": 56, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Christopher_Nolan_2024.jpg"},
 {"name": "Cillian Murphy", "arena": "Movies", "netWorth": "20,000,000", "country": "Ireland", "followers": 20000, "gender": "Male", "age": 50, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cillian_Murphy_2024.jpg"},
 {"name": "Daniel Day-Lewis", "arena": "Movies", "netWorth": "60,000,000", "country": "UK", "followers": 20000, "gender": "Male", "age": 69, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Daniel_Day-Lewis_2013.jpg"},
 {"name": "Denzel Washington", "arena": "Movies", "netWorth": "280,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 71, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Denzel_Washington_2024.jpg"},
@@ -796,22 +915,22 @@ const figures = [
 {"name": "Emma Stone", "arena": "Movies", "netWorth": "40,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 37, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Emma_Stone_2024.jpg"},
 {"name": "Florence Pugh", "arena": "Movies", "netWorth": "8,000,000", "country": "US", "followers": 9000000, "gender": "Female", "age": 30, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Florence_Pugh_2024.jpg"},
 {"name": "George Clooney", "arena": "Movies", "netWorth": "500,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 65, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/George_Clooney_2023.jpg"},
-{"name": "Greta Gerwig", "arena": "Movies", "netWorth": "12,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 43, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Greta_Gerwig_2024.jpg"},
+{"name": "Greta Gerwig", "arena": "Writer/Director", "netWorth": "12,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 43, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Greta_Gerwig_2024.jpg"},
 {"name": "Harrison Ford", "arena": "Movies", "netWorth": "300,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 84, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Harrison_Ford_2023.jpg"},
 {"name": "Hugh Jackman", "arena": "Movies", "netWorth": "180,000,000", "country": "Australia", "followers": 33000000, "gender": "Male", "age": 57, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Hugh_Jackman_2024.jpg"},
 {"name": "Jack Black", "arena": "Movies", "netWorth": "50,000,000", "country": "US", "followers": 10000000, "gender": "Male", "age": 57, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jack_Black_2016.jpg"},
-{"name": "James Cameron", "arena": "Movies", "netWorth": "800,000,000", "country": "US", "followers": 700000, "gender": "Male", "age": 72, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/James_Cameron_2023.jpg"},
+{"name": "James Cameron", "arena": "Writer/Director", "netWorth": "800,000,000", "country": "US", "followers": 700000, "gender": "Male", "age": 72, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/James_Cameron_2023.jpg"},
 {"name": "Jennifer Lawrence", "arena": "Movies", "netWorth": "160,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 36, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jennifer_Lawrence_2023.jpg"},
 {"name": "Jim Carrey", "arena": "Movies", "netWorth": "180,000,000", "country": "US", "followers": 1500000, "gender": "Male", "age": 64, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jim_Carrey_2014.jpg"},
 {"name": "Joaquin Phoenix", "arena": "Movies", "netWorth": "60,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 51, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Joaquin_Phoenix_2023.jpg"},
 {"name": "Johnny Depp", "arena": "Movies", "netWorth": "150,000,000", "country": "US", "followers": 28000000, "gender": "Male", "age": 63, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp_2023.jpg"},
-{"name": "Jordan Peele", "arena": "Movies", "netWorth": "50,000,000", "country": "US", "followers": 1500000, "gender": "Male", "age": 47, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jordan_Peele_2022.jpg"},
+{"name": "Jordan Peele", "arena": "Writer/Director", "netWorth": "50,000,000", "country": "US", "followers": 1500000, "gender": "Male", "age": 47, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Jordan_Peele_2022.jpg"},
 {"name": "Julia Roberts", "arena": "Movies", "netWorth": "250,000,000", "country": "US", "followers": 12000000, "gender": "Female", "age": 58, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Julia_Roberts_2023.jpg"},
 {"name": "Keanu Reeves", "arena": "Movies", "netWorth": "380,000,000", "country": "Canada", "followers": 20000, "gender": "Male", "age": 62, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Keanu_Reeves_2023.jpg"},
 {"name": "Kevin Hart", "arena": "Movies", "netWorth": "450,000,000", "country": "US", "followers": 180000000, "gender": "Male", "age": 47, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Kevin_Hart_2023.jpg"},
 {"name": "Leonardo DiCaprio", "arena": "Movies", "netWorth": "300,000,000", "country": "US", "followers": 61000000, "gender": "Male", "age": 51, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Leonardo_DiCaprio_2023.jpg"},
 {"name": "Margot Robbie", "arena": "Movies", "netWorth": "60,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 36, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Margot_Robbie_2023.jpg"},
-{"name": "Martin Scorsese", "arena": "Movies", "netWorth": "200,000,000", "country": "US", "followers": 2000000, "gender": "Male", "age": 83, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Martin_Scorsese_2023.jpg"},
+{"name": "Martin Scorsese", "arena": "Writer/Director", "netWorth": "200,000,000", "country": "US", "followers": 2000000, "gender": "Male", "age": 83, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Martin_Scorsese_2023.jpg"},
 {"name": "Matt Damon", "arena": "Movies", "netWorth": "170,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 55, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Matt_Damon_2023.jpg"},
 {"name": "Matthew McConaughey", "arena": "Movies", "netWorth": "160,000,000", "country": "US", "followers": 9000000, "gender": "Male", "age": 56, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Matthew_McConaughey_2023.jpg"},
 {"name": "Meryl Streep", "arena": "Movies", "netWorth": "160,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 77, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Meryl_Streep_2024.jpg"},
@@ -819,8 +938,8 @@ const figures = [
 {"name": "Morgan Freeman", "arena": "Movies", "netWorth": "250,000,000", "country": "US", "followers": 4000000, "gender": "Male", "age": 89, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Morgan_Freeman_2023.jpg"},
 {"name": "Natalie Portman", "arena": "Movies", "netWorth": "90,000,000", "country": "US", "followers": 9000000, "gender": "Female", "age": 45, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Natalie_Portman_2023.jpg"},
 {"name": "Nicole Kidman", "arena": "Movies", "netWorth": "250,000,000", "country": "Australia", "followers": 10000000, "gender": "Female", "age": 59, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Nicole_Kidman_2024.jpg"},
-{"name": "Peter Jackson", "arena": "Movies", "netWorth": "1,500,000,000", "country": "New Zealand", "followers": 20000, "gender": "Male", "age": 64, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Peter_Jackson_2022.jpg"},
-{"name": "Quentin Tarantino", "arena": "Movies", "netWorth": "120,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 63, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Quentin_Tarantino_2023.jpg"},
+{"name": "Peter Jackson", "arena": "Writer/Director", "netWorth": "1,500,000,000", "country": "New Zealand", "followers": 20000, "gender": "Male", "age": 64, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Peter_Jackson_2022.jpg"},
+{"name": "Quentin Tarantino", "arena": "Writer/Director", "netWorth": "120,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 63, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Quentin_Tarantino_2023.jpg"},
 {"name": "Robert Downey Jr.", "arena": "Movies", "netWorth": "300,000,000", "country": "US", "followers": 57000000, "gender": "Male", "age": 61, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Robert_Downey_Jr_2024.jpg"},
 {"name": "Ryan Gosling", "arena": "Movies", "netWorth": "70,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 45, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ryan_Gosling_2024.jpg"},
 {"name": "Ryan Reynolds", "arena": "Movies", "netWorth": "350,000,000", "country": "US", "followers": 51000000, "gender": "Male", "age": 49, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ryan_Reynolds_2024.jpg"},
@@ -828,7 +947,7 @@ const figures = [
 {"name": "Sandra Bullock", "arena": "Movies", "netWorth": "250,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 62, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Sandra_Bullock_2022.jpg"},
 {"name": "Scarlett Johansson", "arena": "Movies", "netWorth": "165,000,000", "country": "US", "followers": 20000, "gender": "Female", "age": 41, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Scarlett_Johansson_2024.jpg"},
 {"name": "Seth Rogen", "arena": "Movies", "netWorth": "80,000,000", "country": "US", "followers": 10000000, "gender": "Male", "age": 44, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Seth_Rogen_2019.jpg"},
-{"name": "Steven Spielberg", "arena": "Movies", "netWorth": "8,500,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 79, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Steven_Spielberg_2023.jpg"},
+{"name": "Steven Spielberg", "arena": "Writer/Director", "netWorth": "8,500,000,000", "country": "US", "followers": 20000, "gender": "Male", "age": 79, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Steven_Spielberg_2023.jpg"},
 {"name": "Timothée Chalamet", "arena": "Movies", "netWorth": "25,000,000", "country": "US", "followers": 19000000, "gender": "Male", "age": 30, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Timoth%25C3%25A9e_Chalamet_2024.jpg"},
 {"name": "Tom Cruise", "arena": "Movies", "netWorth": "600,000,000", "country": "US", "followers": 12000000, "gender": "Male", "age": 64, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Cruise_2023.jpg"},
 {"name": "Tom Hanks", "arena": "Movies", "netWorth": "400,000,000", "country": "US", "followers": 9500000, "gender": "Male", "age": 70, "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Hanks_2023.jpg"},
@@ -1171,6 +1290,34 @@ const figures = [
                     numValue < numTarget
                         ? ' ⬆️'
                         : ' ⬇️';
+
+            } else if (type === 'arena') {
+
+                if (value === targetValue) {
+
+                    statusClass = 'correct';
+
+                } else {
+
+                    const arenaClusters = [
+                        ['Movies', 'TV', 'Reality TV', 'Movies & TV'],
+                        ['Politics', 'Business', 'Tech & Science', 'Journalism'],
+                        ['Music', 'Literature', 'Writer/Director'],
+                        ['Influencers', 'Podcasters'],
+                        ['Sports']
+                    ];
+
+                    const sameCluster = arenaClusters.some(
+                        cluster =>
+                            cluster.includes(value) &&
+                            cluster.includes(targetValue)
+                    );
+
+                    if (sameCluster) {
+                        statusClass = 'partial';
+                    }
+
+                }
 
             } else if (type === 'netWorth') {
 
@@ -2331,7 +2478,7 @@ const figures = [
                     guess.arena,
                     secretFigure.arena,
                     arenaEmojis[guess.arena] || '🌟',
-                    'standard',
+                    'arena',
                     isReveal
                 )
             );
@@ -2989,7 +3136,38 @@ input.addEventListener('keydown', function (e) {
             }
         );
 
-    </script>
+    
+
+        /* =========================================================
+           FAQ MODAL
+           ========================================================= */
+
+        const faqButton = document.getElementById('faq-button');
+        const faqOverlay = document.getElementById('faq-overlay');
+        const faqClose = document.getElementById('faq-close');
+
+        function closeFaq() {
+            faqOverlay.classList.remove('show');
+        }
+
+        faqButton.addEventListener('click', function() {
+            faqOverlay.classList.add('show');
+        });
+
+        faqClose.addEventListener('click', closeFaq);
+
+        faqOverlay.addEventListener('click', function(event) {
+            if (event.target === faqOverlay) {
+                closeFaq();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeFaq();
+            }
+        });
+</script>
 
 </body>
 </html>
