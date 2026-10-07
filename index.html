@@ -1816,22 +1816,121 @@ const figures = [
             }
         }
 
+        async function lookupWikipediaPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+
+            const name = String(figure.name).trim();
+            const endpoints = [
+                `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name.replace(/ /g, '_'))}`,
+                `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent('"' + name + '"')}&gsrnamespace=0&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=600`
+            ];
+
+            // First try the exact Wikipedia article. This is the preferred
+            // source because it is tied directly to the person's encyclopedia page.
+            try {
+                const response = await fetch(endpoints[0], { cache: 'no-store' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const candidate = data?.thumbnail?.source || data?.originalimage?.source || '';
+                    if (candidate && await probeImageUrl(candidate, 7000)) {
+                        return candidate;
+                    }
+                }
+            } catch (error) {
+                // Continue to the Wikipedia search endpoint.
+            }
+
+            // If the exact title is missing (stage names, punctuation, etc.),
+            // search Wikipedia itself and only accept a likely title match.
+            try {
+                const response = await fetch(endpoints[1], { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const pages = data?.query?.pages ? Object.values(data.query.pages) : [];
+                const wanted = normalizePhotoSearchText(name);
+
+                const candidates = pages
+                    .map(page => {
+                        const thumb = page?.thumbnail?.source || '';
+                        const title = normalizePhotoSearchText(page?.title || '');
+                        if (!thumb) return null;
+                        const exact = title === wanted;
+                        const contains = title.includes(wanted) || wanted.includes(title);
+                        return { url: thumb, score: (exact ? 20 : 0) + (contains ? 8 : 0), title };
+                    })
+                    .filter(Boolean)
+                    .sort((a, b) => b.score - a.score);
+
+                for (const candidate of candidates) {
+                    if (candidate.score > 0 && await probeImageUrl(candidate.url, 7000)) {
+                        return candidate.url;
+                    }
+                }
+            } catch (error) {
+                // Continue to the next provider.
+            }
+
+            return '';
+        }
+
+        // Optional Google Images fallback. A static HTML file cannot safely
+        // scrape Google Images directly because Google's results page is HTML,
+        // not a stable image URL, and browser cross-origin rules prevent the
+        // game from reading that page. If a Google Programmable Search JSON API
+        // key and search engine ID are supplied below, this becomes a real
+        // image-source fallback. Otherwise the game continues to Commons and
+        // finally the supplied emergency image.
+        const GOOGLE_IMAGE_SEARCH_API_KEY = '';
+        const GOOGLE_IMAGE_SEARCH_ENGINE_ID = '';
+
+        async function searchGooglePersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            if (!GOOGLE_IMAGE_SEARCH_API_KEY || !GOOGLE_IMAGE_SEARCH_ENGINE_ID) return '';
+
+            const apiUrl =
+                'https://www.googleapis.com/customsearch/v1' +
+                `?key=${encodeURIComponent(GOOGLE_IMAGE_SEARCH_API_KEY)}` +
+                `&cx=${encodeURIComponent(GOOGLE_IMAGE_SEARCH_ENGINE_ID)}` +
+                `&searchType=image&num=5` +
+                `&q=${encodeURIComponent(figure.name + ' official photo')}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const items = Array.isArray(data?.items) ? data.items : [];
+
+                for (const item of items) {
+                    const candidate = item?.link || item?.image?.thumbnailLink || '';
+                    if (candidate && await probeImageUrl(candidate, 7000)) {
+                        return candidate;
+                    }
+                }
+            } catch (error) {
+                // Fall through to the supplied emergency image.
+            }
+
+            return '';
+        }
+
         async function repairPersonPhoto(figure) {
             if (!figure || !figure.name) return '';
             if (resolvedPersonPhotoCache.has(figure.name)) return resolvedPersonPhotoCache.get(figure.name);
             if (failedPersonPhotoCache.has(figure.name)) return '';
 
-            const fileName = getCommonsFileName(figure);
-            let repairedUrl = await lookupCommonsExactPhoto(fileName);
+            // 1. Wikipedia page image — preferred source.
+            let repairedUrl = await lookupWikipediaPersonPhoto(figure);
 
-            // If the stored filename no longer exists, search Commons for a
-            // likely image whose title matches the Persondle figure's name.
+            // 2. Existing Wikimedia Commons filename / Commons search.
+            if (!repairedUrl) {
+                const fileName = getCommonsFileName(figure);
+                repairedUrl = await lookupCommonsExactPhoto(fileName);
+            }
+
             if (!repairedUrl) {
                 repairedUrl = await searchCommonsPersonPhoto(figure);
             }
 
-            // A second, broader search helps names that Commons indexes under
-            // a stage name, nickname, punctuation variant, or maiden name.
             if (!repairedUrl && figure.name) {
                 const broadQuery = normalizePhotoSearchText(figure.name)
                     .split(' ')
@@ -1845,6 +1944,11 @@ const figures = [
                         name: broadQuery
                     });
                 }
+            }
+
+            // 3. Optional Google Images API fallback.
+            if (!repairedUrl) {
+                repairedUrl = await searchGooglePersonPhoto(figure);
             }
 
             if (repairedUrl) {
@@ -1968,65 +2072,25 @@ const figures = [
             }
 
             allPersonPhotosPrevalidationPromise = (async () => {
-                const commonsFigures = figures.filter(figure => getCommonsFileName(figure));
-                const directUrlFigures = figures.filter(figure => !getCommonsFileName(figure));
-
                 let validatedCount = 0;
                 let repairedCount = 0;
                 let failedCount = 0;
 
-                // 50 Commons titles per API request keeps the startup work small
-                // while still checking the entire database.
-                const batches = chunkArray(commonsFigures, 50);
-
-                for (const batch of batches) {
-                    const results = await validateCommonsPhotoBatch(batch);
-
-                    const missing = [];
-
-                    results.forEach(result => {
-                        if (result.url) {
-                            resolvedPersonPhotoCache.set(result.figure.name, result.url);
-                            validatedCount++;
-                        } else {
-                            missing.push(result.figure);
-                        }
-                    });
-
-                    // Repair only the filenames that failed the exact lookup.
-                    // This avoids unnecessary Commons searches for healthy photos.
-                    if (missing.length) {
-                        const repairResults = await Promise.all(
-                            missing.map(figure => repairPersonPhoto(figure))
-                        );
-
-                        repairResults.forEach(url => {
-                            if (url) {
-                                repairedCount++;
-                            } else {
-                                failedCount++;
-                            }
-                        });
-                    }
-                }
-
-                // Validate any non-Wikimedia URLs (currently this covers the
-                // direct Conor McGregor image) without requiring CORS access.
-                if (directUrlFigures.length) {
-                    const directResults = await Promise.all(
-                        directUrlFigures.map(async figure => ({
+                // Run the complete provider chain for every person. This is a
+                // real database-wide audit rather than only checking filenames
+                // that happen to look like Commons URLs.
+                for (const batch of chunkArray(figures, 10)) {
+                    const results = await Promise.all(
+                        batch.map(async figure => ({
                             figure,
-                            valid: await probeImageUrl(String(figure.photoUrl || '').trim())
+                            url: await repairPersonPhoto(figure)
                         }))
                     );
 
-                    directResults.forEach(result => {
-                        if (result.valid) {
-                            resolvedPersonPhotoCache.set(
-                                result.figure.name,
-                                String(result.figure.photoUrl || '').trim()
-                            );
+                    results.forEach(result => {
+                        if (result.url) {
                             validatedCount++;
+                            repairedCount++;
                         } else {
                             failedCount++;
                         }
@@ -2092,17 +2156,9 @@ const figures = [
                 return resolvedPersonPhotoCache.get(figure.name);
             }
 
-            // Give the original Wikimedia filename one direct, reliable chance.
-            const directUrl = getPersonPhotoUrl(figure);
-            if (directUrl) {
-                const directWorks = await probeImageUrl(directUrl, 7000);
-                if (directWorks) {
-                    resolvedPersonPhotoCache.set(figure.name, directUrl);
-                    return directUrl;
-                }
-            }
-
-            // Then use the Commons API/repair system to find a verified image.
+            // Prefer the repair pipeline: Wikipedia first, then Commons, then
+            // the optional Google Images provider. This prevents a stale stored
+            // Commons filename from blocking a valid Wikipedia image.
             const repairedUrl = await repairPersonPhoto(figure);
             if (repairedUrl) return repairedUrl;
 
@@ -2183,8 +2239,12 @@ const figures = [
 
                 repairAttempted = true;
                 photoContainer.classList.add('photo-validating');
-                fallbackMessage.textContent = 'Repairing photo…';
+                fallbackMessage.textContent = 'Finding another photo…';
 
+                // Re-run the complete provider chain in case the initial request
+                // was a transient network failure.
+                resolvedPersonPhotoCache.delete(secretFigure.name);
+                failedPersonPhotoCache.delete(secretFigure.name);
                 const repairedUrl = await repairPersonPhoto(secretFigure);
 
                 if (repairedUrl) {
@@ -2363,26 +2423,29 @@ const figures = [
 
                 const lossMessages = [
 
-                    "Oof, 0 for 10. Don't worry, reading the news is always an option for tomorrow!",
+                    "10 guesses. 0 answers. The secret figure wins this round. Your dignity may file an appeal tomorrow.",
 
-                    "Tough luck! 10 guesses and still missed. Maybe pop culture just isn't your calling.",
+                    "You used all 10 guesses and still missed. Somewhere, the correct answer is quietly laughing.",
 
-                    "Well, at least you were consistent... consistently wrong! Better luck tomorrow.",
+                    "Ten swings, ten misses. Impressive commitment to the wrong answer.",
 
-                    "Out of guesses! Go take a quick walk, clear your head, and try again tomorrow.",
+                    "And that's all 10 guesses gone. The good news: tomorrow is another day. The better news: you can pretend this never happened.",
 
-                    "10 attempts, zero hits! The secret figure remains in the shadows until tomorrow.",
+                    "10 guesses and no breakthrough. At least you were persistent. Accuracy was apparently on vacation.",
 
-                    "A swing and a complete miss across all 10 tries! Time to do some light research."
+                    "The answer escaped all 10 attempts. Consider this a valuable lesson in what NOT to do tomorrow.",
+
+                    "A full 10-guess adventure with absolutely no happy ending. Bold strategy.",
+
+                    "You made it through all 10 guesses without finding them. Honestly, that's almost a different kind of achievement.",
+
+                    "Game over. Ten guesses down, one celebrity still undefeated. Better luck tomorrow, detective.",
+
+                    "10 attempts. No cigar. The Person of the Day remains safely beyond your investigative abilities."
 
                 ];
 
-                return lossMessages[
-                    Math.floor(
-                        Math.random() *
-                        lossMessages.length
-                    )
-                ];
+                return lossMessages[Math.floor(Math.random() * lossMessages.length)];
 
             }
 
@@ -2391,128 +2454,133 @@ const figures = [
 
                 const oneMessages = [
 
-                    "Hole in 1! Either you built this game, or you have telepathic powers.",
+                    "ONE GUESS?! Okay, show-off. Leave some glory for everyone else.",
 
-                    "On the VERY FIRST TRY?! Okay, genius, save some brain cells for the rest of us.",
+                    "Hole in one! You didn't even give the game a chance to get interesting.",
 
-                    "1/10! Pure psychic wizardry. You should play the lottery today."
+                    "1 guess. Nailed it. Suspiciously impressive.",
 
-                ];
+                    "FIRST TRY?! Either you're brilliant or today's clues were personally assigned to you.",
 
-                return oneMessages[
-                    Math.floor(
-                        Math.random() *
-                        oneMessages.length
-                    )
-                ];
+                    "One and done. That's not a solve, that's a flex.",
 
-            } else if (attempts === 2) {
+                    "1/10. Absolutely ridiculous. Please stop making the rest of us look bad.",
 
-                const twoMessages = [
+                    "You got it immediately. We may need to make tomorrow's Person harder just for you.",
 
-                    "Guessed in 2 tries! Absolutely clinical precision.",
-
-                    "In just 2 attempts? That's practically a flex. Outstanding job!",
-
-                    "2 guesses! Narrowed it down and closed the deal in seconds."
+                    "Perfect read. One guess and straight to victory. Okay, genius."
 
                 ];
 
-                return twoMessages[
-                    Math.floor(
-                        Math.random() *
-                        twoMessages.length
-                    )
-                ];
+                return oneMessages[Math.floor(Math.random() * oneMessages.length)];
 
-            } else if (
-                attempts >= 3 &&
-                attempts <= 4
-            ) {
+            }
 
-                const threeFourMessages = [
 
-                    `Got it in ${attempts}! Sharp deduction skills on display today.`,
+            if (attempts >= 2 && attempts <= 3) {
 
-                    `Winner in ${attempts} tries! Very clean gameplay, no panicking necessary.`,
+                const twoThreeMessages = [
 
-                    `Only ${attempts} guesses needed! Smooth, logical, and quick.`
+                    `Got it in ${attempts} guesses! That's seriously sharp.`,
 
-                ];
+                    `${attempts} guesses? Very nice. You clearly came prepared today.`,
 
-                return threeFourMessages[
-                    Math.floor(
-                        Math.random() *
-                        threeFourMessages.length
-                    )
-                ];
+                    `Solved in ${attempts}! That's an excellent read of the clues.`,
 
-            } else if (
-                attempts >= 5 &&
-                attempts <= 6
-            ) {
+                    `Only ${attempts} attempts. Clean, confident, and impressively efficient.`,
 
-                const fiveSixMessages = [
+                    `${attempts} guesses and you've cracked it. Somebody has been studying.`,
 
-                    `Nail-biter territory! Solved in ${attempts} attempts. Nice recovery!`,
+                    `You figured it out in ${attempts}. That's a strong Persondle performance.`,
 
-                    `Got there in ${attempts}! Took a few adjustments, but a win is a win.`,
+                    `${attempts} tries! Excellent deduction. You made that look easier than it is.`,
 
-                    `In ${attempts} guesses! Balanced deduction with a hint of dramatic suspense.`
+                    `Winner in ${attempts} guesses. Very, very solid work.`
 
                 ];
 
-                return fiveSixMessages[
-                    Math.floor(
-                        Math.random() *
-                        fiveSixMessages.length
-                    )
+                return twoThreeMessages[Math.floor(Math.random() * twoThreeMessages.length)];
+
+            }
+
+
+            if (attempts >= 4 && attempts <= 6) {
+
+                const fourSixMessages = [
+
+                    `Nice! You got it in ${attempts} guesses. Solid work.`,
+
+                    `Solved in ${attempts}. Good deduction and a well-earned win.`,
+
+                    `${attempts} guesses! Nice job — you worked through the clues and got there.`,
+
+                    `You got them in ${attempts}. Not effortless, not frantic — just a good solve.`,
+
+                    `Winner in ${attempts} guesses. A respectable piece of detective work.`,
+
+                    `Got it in ${attempts}. Nice recovery as the clues started narrowing things down.`,
+
+                    `${attempts} attempts and a correct answer. That's a very respectable Persondle.`,
+
+                    `Well played! ${attempts} guesses is a solid result. You earned that one.`
+
                 ];
 
-            } else if (
-                attempts >= 7 &&
-                attempts <= 8
-            ) {
+                return fourSixMessages[Math.floor(Math.random() * fourSixMessages.length)];
+
+            }
+
+
+            if (attempts >= 7 && attempts <= 8) {
 
                 const sevenEightMessages = [
 
-                    `Whew! Solved on try #${attempts}. You were cutting it a bit close there!`,
+                    `Whew. You got it in ${attempts} guesses. We were starting to wonder where this was going.`,
 
-                    `In ${attempts} attempts! A victory pulled right out of the fire.`,
+                    `${attempts} guesses! A win is a win... and we'll politely ignore how close that got.`,
 
-                    `Took ${attempts} tries! The path was winding, but you reached the finish line.`
+                    `You got there in ${attempts}. Not exactly a victory lap, but technically a victory.`,
 
-                ];
+                    `Solved in ${attempts} guesses. The clues did most of the work eventually, huh?`,
 
-                return sevenEightMessages[
-                    Math.floor(
-                        Math.random() *
-                        sevenEightMessages.length
-                    )
-                ];
+                    `${attempts} tries and you survived. That's what we're calling a successful investigation.`,
 
-            } else {
+                    `You found them on guess ${attempts}. A little late to the party, but you made it.`,
 
-                const lateWinMessages = [
+                    `Victory in ${attempts}! We were beginning to prepare a very different message for you.`,
 
-                    `Congrats! You eventually stumbled across the correct answer on try #${attempts}. We were starting to lose hope.`,
+                    `${attempts} guesses. No need to panic — you still had time. Probably.`,
 
-                    `You got it in ${attempts}! Only took almost every single try you had available.`,
-
-                    `Winner in ${attempts} guesses! Though let's be honest, that was more of a brute-force victory than skill.`,
-
-                    `On attempt #${attempts}! Defeated at the very edge of the cliff!`
+                    `You got it in ${attempts}. Let's call that a "strategic use of almost all available resources."`
 
                 ];
 
-                return lateWinMessages[
-                    Math.floor(
-                        Math.random() *
-                        lateWinMessages.length
-                    )
-                ];
+                return sevenEightMessages[Math.floor(Math.random() * sevenEightMessages.length)];
 
             }
+
+
+            const nineMessages = [
+
+                "GUESS #9?! You were one bad guess away from a very different ending. Massive escape.",
+
+                "You got it on the 9th guess. One more wrong answer and this message was going to be much meaner.",
+
+                "9 guesses. You were standing directly on the edge of the cliff and somehow walked away.",
+
+                "Solved on guess 9! That was not a comfortable margin. But hey — a win is a win.",
+
+                "NINTH GUESS. You had one life left and absolutely no business feeling this confident.",
+
+                "You found the answer with one guess remaining. Please enjoy this victory before tomorrow tries to humble you.",
+
+                "Guess #9 and you finally cracked it. That was less detective work and more controlled panic.",
+
+                "You survived until guess 9. The correct answer has officially been located before disaster struck."
+
+            ];
+
+            return nineMessages[Math.floor(Math.random() * nineMessages.length)];
 
         }
 
