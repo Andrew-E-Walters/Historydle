@@ -1,0 +1,2974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Persondle - Daily 21st Century Figures</title>
+
+    <style>
+
+        :root {
+            --green: #6aaa64;
+            --yellow: #c9b458;
+            --gray: #242526;
+            --bg-color: #000000;
+            --card-bg: #121213;
+            --text-color: #ffffff;
+            --border-color: #3a3a3c;
+            --red: #8b0000;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            margin: 4px 0 2px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #a0a0a2;
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            text-align: center;
+            line-height: 1.35;
+            padding: 0 4px;
+        }
+
+        .daily-tracker {
+            color: #6aaa64;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .guess-counter {
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #818384;
+            margin-bottom: 8px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* =========================================================
+           SEARCH BAR
+           ========================================================= */
+
+        .search-box-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            position: sticky;
+            top: 8px;
+            z-index: 10000;
+            background-color: var(--bg-color);
+            padding-bottom: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 16px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus {
+            border-color: #818384;
+        }
+
+        input:disabled {
+            background-color: #1a1a1c;
+            color: #555555;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            min-height: 44px;
+            flex-shrink: 0;
+        }
+
+        .submit-btn:active {
+            background-color: #cccccc;
+        }
+
+        .submit-btn:disabled {
+            background-color: #3a3a3c;
+            color: #777777;
+            cursor: not-allowed;
+        }
+
+        /* =========================================================
+           MOBILE-FRIENDLY SCROLLABLE SUGGESTIONS
+           ========================================================= */
+
+        .suggestions {
+            position: absolute;
+
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+
+            background-color: var(--card-bg);
+
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+
+            height: 280px;
+            max-height: 280px;
+
+            overflow-y: scroll;
+            overflow-x: hidden;
+
+            -webkit-overflow-scrolling: touch;
+
+            overscroll-behavior: contain;
+
+            touch-action: pan-y;
+
+            z-index: 99999;
+
+            display: none;
+
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+
+            scrollbar-width: thin;
+        }
+
+        .suggestions::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .suggestions::-webkit-scrollbar-track {
+            background: #121213;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb {
+            background: #555555;
+            border-radius: 10px;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb:hover {
+            background: #777777;
+        }
+
+        .suggestion-item {
+            padding: 14px;
+            min-height: 48px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            color: #ffffff;
+            text-align: left;
+            font-size: 0.95rem;
+
+            touch-action: manipulation;
+
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: #2a2a2b;
+        }
+
+        .suggestion-item:active {
+            background-color: #3a3a3c;
+        }
+
+        /* =========================================================
+           GUESS CARDS
+           ========================================================= */
+
+        .guess-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .guess-card-header {
+            font-size: 1.05rem;
+            font-weight: bold;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attributes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .cell {
+            background-color: #1a1a1c;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .cell.correct {
+            background-color: var(--green);
+            border-color: var(--green);
+        }
+
+        .cell.partial {
+            background-color: var(--yellow);
+            border-color: var(--yellow);
+            color: #000000;
+        }
+
+        .cell.partial .text-label,
+        .cell.partial .attr-title {
+            color: #000000;
+        }
+
+        .cell.wrong {
+            background-color: #1a1a1c;
+            border-color: var(--border-color);
+        }
+
+        .cell .attr-title {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            color: #818384;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .cell .emoji-icon {
+            font-size: 1.05rem;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .cell .text-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            width: 100%;
+            line-height: 1.2;
+        }
+
+        /* =========================================================
+           END GAME
+           ========================================================= */
+
+        .end-game-message {
+            text-align: center;
+            font-size: 1.05rem;
+            background-color: var(--card-bg);
+            border: 2px solid var(--green);
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .end-game-message.loss {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        .end-game-message.win {
+            border-color: var(--green);
+            color: #ffffff;
+        }
+
+        /* =========================================================
+           PERSON OF THE DAY PHOTO
+           ========================================================= */
+
+        .secret-photo-container {
+            margin-top: 14px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .secret-photo {
+            display: block;
+            width: 330px;
+            max-width: 100%;
+            height: auto;
+            max-height: 420px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            background-color: #1a1a1c;
+        }
+
+        .secret-photo-fallback {
+            margin-top: 6px;
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .secret-photo-container.photo-load-failed .secret-photo {
+            display: none;
+        }
+
+        .secret-photo-container.photo-validating .secret-photo {
+            opacity: 0.7;
+        }
+
+        .secret-photo-caption {
+            margin-top: 6px;
+            color: #818384;
+            font-size: 0.72rem;
+            font-weight: normal;
+        }
+
+        .secret-person-name {
+            margin-top: 10px;
+            color: #ffffff;
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+
+        .next-person-timer {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #a0a0a2;
+            font-weight: normal;
+        }
+
+        .share-btn {
+            background-color: var(--green);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .share-btn:active {
+            opacity: 0.9;
+        }
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .game-container {
+                max-width: 100%;
+            }
+
+            .suggestions {
+                height: 300px;
+                max-height: 300px;
+            }
+
+            .suggestion-item {
+                min-height: 50px;
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            .attributes-grid {
+                gap: 5px;
+            }
+
+            .cell {
+                min-height: 54px;
+            }
+
+            .secret-photo {
+                max-width: 100%;
+                max-height: 400px;
+            }
+        }
+
+
+        /* =========================================================
+           FAQ MODAL
+           ========================================================= */
+
+        .faq-button {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 11000;
+            padding: 7px 11px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .faq-button:hover {
+            border-color: #818384;
+        }
+
+        .faq-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.72);
+        }
+
+        .faq-overlay.show {
+            display: flex;
+        }
+
+        .faq-box {
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            background: #121213;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .faq-box h2 {
+            margin: 0 0 16px;
+            font-size: 1.15rem;
+            text-align: center;
+        }
+
+        .faq-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 11px 0;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .faq-swatch {
+            flex: 0 0 24px;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .faq-green { background: var(--green); }
+        .faq-yellow { background: var(--yellow); }
+        .faq-gray { background: var(--gray); }
+
+        .faq-close {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            padding: 9px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text-color);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+    <button id="faq-button" class="faq-button" type="button" aria-label="Open FAQ">FAQ</button>
+
+    <div id="faq-overlay" class="faq-overlay" role="dialog" aria-modal="true" aria-labelledby="faq-title">
+        <div class="faq-box" role="document">
+            <h2 id="faq-title">How the squares work</h2>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-green"></span>
+                <span><strong>Green</strong> = exact match.</span>
+            </div>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-yellow"></span>
+                <span><strong>Yellow</strong> = close match. Within 7 Years, Similar line of work, Within 25% of net worth and followers</span>
+            </div>
+
+            <div class="faq-row">
+                <span class="faq-swatch faq-gray"></span>
+                <span><strong>Gray</strong> = no match.</span>
+            </div>
+
+            <button id="faq-close" class="faq-close" type="button">Close</button>
+        </div>
+    </div>
+
+
+    <h1>PERSONDLE</h1>
+
+    <div class="subtitle">
+        Guess the 21st century figure. They can be from any of these arenas:
+        <br>
+        <strong>
+            🎵 <strong>Music / Literature / Writer/Director</strong><br>
+            🎬 <strong>Movies / TV / Reality TV</strong><br>
+            🎙️ <strong>Podcasters / Influencers</strong><br>
+            🔬 <strong>Tech &amp; Science / Business / Politics / Journalism</strong><br>
+            🏆 <strong>Sports</strong>
+        </strong>
+    </div>
+
+    <div id="daily-number" class="daily-tracker">
+        PERSONDLE #1
+    </div>
+
+    <div class="game-container">
+
+        <div id="guess-counter" class="guess-counter">
+            Guesses: 0 / 10
+        </div>
+
+        <div class="search-box-row">
+
+            <div class="input-wrapper">
+
+                <input
+                    type="text"
+                    id="guess-input"
+                    placeholder="Type a figure's name..."
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="words"
+                    spellcheck="false"
+                >
+
+                <div
+                    id="suggestions"
+                    class="suggestions"
+                ></div>
+
+            </div>
+
+            <button
+                id="submit-guess-btn"
+                class="submit-btn"
+            >
+                Guess
+            </button>
+
+        </div>
+
+        <div
+            id="end-game-box"
+            class="end-game-message"
+        >
+
+            <div id="end-game-text"></div>
+
+            <div id="secret-photo-slot" class="secret-photo-slot" aria-live="polite"></div>
+
+            <div class="next-person-timer">
+                Next Person in:
+                <span id="countdown">00:00:00</span>
+            </div>
+
+            <button
+                id="share-button"
+                class="share-btn"
+            >
+                Share Result 📋
+            </button>
+
+        </div>
+
+        <div
+            id="guesses-container"
+            style="display: flex; flex-direction: column; gap: 10px;"
+        ></div>
+
+    </div>
+
+
+    <script>
+
+        const maxGuesses = 10;
+
+
+        /* =========================================================
+           EMOJIS
+           ========================================================= */
+
+        const arenaEmojis = {
+
+            "Music": "🎵",
+            "Movies": "🎬",
+            "Writer/Director": "🎬✍️",
+            "TV": "📺",
+            "Politics": "🏛️",
+            "Sports": "🏆",
+            "Business": "💼",
+            "Tech & Science": "🔬",
+            "Influencers": "📸",
+            "Podcasters": "🎙️",
+            "Reality TV": "🎥",
+            "Journalism": "📰",
+            "Literature": "📚",
+            
+        };
+
+
+        const normalizeCountry = c => (String(c || "").trim().toUpperCase() === "US" || String(c || "").trim().toUpperCase() === "USA") ? "USA" : c;
+
+        const countryEmojis = {
+
+            "USA": "🇺🇸",
+            "US": "🇺🇸",
+            "UK": "🇬🇧",
+            "South Africa": "🇿🇦",
+            "Germany": "🇩🇪",
+            "India": "🇮🇳",
+            "Australia": "🇦🇺",
+            "Canada": "🇨🇦",
+            "Ukraine": "🇺🇦",
+            "Sweden": "🇸🇪",
+            "Argentina": "🇦🇷",
+            "Portugal": "🇵🇹",
+            "France": "🇫🇷",
+            "Brazil": "🇧🇷",
+            "Norway": "🇳🇴",
+            "Japan": "🇯🇵",
+            "Italy": "🇮🇹",
+            "Taiwan": "🇹🇼",
+            "Senegal": "🇸🇳",
+            "Barbados": "🇧🇧",
+            "Colombia": "🇨🇴",
+            "Puerto Rico": "🇵🇷",
+            "Ireland": "🇮🇪",
+            "New Zealand": "🇳🇿",
+            "Austria": "🇦🇹",
+            "Switzerland": "🇨🇭",
+            "Serbia": "🇷🇸",
+            "Jamaica": "🇯🇲",
+            "Russia": "🇷🇺",
+            "Philippines": "🇵🇭",
+            "Netherlands": "🇳🇱",
+            "Uganda": "🇺🇬",
+            "Chile": "🇨🇱",
+            "China": "🇨🇳",
+            "Israel": "🇮🇱"
+
+        };
+
+
+        const countryContinents = {
+            "USA": "North America",
+            "US": "North America",
+            "Canada": "North America",
+            "UK": "Europe",
+            "Germany": "Europe",
+            "Ukraine": "Europe",
+            "Sweden": "Europe",
+            "Portugal": "Europe",
+            "France": "Europe",
+            "Norway": "Europe",
+            "Italy": "Europe",
+            "India": "Asia",
+            "Japan": "Asia",
+            "South Africa": "Africa",
+            "Australia": "Oceania",
+            "Argentina": "South America",
+            "Brazil": "South America",
+            "Austria": "Europe",
+            "Barbados": "North America",
+            "Chile": "South America",
+            "Colombia": "South America",
+            "Ireland": "Europe",
+            "Jamaica": "North America",
+            "Netherlands": "Europe",
+            "New Zealand": "Oceania",
+            "Philippines": "Asia",
+            "Puerto Rico": "North America",
+            "Russia": "Europe",
+            "Senegal": "Africa",
+            "Serbia": "Europe",
+            "Switzerland": "Europe",
+            "Taiwan": "Asia",
+            "Uganda": "Africa",
+            "China": "Asia",
+            "Israel": "Asia"
+        };
+
+
+        const genderEmojis = {
+
+            "Male": "👨",
+            "Female": "👩"
+
+        };
+
+
+        function getAgeGroupEmoji(age) {
+
+            if (age < 40) return "🧑";
+
+            if (age < 65) return "👨";
+
+            if (age < 80) return "👴";
+
+            return "🧙‍♂️";
+
+        }
+
+
+
+        /* =========================================================
+           MASTER DATABASE
+           ========================================================= */
+
+const figures = [{"name":"Warren Buffett","arena":"Business","netWorth":"149,000,000,000","country":"US","followers":1100000,"gender":"Male","age":96,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Warren_Buffett_in_2010.jpg"},{"name":"Jeff Bezos","arena":"Business","netWorth":"224,000,000,000","country":"US","followers":6600000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jeff_Bezos_%28cropped%29.jpg"},{"name":"Richard Branson","arena":"Business","netWorth":"4,000,000,000","country":"UK","followers":4700000,"gender":"Male","age":76,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Richard_Branson.jpg"},{"name":"Kevin O'Leary","arena":"Business","netWorth":"400,000,000","country":"Canada","followers":2500000,"gender":"Male","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/KevinOLeary2023.jpg"},{"name":"Mark Cuban","arena":"Business","netWorth":"6,200,000,000","country":"US","followers":9000000,"gender":"Male","age":68,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mark_Cuban_in_2022.jpg"},{"name":"Dave Ramsey","arena":"Business","netWorth":"200,000,000","country":"US","followers":2400000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Dave_Ramsey_%2852941346016%29.jpg"},{"name":"Anthony Fauci","arena":"Tech & Science","netWorth":"12,500,000","country":"US","followers":20000,"gender":"Male","age":85,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Anthony_Fauci_2020.jpg"},{"name":"Bill Nye","arena":"Tech & Science","netWorth":"8,000,000","country":"US","followers":3100000,"gender":"Male","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_Nye_2018.jpg"},{"name":"Jack Dorsey","arena":"Tech & Science","netWorth":"4,000,000,000","country":"US","followers":20000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jack_Dorsey_2014_%28cropped%29.jpg"},{"name":"Jane Goodall","arena":"Tech & Science","netWorth":"1,500,000","country":"UK","followers":1100000,"gender":"Female","age":92,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jane_Goodall_2015.jpg"},{"name":"Jensen Huang","arena":"Tech & Science","netWorth":"100,000,000,000","country":"Taiwan","followers":20000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jensen_Huang_2024.jpg"},{"name":"Marc Andreessen","arena":"Tech & Science","netWorth":"1,800,000,000","country":"US","followers":20000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Marc_Andreessen_2018.jpg"},{"name":"Neil deGrasse Tyson","arena":"Tech & Science","netWorth":"5,000,000","country":"US","followers":1900000,"gender":"Male","age":68,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Neil_deGrasse_Tyson_in_2022.jpg"},{"name":"Peter Thiel","arena":"Tech & Science","netWorth":"7,000,000,000","country":"US","followers":20000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Peter_Thiel_by_Gage_Skidmore.jpg"},{"name":"Richard Dawkins","arena":"Tech & Science","netWorth":"10,000,000","country":"UK","followers":100000,"gender":"Male","age":85,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Richard_Dawkins_2022.jpg"},{"name":"Sam Altman","arena":"Tech & Science","netWorth":"2,000,000,000","country":"US","followers":1400000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sam_Altman_TechCrunch_Disrupt_2019_crop.jpg"},{"name":"Stephen Hawking","arena":"Tech & Science","netWorth":"20,000,000","country":"UK","followers":20000,"gender":"Male","age":76,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stephen_Hawking_StarChild.jpg"},{"name":"Steve Jobs","arena":"Tech & Science","netWorth":"10,000,000,000","country":"US","followers":20000,"gender":"Male","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Steve_Jobs_Headshot_2010-CROP_%28cropped%29.jpg"},{"name":"Addison Rae","arena":"Influencers","netWorth":"20,000,000","country":"US","followers":36000000,"gender":"Female","age":25,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Addison_Rae_2021.jpg"},{"name":"Charli D'Amelio","arena":"Influencers","netWorth":"30,000,000","country":"US","followers":45000000,"gender":"Female","age":22,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Charli_D%27Amelio_2022.jpg"},{"name":"David Dobrik","arena":"Influencers","netWorth":"25,000,000","country":"US","followers":11000000,"gender":"Male","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/David_Dobrik_2019.jpg"},{"name":"Emma Chamberlain","arena":"Influencers","netWorth":"20,000,000","country":"US","followers":15000000,"gender":"Female","age":25,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Emma_Chamberlain_2022.jpg"},{"name":"IShowSpeed","arena":"Influencers","netWorth":"30,000,000","country":"US","followers":20000000,"gender":"Male","age":21,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/IShowSpeed_2024.jpg"},{"name":"Jake Paul","arena":"Influencers","netWorth":"80,000,000","country":"US","followers":26000000,"gender":"Male","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jake_Paul_2021.jpg"},{"name":"James Charles","arena":"Influencers","netWorth":"20,000,000","country":"US","followers":20000000,"gender":"Male","age":27,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/James_Charles_2019.jpg"},{"name":"Kai Cenat","arena":"Influencers","netWorth":"45,000,000","country":"US","followers":20000000,"gender":"Male","age":24,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kai_Cenat_2023.jpg"},{"name":"Khaby Lame","arena":"Influencers","netWorth":"15,000,000","country":"Senegal","followers":80000000,"gender":"Male","age":26,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Khaby_Lame_2022.jpg"},{"name":"Logan Paul","arena":"Influencers","netWorth":"50,000,000","country":"US","followers":27000000,"gender":"Male","age":31,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Logan_Paul_2021.jpg"},{"name":"Markiplier","arena":"Influencers","netWorth":"35,000,000","country":"US","followers":12000000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Markiplier_2019.jpg"},{"name":"MrBeast","arena":"Influencers","netWorth":"500,000,000","country":"US","followers":60000000,"gender":"Male","age":28,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/MrBeast_2023.jpg"},{"name":"Ninja","arena":"Influencers","netWorth":"40,000,000","country":"US","followers":12000000,"gender":"Male","age":35,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ninja_2019.jpg"},{"name":"PewDiePie","arena":"Influencers","netWorth":"40,000,000","country":"Sweden","followers":20000000,"gender":"Male","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/PewDiePie_at_somewhere_in_2019.jpg"},{"name":"Alex Cooper","arena":"Podcasters","netWorth":"30,000,000","country":"US","followers":3000000,"gender":"Female","age":32,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Alex_Cooper_2023.jpg"},{"name":"Amy Poehler","arena":"Movies","netWorth":"25,000,000","country":"US","followers":7000000,"gender":"Female","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Amy_Poehler_2024.jpg"},{"name":"Ben Shapiro","arena":"Podcasters","netWorth":"50,000,000","country":"US","followers":4000000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ben_Shapiro_2021.jpg"},{"name":"Bill Burr","arena":"Podcasters","netWorth":"14,000,000","country":"US","followers":2500000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_Burr_2019.jpg"},{"name":"Conan O'Brien","arena":"Podcasters","netWorth":"200,000,000","country":"US","followers":2000000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Conan_O%27Brien_2019.jpg"},{"name":"Joe Rogan","arena":"Podcasters","netWorth":"200,000,000","country":"US","followers":19000000,"gender":"Male","age":59,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Joe_Rogan_2020.jpg"},{"name":"Rachel Maddow","arena":"Journalism","netWorth":"35,000,000","country":"US","followers":500000,"gender":"Female","age":53,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rachel_Maddow_2019.jpg"},{"name":"Shane Gillis","arena":"Podcasters","netWorth":"5,000,000","country":"US","followers":2000000,"gender":"Male","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Shane_Gillis_2024.jpg"},{"name":"Stavros Halkias","arena":"Podcasters","netWorth":"2,000,000","country":"US","followers":800000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stavros_Halkias_2023.jpg"},{"name":"Tom Segura","arena":"Podcasters","netWorth":"14,000,000","country":"US","followers":3000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Segura_2023.jpg"},{"name":"Theo Von","arena":"Podcasters","netWorth":"12,000,000","country":"US","followers":9200000,"gender":"Male","age":46,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Theo_Von_Comedian.jpg"},{"name":"Nikki Glaser","arena":"Podcasters","netWorth":"10,000,000","country":"US","followers":2600000,"gender":"Female","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Nikki_Glaser.jpg"},{"name":"A$AP Rocky","arena":"Music","netWorth":"20,000,000","country":"US","followers":20000000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/ASAP_Rocky_2019.jpg"},{"name":"Adam Levine","arena":"Music","netWorth":"160,000,000","country":"US","followers":16000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Adam_Levine_2022.jpg"},{"name":"Adele","arena":"Music","netWorth":"220,000,000","country":"UK","followers":56000000,"gender":"Female","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Adele_2021.jpg"},{"name":"Alicia Keys","arena":"Music","netWorth":"150,000,000","country":"US","followers":27000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Alicia_Keys_2023.jpg"},{"name":"Ariana Grande","arena":"Music","netWorth":"240,000,000","country":"US","followers":375000000,"gender":"Female","age":33,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ariana_Grande_2024.jpg"},{"name":"Bad Bunny","arena":"Music","netWorth":"50,000,000","country":"Puerto Rico","followers":45000000,"gender":"Male","age":32,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bad_Bunny_2023.jpg"},{"name":"Beyonc\u00e9","arena":"Music","netWorth":"800,000,000","country":"US","followers":315000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Beyonce_Renaissance_World_Tour_2023.jpg"},{"name":"Billie Eilish","arena":"Music","netWorth":"50,000,000","country":"US","followers":120000000,"gender":"Female","age":24,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Billie_Eilish_2023.jpg"},{"name":"Blake Shelton","arena":"Music","netWorth":"120,000,000","country":"US","followers":6000000,"gender":"Male","age":50,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Blake_Shelton_2023.jpg"},{"name":"Bono","arena":"Music","netWorth":"700,000,000","country":"Ireland","followers":20000,"gender":"Male","age":66,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bono_2022.jpg"},{"name":"Bruce Springsteen","arena":"Music","netWorth":"650,000,000","country":"US","followers":2000000,"gender":"Male","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bruce_Springsteen_2023.jpg"},{"name":"Bruno Mars","arena":"Music","netWorth":"175,000,000","country":"US","followers":32000000,"gender":"Male","age":40,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bruno_Mars_2022.jpg"},{"name":"Cardi B","arena":"Music","netWorth":"80,000,000","country":"US","followers":165000000,"gender":"Female","age":33,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Cardi_B_2023.jpg"},{"name":"Carrie Underwood","arena":"Music","netWorth":"140,000,000","country":"US","followers":13000000,"gender":"Female","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Carrie_Underwood_2023.jpg"},{"name":"Chris Martin","arena":"Music","netWorth":"160,000,000","country":"US","followers":20000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Martin_2023.jpg"},{"name":"Doja Cat","arena":"Music","netWorth":"12,000,000","country":"US","followers":24000000,"gender":"Female","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Doja_Cat_2024.jpg"},{"name":"Dr. Dre","arena":"Music","netWorth":"500,000,000","country":"US","followers":8000000,"gender":"Male","age":61,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Dr._Dre_at_Coachella_2012_cropped.jpg"},{"name":"Drake","arena":"Music","netWorth":"250,000,000","country":"Canada","followers":145000000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Drake_July_2016.jpg"},{"name":"Dua Lipa","arena":"Music","netWorth":"35,000,000","country":"UK","followers":88000000,"gender":"Female","age":31,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Dua_Lipa_2024.jpg"},{"name":"Ed Sheeran","arena":"Music","netWorth":"200,000,000","country":"UK","followers":47000000,"gender":"Male","age":35,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ed_Sheeran_2022.jpg"},{"name":"Elton John","arena":"Music","netWorth":"550,000,000","country":"UK","followers":5000000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Elton_John_2023.jpg"},{"name":"Eminem","arena":"Music","netWorth":"250,000,000","country":"US","followers":44000000,"gender":"Male","age":53,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Eminem_2021.jpg"},{"name":"Future","arena":"Music","netWorth":"50,000,000","country":"US","followers":25000000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Future_2023.jpg"},{"name":"Harry Styles","arena":"Music","netWorth":"120,000,000","country":"UK","followers":48000000,"gender":"Male","age":32,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Harry_Styles_2023.jpg"},{"name":"J. Cole","arena":"Music","netWorth":"60,000,000","country":"US","followers":9000000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/J._Cole_in_2023.png"},{"name":"Jay-Z","arena":"Music","netWorth":"2,500,000,000","country":"US","followers":20000,"gender":"Male","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jay-Z_2019.jpg"},{"name":"Jennifer Lopez","arena":"Music","netWorth":"400,000,000","country":"US","followers":250000000,"gender":"Female","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jennifer_Lopez_2024.jpg"},{"name":"John Legend","arena":"Music","netWorth":"100,000,000","country":"US","followers":16000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Legend_2023.jpg"},{"name":"Justin Bieber","arena":"Music","netWorth":"300,000,000","country":"US","followers":293000000,"gender":"Male","age":32,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Justin_Bieber_2020.jpg"},{"name":"Justin Timberlake","arena":"Music","netWorth":"250,000,000","country":"US","followers":72000000,"gender":"Male","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Justin_Timberlake_2024.jpg"},{"name":"Kacey Musgraves","arena":"Music","netWorth":"12,000,000","country":"US","followers":5000000,"gender":"Female","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kacey_Musgraves_2019.jpg"},{"name":"Kanye West","arena":"Music","netWorth":"400,000,000","country":"US","followers":20000000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kanye_West_at_the_2009_Tribeca_Film_Festival.jpg"},{"name":"Katy Perry","arena":"Music","netWorth":"340,000,000","country":"US","followers":205000000,"gender":"Female","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Katy_Perry_2023.jpg"},{"name":"Kelly Clarkson","arena":"Music","netWorth":"50,000,000","country":"US","followers":7000000,"gender":"Female","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kelly_Clarkson_2023.jpg"},{"name":"Kendrick Lamar","arena":"Music","netWorth":"75,000,000","country":"US","followers":15000000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kendrick_Lamar_2022.jpg"},{"name":"Lady Gaga","arena":"Music","netWorth":"320,000,000","country":"US","followers":57000000,"gender":"Female","age":40,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lady_Gaga_2023.jpg"},{"name":"Lana Del Rey","arena":"Music","netWorth":"30,000,000","country":"US","followers":20000000,"gender":"Female","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lana_Del_Rey_2024.jpg"},{"name":"Lil Wayne","arena":"Music","netWorth":"170,000,000","country":"US","followers":19000000,"gender":"Male","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lil_Wayne_2023.jpg"},{"name":"Luke Combs","arena":"Music","netWorth":"20,000,000","country":"US","followers":6000000,"gender":"Male","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Luke_Combs_2023.jpg"},{"name":"Madonna","arena":"Music","netWorth":"850,000,000","country":"US","followers":19000000,"gender":"Female","age":68,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Madonna_Celebration_Tour_2023.jpg"},{"name":"Mariah Carey","arena":"Music","netWorth":"340,000,000","country":"US","followers":13000000,"gender":"Female","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mariah_Carey_2023.jpg"},{"name":"Megan Thee Stallion","arena":"Music","netWorth":"8,000,000","country":"US","followers":32000000,"gender":"Female","age":31,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Megan_Thee_Stallion_2024.jpg"},{"name":"Mick Jagger","arena":"Music","netWorth":"500,000,000","country":"UK","followers":3000000,"gender":"Male","age":83,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mick_Jagger_2022.jpg"},{"name":"Miley Cyrus","arena":"Music","netWorth":"160,000,000","country":"US","followers":215000000,"gender":"Female","age":33,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Miley_Cyrus_2024.jpg"},{"name":"Morgan Wallen","arena":"Music","netWorth":"20,000,000","country":"US","followers":7000000,"gender":"Male","age":33,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Morgan_Wallen_2023.jpg"},{"name":"Nicki Minaj","arena":"Music","netWorth":"150,000,000","country":"US","followers":228000000,"gender":"Female","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Nicki_Minaj_2024.jpg"},{"name":"Olivia Rodrigo","arena":"Music","netWorth":"16,000,000","country":"US","followers":38000000,"gender":"Female","age":23,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Olivia_Rodrigo_2024.jpg"},{"name":"Paul McCartney","arena":"Music","netWorth":"1,200,000,000","country":"UK","followers":4000000,"gender":"Male","age":84,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Paul_McCartney_2021.jpg"},{"name":"Pharrell Williams","arena":"Music","netWorth":"250,000,000","country":"US","followers":15000000,"gender":"Male","age":53,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Pharrell_Williams_2023.jpg"},{"name":"Pink","arena":"Music","netWorth":"200,000,000","country":"US","followers":10000000,"gender":"Female","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Pink_2023.jpg"},{"name":"Post Malone","arena":"Music","netWorth":"50,000,000","country":"US","followers":25000000,"gender":"Male","age":31,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Post_Malone_2023.jpg"},{"name":"Rihanna","arena":"Music","netWorth":"1,400,000,000","country":"Barbados","followers":150000000,"gender":"Female","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rihanna_2018.jpg"},{"name":"SZA","arena":"Music","netWorth":"6,000,000","country":"US","followers":20000000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/SZA_2024.jpg"},{"name":"Selena Gomez","arena":"Music","netWorth":"800,000,000","country":"US","followers":424000000,"gender":"Female","age":34,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Selena_Gomez_2024.jpg"},{"name":"Shakira","arena":"Music","netWorth":"300,000,000","country":"Colombia","followers":90000000,"gender":"Female","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Shakira_2024.jpg"},{"name":"Snoop Dogg","arena":"Music","netWorth":"160,000,000","country":"US","followers":88000000,"gender":"Male","age":54,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Snoop_Dogg_2024.jpg"},{"name":"Taylor Swift","arena":"Music","netWorth":"1,100,000,000","country":"US","followers":283000000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_4.org.jpg"},{"name":"The Weeknd","arena":"Music","netWorth":"300,000,000","country":"US","followers":75000000,"gender":"Male","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/The_Weeknd_2023.jpg"},{"name":"Travis Scott","arena":"Music","netWorth":"80,000,000","country":"US","followers":57000000,"gender":"Male","age":35,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Travis_Scott_2023.jpg"},{"name":"Usher","arena":"Music","netWorth":"180,000,000","country":"US","followers":13000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Usher_2024.jpg"},{"name":"Adam Sandler","arena":"Movies","netWorth":"440,000,000","country":"US","followers":10000000,"gender":"Male","age":60,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Adam_Sandler_2011.jpg"},{"name":"Anne Hathaway","arena":"Movies","netWorth":"80,000,000","country":"US","followers":33000000,"gender":"Female","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Anne_Hathaway_2024.jpg"},{"name":"Ben Affleck","arena":"Movies","netWorth":"150,000,000","country":"US","followers":5000000,"gender":"Male","age":54,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ben_Affleck_2012.jpg"},{"name":"Brad Pitt","arena":"Movies","netWorth":"400,000,000","country":"US","followers":20000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Brad_Pitt_2022.jpg"},{"name":"Bradley Cooper","arena":"Movies","netWorth":"120,000,000","country":"US","followers":20000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bradley_Cooper_2023.jpg"},{"name":"Cate Blanchett","arena":"Movies","netWorth":"95,000,000","country":"Australia","followers":20000,"gender":"Female","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Cate_Blanchett_2024.jpg"},{"name":"Chadwick Boseman","arena":"Movies","netWorth":"12,000,000","country":"US","followers":11000000,"gender":"Male","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chadwick_Boseman_2018.jpg"},{"name":"Chris Evans","arena":"Movies","netWorth":"110,000,000","country":"US","followers":15000000,"gender":"Male","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Evans_2023.jpg"},{"name":"Chris Hemsworth","arena":"Movies","netWorth":"130,000,000","country":"US","followers":58000000,"gender":"Male","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Hemsworth_2024.jpg"},{"name":"Christian Bale","arena":"Movies","netWorth":"120,000,000","country":"UK","followers":20000,"gender":"Male","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Christian_Bale_2022.jpg"},{"name":"Christopher Nolan","arena":"Writer/Director","netWorth":"250,000,000","country":"UK","followers":20000,"gender":"Male","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Christopher_Nolan_2024.jpg"},{"name":"Cillian Murphy","arena":"Movies","netWorth":"20,000,000","country":"Ireland","followers":20000,"gender":"Male","age":50,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Cillian_Murphy_2024.jpg"},{"name":"Daniel Day-Lewis","arena":"Movies","netWorth":"60,000,000","country":"UK","followers":20000,"gender":"Male","age":69,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Daniel_Day-Lewis_2013.jpg"},{"name":"Denzel Washington","arena":"Movies","netWorth":"280,000,000","country":"US","followers":20000,"gender":"Male","age":71,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Denzel_Washington_2024.jpg"},{"name":"Dwayne Johnson","arena":"Movies","netWorth":"800,000,000","country":"US","followers":395000000,"gender":"Male","age":54,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Dwayne_Johnson_2023.jpg"},{"name":"Emma Stone","arena":"Movies","netWorth":"40,000,000","country":"US","followers":20000,"gender":"Female","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Emma_Stone_2024.jpg"},{"name":"Florence Pugh","arena":"Movies","netWorth":"8,000,000","country":"US","followers":9000000,"gender":"Female","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Florence_Pugh_2024.jpg"},{"name":"George Clooney","arena":"Movies","netWorth":"500,000,000","country":"US","followers":20000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/George_Clooney_2023.jpg"},{"name":"Greta Gerwig","arena":"Writer/Director","netWorth":"12,000,000","country":"US","followers":20000,"gender":"Female","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Greta_Gerwig_2024.jpg"},{"name":"Harrison Ford","arena":"Movies","netWorth":"300,000,000","country":"US","followers":20000,"gender":"Male","age":84,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Harrison_Ford_2023.jpg"},{"name":"Hugh Jackman","arena":"Movies","netWorth":"180,000,000","country":"Australia","followers":33000000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Hugh_Jackman_2024.jpg"},{"name":"Jack Black","arena":"Movies","netWorth":"50,000,000","country":"US","followers":10000000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jack_Black_2016.jpg"},{"name":"James Cameron","arena":"Writer/Director","netWorth":"800,000,000","country":"US","followers":700000,"gender":"Male","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/James_Cameron_2023.jpg"},{"name":"Jennifer Lawrence","arena":"Movies","netWorth":"160,000,000","country":"US","followers":20000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jennifer_Lawrence_2023.jpg"},{"name":"Jim Carrey","arena":"Movies","netWorth":"180,000,000","country":"US","followers":1500000,"gender":"Male","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jim_Carrey_2014.jpg"},{"name":"Joaquin Phoenix","arena":"Movies","netWorth":"60,000,000","country":"US","followers":20000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Joaquin_Phoenix_2023.jpg"},{"name":"Johnny Depp","arena":"Movies","netWorth":"150,000,000","country":"US","followers":28000000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp_2023.jpg"},{"name":"Jordan Peele","arena":"Writer/Director","netWorth":"50,000,000","country":"US","followers":1500000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jordan_Peele_2022.jpg"},{"name":"Julia Roberts","arena":"Movies","netWorth":"250,000,000","country":"US","followers":12000000,"gender":"Female","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Julia_Roberts_2023.jpg"},{"name":"Keanu Reeves","arena":"Movies","netWorth":"380,000,000","country":"Canada","followers":20000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Keanu_Reeves_2023.jpg"},{"name":"Kevin Hart","arena":"Movies","netWorth":"450,000,000","country":"US","followers":180000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kevin_Hart_2023.jpg"},{"name":"Leonardo DiCaprio","arena":"Movies","netWorth":"300,000,000","country":"US","followers":61000000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Leonardo_DiCaprio_2023.jpg"},{"name":"Margot Robbie","arena":"Movies","netWorth":"60,000,000","country":"US","followers":20000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Margot_Robbie_2023.jpg"},{"name":"Martin Scorsese","arena":"Writer/Director","netWorth":"200,000,000","country":"US","followers":2000000,"gender":"Male","age":83,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Martin_Scorsese_2023.jpg"},{"name":"Matt Damon","arena":"Movies","netWorth":"170,000,000","country":"US","followers":20000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Matt_Damon_2023.jpg"},{"name":"Matthew McConaughey","arena":"Movies","netWorth":"160,000,000","country":"US","followers":9000000,"gender":"Male","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Matthew_McConaughey_2023.jpg"},{"name":"Meryl Streep","arena":"Movies","netWorth":"160,000,000","country":"US","followers":20000,"gender":"Female","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Meryl_Streep_2024.jpg"},{"name":"Michael B. Jordan","arena":"Movies","netWorth":"25,000,000","country":"US","followers":25000000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael_B._Jordan_in_2019.jpg"},{"name":"Morgan Freeman","arena":"Movies","netWorth":"250,000,000","country":"US","followers":4000000,"gender":"Male","age":89,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Morgan_Freeman_2023.jpg"},{"name":"Natalie Portman","arena":"Movies","netWorth":"90,000,000","country":"US","followers":9000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Natalie_Portman_2023.jpg"},{"name":"Nicole Kidman","arena":"Movies","netWorth":"250,000,000","country":"Australia","followers":10000000,"gender":"Female","age":59,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Nicole_Kidman_2024.jpg"},{"name":"Peter Jackson","arena":"Writer/Director","netWorth":"1,500,000,000","country":"New Zealand","followers":20000,"gender":"Male","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Peter_Jackson_2022.jpg"},{"name":"Quentin Tarantino","arena":"Writer/Director","netWorth":"120,000,000","country":"US","followers":20000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Quentin_Tarantino_2023.jpg"},{"name":"Robert Downey Jr.","arena":"Movies","netWorth":"300,000,000","country":"US","followers":57000000,"gender":"Male","age":61,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Robert_Downey_Jr_2024.jpg"},{"name":"Ryan Gosling","arena":"Movies","netWorth":"70,000,000","country":"US","followers":20000,"gender":"Male","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ryan_Gosling_2024.jpg"},{"name":"Ryan Reynolds","arena":"Movies","netWorth":"350,000,000","country":"US","followers":51000000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ryan_Reynolds_2024.jpg"},{"name":"Samuel L. Jackson","arena":"Movies","netWorth":"250,000,000","country":"US","followers":7000000,"gender":"Male","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Samuel_L_Jackson_Comic_Con.jpg"},{"name":"Sandra Bullock","arena":"Movies","netWorth":"250,000,000","country":"US","followers":20000,"gender":"Female","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sandra_Bullock_2022.jpg"},{"name":"Scarlett Johansson","arena":"Movies","netWorth":"165,000,000","country":"US","followers":20000,"gender":"Female","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Scarlett_Johansson_2024.jpg"},{"name":"Seth Rogen","arena":"Movies","netWorth":"80,000,000","country":"US","followers":10000000,"gender":"Male","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Seth_Rogen_2019.jpg"},{"name":"Steven Spielberg","arena":"Writer/Director","netWorth":"8,500,000,000","country":"US","followers":20000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Steven_Spielberg_2023.jpg"},{"name":"Timoth\u00e9e Chalamet","arena":"Movies","netWorth":"25,000,000","country":"US","followers":19000000,"gender":"Male","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Timoth%25C3%25A9e_Chalamet_2024.jpg"},{"name":"Tom Cruise","arena":"Movies","netWorth":"600,000,000","country":"US","followers":12000000,"gender":"Male","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Cruise_2023.jpg"},{"name":"Tom Hanks","arena":"Movies","netWorth":"400,000,000","country":"US","followers":9500000,"gender":"Male","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Hanks_2023.jpg"},{"name":"Tom Holland","arena":"Movies","netWorth":"25,000,000","country":"UK","followers":66000000,"gender":"Male","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Holland_2022.jpg"},{"name":"Will Ferrell","arena":"Movies","netWorth":"160,000,000","country":"US","followers":4000000,"gender":"Male","age":59,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Will_Ferrell_2014.jpg"},{"name":"Will Smith","arena":"Movies","netWorth":"350,000,000","country":"US","followers":70000000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Will_Smith_2024.jpg"},{"name":"Zendaya","arena":"Movies","netWorth":"22,000,000","country":"US","followers":180000000,"gender":"Female","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Zendaya_2024.jpg"},{"name":"Aaron Paul","arena":"TV","netWorth":"25,000,000","country":"US","followers":6000000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Aaron_Paul_2022.jpg"},{"name":"Anderson Cooper","arena":"Journalism","netWorth":"50,000,000","country":"US","followers":3800000,"gender":"Male","age":59,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Anderson_Cooper_2023.jpg"},{"name":"Bill Maher","arena":"TV","netWorth":"140,000,000","country":"US","followers":1000000,"gender":"Male","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_Maher_2023.jpg"},{"name":"Bryan Cranston","arena":"TV","netWorth":"40,000,000","country":"US","followers":5000000,"gender":"Male","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bryan_Cranston_2023.jpg"},{"name":"Chris Rock","arena":"TV","netWorth":"60,000,000","country":"US","followers":5000000,"gender":"Male","age":61,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chris_Rock_2012.jpg"},{"name":"Courteney Cox","arena":"TV","netWorth":"150,000,000","country":"US","followers":12000000,"gender":"Female","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Courteney_Cox_2023.jpg"},{"name":"David Letterman","arena":"TV","netWorth":"400,000,000","country":"US","followers":500000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/David_Letterman_2022.jpg"},{"name":"Ellen DeGeneres","arena":"TV","netWorth":"380,000,000","country":"US","followers":139000000,"gender":"Female","age":68,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ellen_DeGeneres_2021.jpg"},{"name":"Gordon Ramsay","arena":"TV","netWorth":"220,000,000","country":"UK","followers":17000000,"gender":"Male","age":59,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Gordon_Ramsay_2022.jpg"},{"name":"Henry Cavill","arena":"TV","netWorth":"50,000,000","country":"UK","followers":27000000,"gender":"Male","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Henry_Cavill_2024.jpg"},{"name":"James Gandolfini","arena":"TV","netWorth":"70,000,000","country":"US","followers":20000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/James_Gandolfini_2011.jpg"},{"name":"Jason Bateman","arena":"TV","netWorth":"30,000,000","country":"US","followers":20000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jason_Bateman_2022.jpg"},{"name":"Jay Leno","arena":"TV","netWorth":"450,000,000","country":"US","followers":1000000,"gender":"Male","age":76,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jay_Leno_2022.jpg"},{"name":"Jennifer Aniston","arena":"TV","netWorth":"300,000,000","country":"US","followers":45000000,"gender":"Female","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jennifer_Aniston_2023.jpg"},{"name":"Jerry Seinfeld","arena":"TV","netWorth":"1,000,000,000","country":"US","followers":1300000,"gender":"Male","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jerry_Seinfeld_2024.jpg"},{"name":"Jimmy Fallon","arena":"TV","netWorth":"60,000,000","country":"US","followers":26000000,"gender":"Male","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jimmy_Fallon_2023.jpg"},{"name":"Jimmy Kimmel","arena":"TV","netWorth":"50,000,000","country":"US","followers":3000000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jimmy_Kimmel_2023.jpg"},{"name":"John Krasinski","arena":"TV","netWorth":"80,000,000","country":"US","followers":6000000,"gender":"Male","age":46,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Krasinski_2024.jpg"},{"name":"John Oliver","arena":"TV","netWorth":"35,000,000","country":"UK","followers":20000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Oliver_2023.jpg"},{"name":"Jon Hamm","arena":"TV","netWorth":"45,000,000","country":"US","followers":20000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jon_Hamm_2023.jpg"},{"name":"Jon Stewart","arena":"TV","netWorth":"120,000,000","country":"US","followers":20000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jon_Stewart_2024.jpg"},{"name":"Julia Louis-Dreyfus","arena":"TV","netWorth":"250,000,000","country":"US","followers":1500000,"gender":"Female","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Julia_Louis-Dreyfus_2023.jpg"},{"name":"Larry David","arena":"TV","netWorth":"400,000,000","country":"US","followers":20000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Larry_David_2024.jpg"},{"name":"Millie Bobby Brown","arena":"TV","netWorth":"14,000,000","country":"US","followers":63000000,"gender":"Female","age":22,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Millie_Bobby_Brown_2024.jpg"},{"name":"Oprah Winfrey","arena":"TV","netWorth":"2,800,000,000","country":"US","followers":23000000,"gender":"Female","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Oprah_Winfrey_2023.jpg"},{"name":"Pedro Pascal","arena":"TV","netWorth":"10,000,000","country":"US","followers":8500000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Pedro_Pascal_2024.jpg"},{"name":"Ryan Seacrest","arena":"TV","netWorth":"450,000,000","country":"US","followers":6000000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ryan_Seacrest_2023.jpg"},{"name":"Sean Hannity","arena":"TV","netWorth":"300,000,000","country":"US","followers":1000000,"gender":"Male","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sean_Hannity_2022.jpg"},{"name":"Stephen Colbert","arena":"TV","netWorth":"75,000,000","country":"US","followers":1000000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stephen_Colbert_2023.jpg"},{"name":"Steve Carell","arena":"TV","netWorth":"80,000,000","country":"US","followers":20000,"gender":"Male","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Steve_Carell_2022.jpg"},{"name":"Steve Harvey","arena":"TV","netWorth":"200,000,000","country":"US","followers":6000000,"gender":"Male","age":69,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Steve_Harvey_2022.jpg"},{"name":"Sydney Sweeney","arena":"TV","netWorth":"10,000,000","country":"US","followers":22000000,"gender":"Female","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sydney_Sweeney_2024.jpg"},{"name":"Tina Fey","arena":"TV","netWorth":"75,000,000","country":"US","followers":20000,"gender":"Female","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tina_Fey_2024.jpg"},{"name":"Trevor Noah","arena":"TV","netWorth":"100,000,000","country":"South Africa","followers":9000000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Trevor_Noah_2023.jpg"},{"name":"Tucker Carlson","arena":"Journalism","netWorth":"30,000,000","country":"US","followers":5000000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tucker_Carlson_2024.jpg"},{"name":"Al Gore","arena":"Politics","netWorth":"300,000,000","country":"US","followers":200000,"gender":"Male","age":78,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Al_Gore_2021.jpg"},{"name":"Alexandria Ocasio-Cortez","arena":"Politics","netWorth":"1,500,000","country":"US","followers":8500000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Alexandria_Ocasio-Cortez_Official_Portrait.jpg"},{"name":"Antonin Scalia","arena":"Politics","netWorth":"3,000,000","country":"US","followers":20000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Antonin_Scalia_official_portrait.jpg"},{"name":"Arnold Schwarzenegger","arena":"Politics","netWorth":"450,000,000","country":"Austria","followers":25000000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Arnold_Schwarzenegger_2023.jpg"},{"name":"Barack Obama","arena":"Politics","netWorth":"70,000,000","country":"US","followers":36000000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/President_Barack_Obama.jpg"},{"name":"Bernie Sanders","arena":"Politics","netWorth":"3,000,000","country":"US","followers":6000000,"gender":"Male","age":85,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bernie_Sanders_july_2019.jpg"},{"name":"Bill Clinton","arena":"Politics","netWorth":"120,000,000","country":"US","followers":3000000,"gender":"Male","age":80,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_Clinton_by_Gage_Skidmore_2.jpg"},{"name":"Chuck Schumer","arena":"Politics","netWorth":"80,000,000","country":"US","followers":400000,"gender":"Male","age":75,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Chuck_Schumer_official_photo.jpg"},{"name":"Clarence Thomas","arena":"Politics","netWorth":"1,500,000","country":"US","followers":20000,"gender":"Male","age":78,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Clarence_Thomas_official_portrait.jpg"},{"name":"Colin Powell","arena":"Politics","netWorth":"60,000,000","country":"US","followers":20000,"gender":"Male","age":84,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Colin_Powell_official_portrait.jpg"},{"name":"Dick Cheney","arena":"Politics","netWorth":"100,000,000","country":"US","followers":20000,"gender":"Male","age":85,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Dick_Cheney_official_portrait.jpg"},{"name":"Donald Trump","arena":"Politics","netWorth":"2,600,000,000","country":"US","followers":24000000,"gender":"Male","age":80,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Donald_Trump_official_portrait.jpg"},{"name":"Elizabeth Warren","arena":"Politics","netWorth":"12,000,000","country":"US","followers":3000000,"gender":"Female","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Elizabeth_Warren_official_portrait.jpg"},{"name":"Gavin Newsom","arena":"Politics","netWorth":"20,000,000","country":"US","followers":1200000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Gavin_Newsom_official_portrait.jpg"},{"name":"George W. Bush","arena":"Politics","netWorth":"50,000,000","country":"US","followers":1200000,"gender":"Male","age":80,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/George-W-Bush.jpg"},{"name":"Hillary Clinton","arena":"Politics","netWorth":"120,000,000","country":"US","followers":6000000,"gender":"Female","age":78,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Hillary_Clinton_official_Secretary_of_State_portrait_crop.jpg"},{"name":"Ilhan Omar","arena":"Politics","netWorth":"3,000,000","country":"US","followers":1300000,"gender":"Female","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ilhan_Omar_official_portrait.jpg"},{"name":"JD Vance","arena":"Politics","netWorth":"5,000,000","country":"US","followers":3200000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/J._D._Vance_2024.jpg"},{"name":"Joe Biden","arena":"Politics","netWorth":"10,000,000","country":"US","followers":17000000,"gender":"Male","age":83,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Joe_Biden_presidential_portrait.jpg"},{"name":"John McCain","arena":"Politics","netWorth":"16,000,000","country":"US","followers":20000,"gender":"Male","age":81,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_McCain_official_portrait_2009.jpg"},{"name":"John Roberts","arena":"Politics","netWorth":"10,000,000","country":"US","followers":20000,"gender":"Male","age":71,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Roberts_official_portrait.jpg"},{"name":"Kamala Harris","arena":"Politics","netWorth":"8,000,000","country":"US","followers":18000000,"gender":"Female","age":61,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kamala_Harris_Vice_Presidential_Portrait.jpg"},{"name":"Marco Rubio","arena":"Politics","netWorth":"1,500,000","country":"US","followers":600000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Marco_Rubio_official_portrait.jpg"},{"name":"Marjorie Taylor Greene","arena":"Politics","netWorth":"40,000,000","country":"US","followers":500000,"gender":"Female","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Marjorie_Taylor_Greene_official_portrait.jpg"},{"name":"Mark Kelly","arena":"Politics","netWorth":"10,000,000","country":"US","followers":1100000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mark_Kelly_official_portrait.jpg"},{"name":"Melania Trump","arena":"Politics","netWorth":"50,000,000","country":"US","followers":1700000,"gender":"Female","age":56,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Melania_Trump_2020.jpg"},{"name":"Michael Bloomberg","arena":"Politics","netWorth":"96,000,000,000","country":"US","followers":300000,"gender":"Male","age":84,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael_Bloomberg_2019.jpg"},{"name":"Michelle Obama","arena":"Politics","netWorth":"70,000,000","country":"US","followers":22000000,"gender":"Female","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Michelle_Obama_2013.jpg"},{"name":"Mike Pence","arena":"Politics","netWorth":"4,000,000","country":"US","followers":1800000,"gender":"Male","age":67,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mike_Pence_official_vice_presidential_portrait.jpg"},{"name":"Mitch McConnell","arena":"Politics","netWorth":"35,000,000","country":"US","followers":20000,"gender":"Male","age":84,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mitch_McConnell_portrait_2016.jpg"},{"name":"Mitt Romney","arena":"Politics","netWorth":"300,000,000","country":"US","followers":300000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mitt_Romney_official_US_Senate_portrait.jpg"},{"name":"Nancy Pelosi","arena":"Politics","netWorth":"120,000,000","country":"US","followers":3000000,"gender":"Female","age":86,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Nancy_Pelosi_official_photo_2019.jpg"},{"name":"Pete Buttigieg","arena":"Politics","netWorth":"1,500,000","country":"US","followers":1200000,"gender":"Male","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Pete_Buttigieg_official_portrait.jpg"},{"name":"Rashida Tlaib","arena":"Politics","netWorth":"1,500,000","country":"US","followers":600000,"gender":"Female","age":50,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rashida_Tlaib_official_portrait.jpg"},{"name":"Robert F. Kennedy Jr.","arena":"Politics","netWorth":"50,000,000","country":"US","followers":1200000,"gender":"Male","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Robert_F._Kennedy_Jr._2023.jpg"},{"name":"Ron DeSantis","arena":"Politics","netWorth":"1,500,000","country":"US","followers":3500000,"gender":"Male","age":48,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ron_DeSantis_official_portrait.jpg"},{"name":"Rudy Giuliani","arena":"Politics","netWorth":"1,500,000","country":"US","followers":20000,"gender":"Male","age":82,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rudy_Giuliani_2020.jpg"},{"name":"Ruth Bader Ginsburg","arena":"Politics","netWorth":"9,000,000","country":"US","followers":20000,"gender":"Female","age":87,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ruth_Bader_Ginsburg_official_portrait.jpg"},{"name":"Sonia Sotomayor","arena":"Politics","netWorth":"6,000,000","country":"US","followers":20000,"gender":"Female","age":72,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sonia_Sotomayor_official_portrait.jpg"},{"name":"Ted Cruz","arena":"Politics","netWorth":"4,000,000","country":"US","followers":1200000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ted_Cruz_official_portrait.jpg"},{"name":"Zohran Mamdani","arena":"Politics","netWorth":"1000000","country":"Uganda","followers":3000000,"gender":"Male","age":34,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Zohran_Mamdani_2025.jpg"},{"name":"Aaron Judge","arena":"Sports","netWorth":"50,000,000","country":"US","followers":1700000,"gender":"Male","age":34,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Aaron_Judge_2024.jpg"},{"name":"Aaron Rodgers","arena":"Sports","netWorth":"200,000,000","country":"US","followers":2200000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Aaron_Rodgers_2023.jpg"},{"name":"Alex Morgan","arena":"Sports","netWorth":"3,000,000","country":"US","followers":10000000,"gender":"Female","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Alex_Morgan_2023.jpg"},{"name":"Alexander Ovechkin","arena":"Sports","netWorth":"80,000,000","country":"Russia","followers":1600000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Alexander_Ovechkin_2022.jpg"},{"name":"Allen Iverson","arena":"Sports","netWorth":"1,000,000","country":"US","followers":16000000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Allen_Iverson_2010.jpg"},{"name":"Barry Bonds","arena":"Sports","netWorth":"100,000,000","country":"US","followers":300000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Barry_Bonds_2019.jpg"},{"name":"Brittney Griner","arena":"Sports","netWorth":"14,000,000","country":"US","followers":800000,"gender":"Female","age":36,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Brittney_Griner_2018.jpg"},{"name":"Caitlin Clark","arena":"Sports","netWorth":"10,000,000","country":"US","followers":8000000,"gender":"Female","age":24,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Caitlin_Clark_2024.jpg"},{"name":"Cristiano Ronaldo","arena":"Sports","netWorth":"600,000,000","country":"Portugal","followers":630000000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Cristiano_Ronaldo_2023.jpg"},{"name":"Derek Jeter","arena":"Sports","netWorth":"200,000,000","country":"US","followers":1000000,"gender":"Male","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Derek_Jeter_2022.jpg"},{"name":"Eli Manning","arena":"Sports","netWorth":"150,000,000","country":"US","followers":350000,"gender":"Male","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Eli_Manning_2022.jpg"},{"name":"Floyd Mayweather Jr.","arena":"Sports","netWorth":"400,000,000","country":"US","followers":29000000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Floyd_Mayweather_Jr._2021.jpg"},{"name":"Jalen Brunson","arena":"Sports","netWorth":"20,000,000","country":"US","followers":2000000,"gender":"Male","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jalen_Brunson_2024.jpg"},{"name":"John Cena","arena":"Sports","netWorth":"80,000,000","country":"US","followers":20000000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/John_Cena_2018.jpg"},{"name":"Katie Ledecky","arena":"Sports","netWorth":"5,000,000","country":"US","followers":1000000,"gender":"Female","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Katie_Ledecky_2024.jpg"},{"name":"Kobe Bryant","arena":"Sports","netWorth":"600,000,000","country":"US","followers":21000000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kobe_Bryant_2015.jpg"},{"name":"Kylian Mbapp\u00e9","arena":"Sports","netWorth":"180,000,000","country":"France","followers":120000000,"gender":"Male","age":27,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kylian_Mbapp%25C3%25A9_2024.jpg"},{"name":"Lamar Jackson","arena":"Sports","netWorth":"40,000,000","country":"US","followers":5000000,"gender":"Male","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lamar_Jackson_2023.jpg"},{"name":"LeBron James","arena":"Sports","netWorth":"1,200,000,000","country":"US","followers":159000000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/LeBron_James_2023.jpg"},{"name":"Lewis Hamilton","arena":"Sports","netWorth":"300,000,000","country":"UK","followers":37000000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lewis_Hamilton_2024.jpg"},{"name":"Lionel Messi","arena":"Sports","netWorth":"600,000,000","country":"Argentina","followers":504000000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lionel_Messi_2023.jpg"},{"name":"Magic Johnson","arena":"Sports","netWorth":"1,200,000,000","country":"US","followers":3500000,"gender":"Male","age":67,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Magic_Johnson_2023.jpg"},{"name":"Manny Pacquiao","arena":"Sports","netWorth":"220,000,000","country":"Philippines","followers":7500000,"gender":"Male","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Manny_Pacquiao_2021.jpg"},{"name":"Max Verstappen","arena":"Sports","netWorth":"210,000,000","country":"Netherlands","followers":12000000,"gender":"Male","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Max_Verstappen_2024.jpg"},{"name":"Megan Rapinoe","arena":"Sports","netWorth":"5,000,000","country":"US","followers":2100000,"gender":"Female","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Megan_Rapinoe_2023.jpg"},{"name":"Michael Jordan","arena":"Sports","netWorth":"3,200,000,000","country":"US","followers":20000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael_Jordan_in_2014.jpg"},{"name":"Michael Phelps","arena":"Sports","netWorth":"100,000,000","country":"US","followers":3400000,"gender":"Male","age":41,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Michael_Phelps_2019.jpg"},{"name":"Mike Trout","arena":"Sports","netWorth":"140,000,000","country":"US","followers":2000000,"gender":"Male","age":35,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mike_Trout_2023.jpg"},{"name":"Mike Tyson","arena":"Sports","netWorth":"10,000,000","country":"US","followers":30000000,"gender":"Male","age":60,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mike_Tyson_2024.jpg"},{"name":"Neymar","arena":"Sports","netWorth":"250,000,000","country":"Brazil","followers":224000000,"gender":"Male","age":34,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Neymar_2023.jpg"},{"name":"Novak Djokovic","arena":"Sports","netWorth":"240,000,000","country":"Serbia","followers":15000000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Novak_Djokovic_2024.jpg"},{"name":"Patrick Mahomes","arena":"Sports","netWorth":"70,000,000","country":"US","followers":6700000,"gender":"Male","age":31,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Patrick_Mahomes_2024.jpg"},{"name":"Peyton Manning","arena":"Sports","netWorth":"250,000,000","country":"US","followers":20000,"gender":"Male","age":50,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Peyton_Manning_2022.jpg"},{"name":"Rob Gronkowski","arena":"Sports","netWorth":"45,000,000","country":"US","followers":4000000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rob_Gronkowski_2017.jpg"},{"name":"Roger Federer","arena":"Sports","netWorth":"550,000,000","country":"Switzerland","followers":12000000,"gender":"Male","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Roger_Federer_2023.jpg"},{"name":"Rory McIlroy","arena":"Sports","netWorth":"170,000,000","country":"US","followers":2800000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Rory_McIlroy_2023.jpg"},{"name":"Serena Williams","arena":"Sports","netWorth":"300,000,000","country":"US","followers":17000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Serena_Williams_2023.jpg"},{"name":"Shaquille O'Neal","arena":"Sports","netWorth":"400,000,000","country":"US","followers":34000000,"gender":"Male","age":54,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Shaquille_O%27Neal_2023.jpg"},{"name":"Shaun White","arena":"Sports","netWorth":"65,000,000","country":"US","followers":2200000,"gender":"Male","age":40,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Shaun_White_2022.jpg"},{"name":"Shohei Ohtani","arena":"Sports","netWorth":"50,000,000","country":"Japan","followers":8000000,"gender":"Male","age":32,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Shohei_Ohtani_2024.jpg"},{"name":"Sidney Crosby","arena":"Sports","netWorth":"75,000,000","country":"Canada","followers":20000,"gender":"Male","age":39,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sidney_Crosby_2022.jpg"},{"name":"Simone Biles","arena":"Sports","netWorth":"16,000,000","country":"US","followers":12000000,"gender":"Female","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Simone_Biles_2024.jpg"},{"name":"Stephen Curry","arena":"Sports","netWorth":"160,000,000","country":"US","followers":57000000,"gender":"Male","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stephen_Curry_2023.jpg"},{"name":"Tiger Woods","arena":"Sports","netWorth":"1,100,000,000","country":"US","followers":3300000,"gender":"Male","age":50,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tiger_Woods_2023.jpg"},{"name":"Tom Brady","arena":"Sports","netWorth":"300,000,000","country":"US","followers":15000000,"gender":"Male","age":49,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Tom_Brady_2023.jpg"},{"name":"Travis Kelce","arena":"Sports","netWorth":"70,000,000","country":"US","followers":12000000,"gender":"Male","age":37,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Travis_Kelce_2023.jpg"},{"name":"Usain Bolt","arena":"Sports","netWorth":"90,000,000","country":"Jamaica","followers":13000000,"gender":"Male","age":40,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Usain_Bolt_2021.jpg"},{"name":"Venus Williams","arena":"Sports","netWorth":"95,000,000","country":"US","followers":2000000,"gender":"Female","age":46,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Venus_Williams_2023.jpg"},{"name":"Wayne Gretzky","arena":"Sports","netWorth":"250,000,000","country":"Canada","followers":200000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Wayne_Gretzky_2019.jpg"},{"name":"Bill O'Reilly","arena":"Literature","netWorth":"85,000,000","country":"US","followers":200000,"gender":"Male","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_O%27Reilly_2017.jpg"},{"name":"Bob Woodward","arena":"Literature","netWorth":"15,000,000","country":"US","followers":20000,"gender":"Male","age":83,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bob_Woodward_2018.jpg"},{"name":"George R.R. Martin","arena":"Literature","netWorth":"120,000,000","country":"US","followers":400000,"gender":"Male","age":78,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/George_R._R._Martin_2019.jpg"},{"name":"J.K. Rowling","arena":"Literature","netWorth":"1,000,000,000","country":"UK","followers":20000,"gender":"Female","age":61,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/J._K._Rowling_2015.jpg"},{"name":"Malcolm Gladwell","arena":"Literature","netWorth":"30,000,000","country":"US","followers":400000,"gender":"Male","age":63,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Malcolm_Gladwell_2019.jpg"},{"name":"Stephen King","arena":"Literature","netWorth":"500,000,000","country":"US","followers":300000,"gender":"Male","age":79,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stephen_King_2021.jpg"},{"name":"Stephenie Meyer","arena":"Literature","netWorth":"120,000,000","country":"US","followers":20000,"gender":"Female","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Stephenie_Meyer_2015.jpg"},{"name":"Suzanne Collins","arena":"Literature","netWorth":"90,000,000","country":"US","followers":20000,"gender":"Female","age":64,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Suzanne_Collins_2010.jpg"},{"name":"Ta-Nehisi Coates","arena":"Literature","netWorth":"3,000,000","country":"US","followers":300000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Ta-Nehisi_Coates_2017.jpg"},{"name":"Diane Sawyer","arena":"Journalism","netWorth":"80,000,000","country":"US","followers":20000,"gender":"Female","age":80,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Diane_Sawyer_2012.jpg"},{"name":"Gayle King","arena":"Journalism","netWorth":"40,000,000","country":"US","followers":1100000,"gender":"Female","age":71,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Gayle_King_2022.jpg"},{"name":"George Stephanopoulos","arena":"Journalism","netWorth":"40,000,000","country":"US","followers":200000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/George_Stephanopoulos_2022.jpg"},{"name":"Jake Tapper","arena":"Journalism","netWorth":"16,000,000","country":"US","followers":800000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jake_Tapper_2023.jpg"},{"name":"Lester Holt","arena":"Journalism","netWorth":"35,000,000","country":"US","followers":500000,"gender":"Male","age":67,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lester_Holt_2022.jpg"},{"name":"Megyn Kelly","arena":"Journalism","netWorth":"45,000,000","country":"US","followers":2500000,"gender":"Female","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Megyn_Kelly_2023.jpg"},{"name":"Savannah Guthrie","arena":"Journalism","netWorth":"40,000,000","country":"US","followers":1200000,"gender":"Female","age":54,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Savannah_Guthrie_2022.jpg"},{"name":"Wolf Blitzer","arena":"Journalism","netWorth":"20,000,000","country":"Germany","followers":300000,"gender":"Male","age":78,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Wolf_Blitzer_2022.jpg"},{"name":"Andy Cohen","arena":"Reality TV","netWorth":"50,000,000","country":"US","followers":4000000,"gender":"Male","age":58,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Andy_Cohen_2019.jpg"},{"name":"Kendall Jenner","arena":"Reality TV","netWorth":"60000000","country":"US","followers":290000000,"gender":"Female","age":30,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kendall_Jenner_2021.jpg"},{"name":"Khlo\u00e9 Kardashian","arena":"Reality TV","netWorth":"60000000","country":"US","followers":300000000,"gender":"Female","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Khloe_Kardashian_2021.jpg"},{"name":"Kim Kardashian","arena":"Reality TV","netWorth":"1,700,000,000","country":"US","followers":380000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kim_Kardashian_2021.jpg"},{"name":"Kourtney Kardashian","arena":"Reality TV","netWorth":"65000000","country":"US","followers":220000000,"gender":"Female","age":47,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kourtney_Kardashian_2021.jpg"},{"name":"Kris Jenner","arena":"Reality TV","netWorth":"170,000,000","country":"US","followers":30000000,"gender":"Female","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kris_Jenner_2019.jpg"},{"name":"Kylie Jenner","arena":"Reality TV","netWorth":"700000000","country":"US","followers":390000000,"gender":"Female","age":29,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kylie_Jenner_2021.jpg"},{"name":"Lisa Vanderpump","arena":"Reality TV","netWorth":"90,000,000","country":"UK","followers":4000000,"gender":"Female","age":66,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lisa_Vanderpump_2019.jpg"},{"name":"Meghan Markle","arena":"Reality TV","netWorth":"60,000,000","country":"US","followers":3200000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Meghan_Markle_2018.jpg"},{"name":"Mike \u201cThe Situation\u201d Sorrentino","arena":"Reality TV","netWorth":"3000000","country":"US","followers":3000000,"gender":"Male","age":44,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mike_Sorrentino_2019.jpg"},{"name":"Paris Hilton","arena":"Reality TV","netWorth":"300,000,000","country":"US","followers":26000000,"gender":"Female","age":45,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Paris_Hilton_2019.jpg"},{"name":"RuPaul","arena":"Reality TV","netWorth":"60,000,000","country":"US","followers":5000000,"gender":"Male","age":65,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/RuPaul_2019.jpg"},{"name":"Simon Cowell","arena":"Reality TV","netWorth":"600,000,000","country":"UK","followers":2000000,"gender":"Male","age":66,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Simon_Cowell_2019.jpg"},{"name":"Snooki (Nicole Polizzi)","arena":"Reality TV","netWorth":"5000000","country":"Chile","followers":10000000,"gender":"Female","age":38,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Snooki_2012.jpg"},{"name":"Lex Fridman","arena":"Podcasters","netWorth":"4,000,000","country":"US","followers":4000000,"gender":"Male","age":43,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Lex_Fridman.jpg"},{"name":"Andrew Huberman","arena":"Podcasters","netWorth":"15,000,000","country":"US","followers":6000000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Andrew_D._Huberman,_Ph.D..jpg"},{"name":"Charlamagne tha God","arena":"Podcasters","netWorth":"25,000,000","country":"US","followers":5000000,"gender":"Male","age":48,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Charlamagne_tha_God_crop.jpg"},{"name":"David Muir","arena":"Journalism","netWorth":"25,000,000","country":"US","followers":1000000,"gender":"Male","age":52,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/David_Muir_(cropped).jpg"},{"name":"Elon Musk","arena":"Tech & Science","netWorth":"981,000,000,000","country":"US","followers":230000000,"gender":"Male","age":55,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Elon_Musk_Colorado_2022.jpg"},{"name":"Bill Gates","arena":"Tech & Science","netWorth":"108,000,000,000","country":"US","followers":76000000,"gender":"Male","age":70,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Bill_Gates_2017_(cropped).jpg"},{"name":"Mark Zuckerberg","arena":"Tech & Science","netWorth":"280,000,000,000","country":"US","followers":14000000,"gender":"Male","age":42,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Mark_Zuckerberg_F8_2019.jpg"},{"name":"Spike Lee","arena":"Writer/Director","netWorth":"50,000,000","country":"US","followers":1500000,"gender":"Male","age":69,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Spike_Lee_Cannes_2025.jpg"},{"name":"Wes Anderson","arena":"Writer/Director","netWorth":"50,000,000","country":"US","followers":200000,"gender":"Male","age":57,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Wes_Anderson_Cannes_2018.jpg"},{"name":"David Beckham","arena":"Sports","netWorth":"600,000,000","country":"UK","followers":88000000,"gender":"Male","age":51,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/David_Beckham_2019.jpg"},{"name":"Vladimir Putin","arena":"Politics","netWorth":"70,000,000,000","country":"Russia","followers":5000000,"gender":"Male","age":74,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Vladimir_Putin_17_June_2021.jpg"},{"name":"Volodymyr Zelenskyy","arena":"Politics","netWorth":"1,000,000","country":"Ukraine","followers":7000000,"gender":"Male","age":48,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Volodymyr_Zelenskyy_Official_portrait.jpg"},{"name":"Xi Jinping","arena":"Politics","netWorth":"1,200,000,000","country":"China","followers":1500000,"gender":"Male","age":73,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Xi_Jinping_2024.jpg"},{"name":"Narendra Modi","arena":"Politics","netWorth":"3,000,000","country":"India","followers":100000000,"gender":"Male","age":76,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Narendra_Modi_2024.jpg"},{"name":"Benjamin Netanyahu","arena":"Politics","netWorth":"80,000,000","country":"Israel","followers":3000000,"gender":"Male","age":77,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Benjamin_Netanyahu_2018.jpg"},{"name":"Jack Ma","arena":"Business","netWorth":"30,000,000,000","country":"China","followers":1000000,"gender":"Male","age":62,"photoUrl":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Jack_Ma_2018.jpg"}];
+
+
+        /* =========================================================
+           HELPER FUNCTIONS
+           ========================================================= */
+
+        function parseNumericValue(val) {
+
+            if (typeof val === 'number') {
+                return val;
+            }
+
+            if (!val) {
+                return 0;
+            }
+
+            const str = String(val)
+                .trim()
+                .toUpperCase()
+                .replace(/\s+/g, '');
+
+            let multiplier = 1;
+
+            if (
+                str.endsWith('B') ||
+                str.endsWith('BN') ||
+                str.endsWith('BILLION')
+            ) {
+
+                multiplier = 1e9;
+
+            } else if (
+                str.endsWith('M') ||
+                str.endsWith('MN') ||
+                str.endsWith('MILLION')
+            ) {
+
+                multiplier = 1e6;
+
+            } else if (
+                str.endsWith('K') ||
+                str.endsWith('THOUSAND')
+            ) {
+
+                multiplier = 1e3;
+
+            }
+
+            const num = parseFloat(
+                str.replace(/[^0-9.-]+/g, "")
+            );
+
+            return isNaN(num) ? 0 : num * multiplier;
+
+        }
+
+
+        function createCell(
+            title,
+            value,
+            targetValue,
+            icon,
+            type = 'standard',
+            isReveal = false
+        ) {
+
+            const cell = document.createElement('div');
+
+            cell.className = 'cell';
+
+            const numValue = parseNumericValue(value);
+
+            const numTarget = parseNumericValue(targetValue);
+
+            let statusClass = 'wrong';
+
+
+            if (type === 'country') {
+
+                if (value === targetValue) {
+
+                    statusClass = 'correct';
+
+                } else if (
+                    countryContinents[value] &&
+                    countryContinents[value] === countryContinents[targetValue]
+                ) {
+
+                    statusClass = 'partial';
+
+                }
+
+            } else if (type === 'age') {
+
+                if (numValue === numTarget) {
+
+                    statusClass = 'correct';
+
+                } else if (
+                    Math.abs(numValue - numTarget) <= 7
+                ) {
+
+                    statusClass = 'partial';
+
+                }
+
+            } else if (type === 'arena') {
+
+                const guessedArena = String(value).trim();
+                const targetArena = String(targetValue).trim();
+
+                if (guessedArena === targetArena) {
+                    statusClass = 'correct';
+                } else {
+                    const arenaClusters = [
+                        ['Music', 'Literature', 'Writer/Director'],
+                        ['Movies', 'TV', 'Reality TV'],
+                        ['Podcasters', 'Influencers'],
+                        ['Tech & Science', 'Business', 'Politics', 'Journalism'],
+                        ['Sports']
+                    ];
+
+                    // Bidirectional cluster match: sharing a cluster is yellow.
+                    const sameCluster = arenaClusters.some(cluster =>
+                        cluster.includes(guessedArena) &&
+                        cluster.includes(targetArena)
+                    );
+
+                    if (sameCluster) {
+                        statusClass = 'partial';
+                    }
+                }
+
+            } else if (type === 'followers') {
+
+    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
+
+    if (percentDifference <= 0.15) {
+        // Within 15% = GREEN
+        statusClass = 'correct';
+
+    } else if (percentDifference <= 0.30) {
+        // Within 30% = YELLOW
+        statusClass = 'partial';
+
+    } else {
+        // More than 30% away = GRAY
+        statusClass = 'wrong';
+    }
+
+} else if (type === 'netWorth') {
+
+    const percentDifference = Math.abs(numValue - numTarget) / numTarget;
+
+    if (percentDifference <= 0.15) {
+        // Within 15% = GREEN
+        statusClass = 'correct';
+
+    } else if (percentDifference <= 0.30) {
+        // Within 30% = YELLOW
+        statusClass = 'partial';
+
+    } else {
+        // More than 30% away = GRAY
+        statusClass = 'wrong';
+    }
+
+            } else {
+
+                if (
+                    String(value)
+                        .trim()
+                        .toLowerCase() ===
+                    String(targetValue)
+                        .trim()
+                        .toLowerCase()
+                ) {
+
+                    statusClass = 'correct';
+
+                }
+
+            }
+
+
+            cell.classList.add(statusClass);
+
+
+            let displayVal = value;
+
+
+            if (
+                type === 'age' &&
+                numValue !== numTarget &&
+                !isReveal
+            ) {
+
+                displayVal +=
+                    numValue < numTarget
+                        ? ' ⬆️'
+                        : ' ⬇️';
+
+            } else if (type === 'netWorth') {
+
+                const formattedNum =
+                    new Intl.NumberFormat(
+                        'en-US',
+                        {
+                            style: 'currency',
+                            currency: 'USD',
+                            notation: 'compact',
+                            maximumFractionDigits: 1
+                        }
+                    ).format(numValue);
+
+                displayVal =
+                    (numValue !== numTarget && !isReveal)
+                        ? formattedNum +
+                          (
+                              numValue < numTarget
+                                  ? ' ⬆️'
+                                  : ' ⬇️'
+                          )
+                        : formattedNum;
+
+            } else if (type === 'followers') {
+
+                const formattedNum =
+                    new Intl.NumberFormat(
+                        'en-US',
+                        {
+                            notation: 'compact',
+                            maximumFractionDigits: 1
+                        }
+                    ).format(numValue);
+
+                displayVal =
+                    (numValue !== numTarget && !isReveal)
+                        ? formattedNum +
+                          (
+                              numValue < numTarget
+                                  ? ' ⬆️'
+                                  : ' ⬇️'
+                          )
+                        : formattedNum;
+
+            }
+
+
+            const iconHTML = icon
+                ? `${icon} `
+                : '';
+
+
+            cell.innerHTML =
+                `<span>${iconHTML}${displayVal}</span>`;
+
+
+            return cell;
+
+        }
+
+
+        /* =========================================================
+           DAILY SELECTION
+           ========================================================= */
+
+        const epochDate =
+            new Date('2026-01-01T00:00:00Z');
+
+        const now = new Date();
+
+        const year =
+            now.getFullYear();
+
+        const month =
+            String(now.getMonth() + 1)
+                .padStart(2, '0');
+
+        const day =
+            String(now.getDate())
+                .padStart(2, '0');
+
+        const todayStr =
+            `${year}-${month}-${day}`;
+
+        const localMidnight =
+            new Date(
+                year,
+                now.getMonth(),
+                now.getDate()
+            );
+
+        const epochLocal =
+            new Date(2026, 0, 1);
+
+        const daysSinceEpoch =
+            Math.floor(
+                (
+                    localMidnight -
+                    epochLocal
+                ) /
+                (1000 * 60 * 60 * 24)
+            );
+
+        const dayIndex =
+            Math.max(0, daysSinceEpoch);
+
+        const secretFigure =
+            figures[
+                (dayIndex * 60) %
+                figures.length
+            ];
+
+        document.getElementById(
+            'daily-number'
+        ).textContent =
+            `PERSONDLE #${dayIndex + 1}`;
+
+
+        /* =========================================================
+           DOM ELEMENTS
+           ========================================================= */
+
+        const input =
+            document.getElementById(
+                'guess-input'
+            );
+
+        const suggestionsBox =
+            document.getElementById(
+                'suggestions'
+            );
+
+        const submitBtn =
+            document.getElementById(
+                'submit-guess-btn'
+            );
+
+        const guessesContainer =
+            document.getElementById(
+                'guesses-container'
+            );
+
+        const endGameBox =
+            document.getElementById(
+                'end-game-box'
+            );
+
+        const endGameText =
+            document.getElementById(
+                'end-game-text'
+            );
+
+        const shareBtn =
+            document.getElementById(
+                'share-button'
+            );
+
+        const guessCounterDisplay =
+            document.getElementById(
+                'guess-counter'
+            );
+
+
+        const guessedNames = new Set();
+
+        const guessHistoryObjects = [];
+
+        let gameOver = false;
+
+
+        // Initialize photo caches before restoring saved game state.
+        // A completed game is restored from localStorage during startup, and
+        // that restoration can immediately call renderSecretPhoto(). The caches
+        // therefore must already exist on a refresh.
+        const resolvedPersonPhotoCache = new Map();
+        const failedPersonPhotoCache = new Set();
+
+
+        /* =========================================================
+           LOCAL STORAGE
+           ========================================================= */
+
+        const savedData =
+            JSON.parse(
+                localStorage.getItem(
+                    'persondle_state'
+                ) || '{}'
+            );
+
+        // Completed-round details are persisted separately from the guesses so
+        // a refresh restores the exact same end-game message and revealed photo.
+        let completedEndGameMessage =
+            savedData.completedEndGameMessage || '';
+        let completedSecretPhotoUrl =
+            savedData.completedSecretPhotoUrl || '';
+
+
+        if (
+            savedData.date === todayStr &&
+            Array.isArray(savedData.guesses)
+        ) {
+
+            savedData.guesses.forEach(
+                name => {
+
+                    const figureObj =
+                        figures.find(
+                            f => f.name === name
+                        );
+
+                    if (figureObj) {
+
+                        guessedNames.add(
+                            figureObj.name
+                        );
+
+                        guessHistoryObjects.push(
+                            figureObj
+                        );
+
+                        renderGuessCard(
+                            figureObj
+                        );
+
+                    }
+
+                }
+            );
+
+
+            guessCounterDisplay.textContent =
+                `Guesses: ${guessedNames.size} / ${maxGuesses}`;
+
+
+            if (
+                guessedNames.has(
+                    secretFigure.name
+                )
+            ) {
+
+                triggerGameOver(
+                    true,
+                    guessedNames.size
+                );
+
+            } else if (
+                guessedNames.size >= maxGuesses
+            ) {
+
+                triggerGameOver(
+                    false,
+                    guessedNames.size
+                );
+
+            }
+
+        } else {
+
+            completedEndGameMessage = '';
+            completedSecretPhotoUrl = '';
+
+            localStorage.setItem(
+                'persondle_state',
+                JSON.stringify({
+                    date: todayStr,
+                    guesses: [],
+                    completedEndGameMessage: '',
+                    completedSecretPhotoUrl: ''
+                })
+            );
+
+        }
+
+
+        function saveState() {
+
+            localStorage.setItem(
+                'persondle_state',
+                JSON.stringify({
+                    date: todayStr,
+                    guesses: Array.from(
+                        guessedNames
+                    ),
+                    completedEndGameMessage,
+                    completedSecretPhotoUrl
+                })
+            );
+
+        }
+
+
+        /* =========================================================
+           COUNTDOWN
+           ========================================================= */
+
+        function updateCountdown() {
+
+            const now =
+                new Date();
+
+            const tomorrow =
+                new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() + 1
+                );
+
+            const diffMs =
+                tomorrow - now;
+
+
+            const hours =
+                String(
+                    Math.floor(
+                        (
+                            diffMs /
+                            (1000 * 60 * 60)
+                        ) % 24
+                    )
+                ).padStart(2, '0');
+
+
+            const minutes =
+                String(
+                    Math.floor(
+                        (
+                            diffMs /
+                            (1000 * 60)
+                        ) % 60
+                    )
+                ).padStart(2, '0');
+
+
+            const seconds =
+                String(
+                    Math.floor(
+                        diffMs /
+                        1000
+                    ) % 60
+                ).padStart(2, '0');
+
+
+            document.getElementById(
+                'countdown'
+            ).textContent =
+                `${hours}:${minutes}:${seconds}`;
+
+        }
+
+
+        setInterval(
+            updateCountdown,
+            1000
+        );
+
+        updateCountdown();
+
+
+        /* =========================================================
+           GREEN ATTRIBUTE COUNT
+           ========================================================= */
+
+        function countGreenAttributes(
+            guess,
+            target
+        ) {
+
+            let greenCount = 0;
+
+            if (
+                guess.arena === target.arena
+            ) greenCount++;
+
+            if (
+                guess.netWorth === target.netWorth
+            ) greenCount++;
+
+            if (
+                guess.country === target.country
+            ) greenCount++;
+
+            if (
+                guess.followers === target.followers
+            ) greenCount++;
+
+            if (
+                guess.gender === target.gender
+            ) greenCount++;
+
+            if (
+                guess.age === target.age
+            ) greenCount++;
+
+            return greenCount;
+
+        }
+
+
+        /* =========================================================
+           SHARE GRID
+           ========================================================= */
+
+        function buildShareEmojiGrid() {
+
+            let emojiList = [];
+
+            guessHistoryObjects.forEach(
+                guess => {
+
+                    if (
+                        guess.name ===
+                        secretFigure.name
+                    ) {
+
+                        emojiList.push(
+                            "🟩"
+                        );
+
+                    } else {
+
+                        const greens =
+                            countGreenAttributes(
+                                guess,
+                                secretFigure
+                            );
+
+                        if (greens >= 3) {
+
+                            emojiList.push(
+                                "🟨"
+                            );
+
+                        } else {
+
+                            emojiList.push(
+                                "⬛"
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+            return emojiList.join("");
+
+        }
+
+
+        /* =========================================================
+           CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+           ========================================================= */
+
+        document.addEventListener(
+            'click',
+            function(e) {
+
+                if (
+                    !e.target.closest(
+                        '.input-wrapper'
+                    )
+                ) {
+
+                    suggestionsBox.style.display =
+                        'none';
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'touchstart',
+            function(e) {
+
+                if (
+                    !e.target.closest(
+                        '.input-wrapper'
+                    )
+                ) {
+
+                    suggestionsBox.style.display =
+                        'none';
+
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        /* =========================================================
+           PERSON OF THE DAY PHOTO
+           ========================================================= */
+
+        function getPersonPhotoUrl(figure) {
+            if (!figure || !figure.photoUrl) return '';
+
+            // v7 prefers a URL that was already validated during the
+            // background database pre-check. This means the end-game reveal
+            // does not have to discover a broken Wikimedia filename first.
+            if (resolvedPersonPhotoCache.has(figure.name)) {
+                return resolvedPersonPhotoCache.get(figure.name);
+            }
+
+            const photoUrl = String(figure.photoUrl).trim();
+
+            // Convert Wikimedia "Redirect/file" URLs into the more reliable
+            // Special:FilePath endpoint and properly encode the filename.
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+            if (redirectIndex !== -1) {
+                const fileName = photoUrl.slice(redirectIndex + redirectMarker.length);
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
+                }
+            }
+
+            if (photoUrl.includes('#/media/File:')) {
+                const fileName = photoUrl.split('#/media/File:')[1];
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(decodeURIComponent(fileName))}?width=600`;
+                }
+            }
+
+            return photoUrl;
+        }
+
+        function getPersonPhotoFallbackUrl(figure) {
+            if (!figure || !figure.photoUrl) return '';
+            const photoUrl = String(figure.photoUrl).trim();
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+
+            if (redirectIndex !== -1) {
+                const fileName = photoUrl.slice(redirectIndex + redirectMarker.length);
+                if (fileName) {
+                    return `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(decodeURIComponent(fileName))}`;
+                }
+            }
+
+            return '';
+        }
+
+        function getCommonsFileName(figure) {
+            if (!figure || !figure.photoUrl) return '';
+            const photoUrl = String(figure.photoUrl).trim();
+            const redirectMarker = '/Special:Redirect/file/';
+            const redirectIndex = photoUrl.indexOf(redirectMarker);
+
+            if (redirectIndex !== -1) {
+                return decodeURIComponent(photoUrl.slice(redirectIndex + redirectMarker.length));
+            }
+
+            if (photoUrl.includes('#/media/File:')) {
+                return decodeURIComponent(photoUrl.split('#/media/File:')[1]);
+            }
+
+            return '';
+        }
+
+        function normalizePhotoSearchText(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/[_-]+/g, ' ')
+                .replace(/[^a-z0-9]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        async function lookupCommonsExactPhoto(fileName) {
+            if (!fileName) return '';
+
+            const apiUrl =
+                'https://commons.wikimedia.org/w/api.php' +
+                '?action=query' +
+                '&format=json' +
+                '&origin=*' +
+                '&prop=imageinfo' +
+                '&iiprop=url|mime' +
+                '&iiurlwidth=600' +
+                `&titles=${encodeURIComponent('File:' + fileName)}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
+                const page = pages.find(item => item && item.imageinfo && item.imageinfo[0]);
+                const imageInfo = page && page.imageinfo && page.imageinfo[0];
+                if (!imageInfo) return '';
+                if (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/')) return '';
+                const candidateUrl = imageInfo.thumburl || imageInfo.url || '';
+                if (!candidateUrl) return '';
+                return await probeImageUrl(candidateUrl, 7000) ? candidateUrl : '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        async function searchCommonsPersonPhoto(figure, extraQueries = []) {
+            if (!figure || !figure.name) return '';
+
+            const baseName = String(figure.name).trim();
+            const queries = [
+                `"${baseName}"`,
+                `${baseName} portrait`,
+                `${baseName} photo`,
+                `${baseName} headshot`,
+                ...extraQueries
+            ];
+
+            const seenUrls = new Set();
+            const nameTokens = normalizePhotoSearchText(baseName)
+                .split(' ')
+                .filter(token => token.length > 2);
+
+            for (const query of queries) {
+                const apiUrl =
+                    'https://commons.wikimedia.org/w/api.php' +
+                    '?action=query' +
+                    '&format=json' +
+                    '&origin=*' +
+                    '&generator=search' +
+                    '&gsrnamespace=6' +
+                    '&gsrlimit=25' +
+                    `&gsrsearch=${encodeURIComponent(query)}` +
+                    '&prop=imageinfo' +
+                    '&iiprop=url|mime' +
+                    '&iiurlwidth=700';
+
+                try {
+                    const response = await fetch(apiUrl, { cache: 'no-store' });
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    const pages = data?.query?.pages ? Object.values(data.query.pages) : [];
+
+                    const candidates = pages
+                        .map(page => {
+                            const imageInfo = page?.imageinfo?.[0];
+                            if (!imageInfo || (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))) return null;
+                            const title = normalizePhotoSearchText(page.title || '');
+                            const tokenMatches = nameTokens.filter(token => title.includes(token)).length;
+                            const exactNameMatch = title.includes(normalizePhotoSearchText(baseName));
+                            const portraitBonus = /portrait|headshot|photo|actor|actress|writer|director|journalist|musician|singer|comedian|host|television|film/.test(title) ? 2 : 0;
+                            return {
+                                url: imageInfo.thumburl || imageInfo.url || '',
+                                score: tokenMatches * 2 + (exactNameMatch ? 20 : 0) + portraitBonus,
+                                title
+                            };
+                        })
+                        .filter(Boolean)
+                        .filter(candidate => candidate.url && !seenUrls.has(candidate.url) && candidate.score >= Math.max(2, nameTokens.length));
+
+                    candidates.sort((a, b) => b.score - a.score);
+
+                    for (const candidate of candidates) {
+                        seenUrls.add(candidate.url);
+                        if (await probeImageUrl(candidate.url, 9000)) return candidate.url;
+                    }
+                } catch (error) {
+                    // Try the next query/provider rather than giving up.
+                }
+            }
+
+            return '';
+        }
+
+        async function lookupWikipediaPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+
+            const name = String(figure.name).trim();
+            const endpoints = [
+                `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name.replace(/ /g, '_'))}`,
+                `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent('"' + name + '"')}&gsrnamespace=0&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=600`
+            ];
+
+            // First try the exact Wikipedia article. This is the preferred
+            // source because it is tied directly to the person's encyclopedia page.
+            try {
+                const response = await fetch(endpoints[0], { cache: 'no-store' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const candidate = data?.thumbnail?.source || data?.originalimage?.source || '';
+                    if (candidate && await probeImageUrl(candidate, 7000)) {
+                        return candidate;
+                    }
+                }
+            } catch (error) {
+                // Continue to the Wikipedia search endpoint.
+            }
+
+            // If the exact title is missing (stage names, punctuation, etc.),
+            // search Wikipedia itself and only accept a likely title match.
+            try {
+                const response = await fetch(endpoints[1], { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const pages = data?.query?.pages ? Object.values(data.query.pages) : [];
+                const wanted = normalizePhotoSearchText(name);
+
+                const candidates = pages
+                    .map(page => {
+                        const thumb = page?.thumbnail?.source || '';
+                        const title = normalizePhotoSearchText(page?.title || '');
+                        if (!thumb) return null;
+                        const exact = title === wanted;
+                        const contains = title.includes(wanted) || wanted.includes(title);
+                        return { url: thumb, score: (exact ? 20 : 0) + (contains ? 8 : 0), title };
+                    })
+                    .filter(Boolean)
+                    .sort((a, b) => b.score - a.score);
+
+                for (const candidate of candidates) {
+                    if (candidate.score > 0 && await probeImageUrl(candidate.url, 7000)) {
+                        return candidate.url;
+                    }
+                }
+            } catch (error) {
+                // Continue to the next provider.
+            }
+
+            return '';
+        }
+
+        async function lookupWikidataPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            const name = String(figure.name).trim();
+            const searchUrl =
+                'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*' +
+                '&language=en&uselang=en&limit=5&search=' + encodeURIComponent(name);
+
+            try {
+                const searchResponse = await fetch(searchUrl, { cache: 'no-store' });
+                if (!searchResponse.ok) return '';
+                const searchData = await searchResponse.json();
+                const ids = Array.isArray(searchData?.search) ? searchData.search.map(item => item.id).filter(Boolean) : [];
+                if (!ids.length) return '';
+
+                const entityUrl =
+                    'https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*' +
+                    '&props=claims&ids=' + encodeURIComponent(ids.join('|'));
+                const entityResponse = await fetch(entityUrl, { cache: 'no-store' });
+                if (!entityResponse.ok) return '';
+                const entityData = await entityResponse.json();
+
+                for (const id of ids) {
+                    const entity = entityData?.entities?.[id];
+                    const claims = entity?.claims?.P18;
+                    if (!Array.isArray(claims)) continue;
+                    for (const claim of claims) {
+                        const value = claim?.mainsnak?.datavalue?.value;
+                        if (!value) continue;
+                        const candidate = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(value)}?width=700`;
+                        if (await probeImageUrl(candidate, 9000)) return candidate;
+                    }
+                }
+            } catch (error) {
+                // Continue to other image providers.
+            }
+            return '';
+        }
+
+        // Optional Google Images fallback. A static HTML file cannot safely
+        // scrape Google Images directly because Google's results page is HTML,
+        // not a stable image URL, and browser cross-origin rules prevent the
+        // game from reading that page. If a Google Programmable Search JSON API
+        // key and search engine ID are supplied below, this becomes a real
+        // image-source fallback. Otherwise the game continues to Commons and
+        // finally the supplied emergency image.
+        const GOOGLE_IMAGE_SEARCH_API_KEY = '';
+        const GOOGLE_IMAGE_SEARCH_ENGINE_ID = '';
+
+        async function searchGooglePersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            if (!GOOGLE_IMAGE_SEARCH_API_KEY || !GOOGLE_IMAGE_SEARCH_ENGINE_ID) return '';
+
+            const apiUrl =
+                'https://www.googleapis.com/customsearch/v1' +
+                `?key=${encodeURIComponent(GOOGLE_IMAGE_SEARCH_API_KEY)}` +
+                `&cx=${encodeURIComponent(GOOGLE_IMAGE_SEARCH_ENGINE_ID)}` +
+                `&searchType=image&num=5` +
+                `&q=${encodeURIComponent(figure.name + ' official photo')}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return '';
+                const data = await response.json();
+                const items = Array.isArray(data?.items) ? data.items : [];
+
+                for (const item of items) {
+                    const candidate = item?.link || item?.image?.thumbnailLink || '';
+                    if (candidate && await probeImageUrl(candidate, 7000)) {
+                        return candidate;
+                    }
+                }
+            } catch (error) {
+                // Fall through to the supplied emergency image.
+            }
+
+            return '';
+        }
+
+        async function repairPersonPhoto(figure) {
+            if (!figure || !figure.name) return '';
+            if (resolvedPersonPhotoCache.has(figure.name)) return resolvedPersonPhotoCache.get(figure.name);
+            failedPersonPhotoCache.delete(figure.name);
+
+            // Aggressive real-photo recovery: try several independent sources and
+            // several query formulations before declaring the photo unavailable.
+            const attempts = [];
+            const addAttempt = async fn => {
+                try {
+                    const result = await fn();
+                    if (result) attempts.push(result);
+                } catch (error) {}
+                return attempts[attempts.length - 1] || '';
+            };
+
+            // 1. Exact Wikipedia page/search.
+            await addAttempt(() => lookupWikipediaPersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 2. Wikidata P18 often succeeds when the Wikipedia page/image is missing.
+            await addAttempt(() => lookupWikidataPersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 3. Exact existing Commons filename.
+            const fileName = getCommonsFileName(figure);
+            if (fileName) {
+                await addAttempt(() => lookupCommonsExactPhoto(fileName));
+                if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+            }
+
+            // 4. Multiple Commons MediaSearch-style queries.
+            const name = String(figure.name).trim();
+            const extraQueries = [
+                `"${name}" person`,
+                `"${name}" celebrity`,
+                `"${name}" public figure`,
+                `"${name}" television`,
+                `"${name}" film`,
+                `"${name}" music`,
+                `"${name}" writer`,
+                `"${name}" journalist`
+            ];
+            await addAttempt(() => searchCommonsPersonPhoto(figure, extraQueries));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            // 5. Search using meaningful name tokens for stage names/punctuation.
+            const broadQuery = normalizePhotoSearchText(name)
+                .split(' ')
+                .filter(token => token.length > 2)
+                .slice(0, 5)
+                .join(' ');
+            if (broadQuery && broadQuery !== normalizePhotoSearchText(name)) {
+                await addAttempt(() => searchCommonsPersonPhoto({ ...figure, name: broadQuery }));
+                if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+            }
+
+            // 6. Optional Google Images API, only if credentials are configured.
+            await addAttempt(() => searchGooglePersonPhoto(figure));
+            if (attempts.length) return resolvedPersonPhotoCache.set(figure.name, attempts[0]) && attempts[0];
+
+            failedPersonPhotoCache.add(figure.name);
+            return '';
+        }
+
+        /*
+         * v7 DATABASE PHOTO PRE-CHECK
+         *
+         * The full Persondle database is checked in the background as soon as
+         * the game loads. Wikimedia filenames are checked in batches through
+         * the Commons API, rather than loading 397 images into the page.
+         * Any filename that no longer exists is then repaired by searching
+         * Commons for a likely image matching the figure's name.
+         *
+         * This runs independently of gameplay, so it never delays the first
+         * screen or blocks the player from starting a round.
+         */
+        let allPersonPhotosPrevalidated = false;
+        let allPersonPhotosPrevalidationPromise = null;
+
+        function chunkArray(items, size) {
+            const chunks = [];
+            for (let i = 0; i < items.length; i += size) {
+                chunks.push(items.slice(i, i + size));
+            }
+            return chunks;
+        }
+
+        async function validateCommonsPhotoBatch(figuresBatch) {
+            const entries = figuresBatch
+                .map(figure => ({
+                    figure,
+                    fileName: getCommonsFileName(figure)
+                }))
+                .filter(entry => entry.fileName);
+
+            if (!entries.length) return [];
+
+            const titles = entries.map(entry => `File:${entry.fileName}`).join('|');
+            const apiUrl =
+                'https://commons.wikimedia.org/w/api.php' +
+                '?action=query' +
+                '&format=json' +
+                '&origin=*' +
+                '&prop=imageinfo' +
+                '&iiprop=url|mime' +
+                '&iiurlwidth=600' +
+                `&titles=${encodeURIComponent(titles)}`;
+
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                if (!response.ok) return entries.map(entry => ({ ...entry, url: '' }));
+
+                const data = await response.json();
+                const pages = data && data.query && data.query.pages
+                    ? Object.values(data.query.pages)
+                    : [];
+
+                const pageByTitle = new Map(
+                    pages
+                        .filter(page => page && page.imageinfo && page.imageinfo[0])
+                        .map(page => [normalizePhotoSearchText(page.title || ''), page])
+                );
+
+                return entries.map(entry => {
+                    const normalizedTitle = normalizePhotoSearchText(`File:${entry.fileName}`);
+                    const page = pageByTitle.get(normalizedTitle);
+                    const imageInfo = page && page.imageinfo && page.imageinfo[0];
+
+                    if (
+                        !imageInfo ||
+                        (imageInfo.mime && !String(imageInfo.mime).toLowerCase().startsWith('image/'))
+                    ) {
+                        return { ...entry, url: '' };
+                    }
+
+                    return {
+                        ...entry,
+                        url: imageInfo.thumburl || imageInfo.url || ''
+                    };
+                });
+            } catch (error) {
+                return entries.map(entry => ({ ...entry, url: '' }));
+            }
+        }
+
+        function probeImageUrl(url, timeoutMs = 9000) {
+            if (!url) return Promise.resolve(false);
+
+            return new Promise(resolve => {
+                const image = new Image();
+                let settled = false;
+
+                const finish = result => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timeoutId);
+                    image.onload = null;
+                    image.onerror = null;
+                    resolve(result);
+                };
+
+                const timeoutId = setTimeout(() => finish(false), timeoutMs);
+
+                image.onload = () => finish(true);
+                image.onerror = () => finish(false);
+                image.src = url;
+            });
+        }
+
+        async function prevalidateAllPersonPhotos() {
+            if (allPersonPhotosPrevalidated) return;
+            if (allPersonPhotosPrevalidationPromise) {
+                return allPersonPhotosPrevalidationPromise;
+            }
+
+            allPersonPhotosPrevalidationPromise = (async () => {
+                let validatedCount = 0;
+                let repairedCount = 0;
+                let failedCount = 0;
+
+                // Run the complete provider chain for every person. This is a
+                // real database-wide audit rather than only checking filenames
+                // that happen to look like Commons URLs.
+                for (const batch of chunkArray(figures, 10)) {
+                    const results = await Promise.all(
+                        batch.map(async figure => ({
+                            figure,
+                            url: await repairPersonPhoto(figure)
+                        }))
+                    );
+
+                    results.forEach(result => {
+                        if (result.url) {
+                            validatedCount++;
+                            repairedCount++;
+                        } else {
+                            failedCount++;
+                        }
+                    });
+                }
+
+                allPersonPhotosPrevalidated = true;
+
+                // Keep diagnostics in the console for development/debugging,
+                // without showing startup messages to players.
+                console.info(
+                    `[Persondle] Photo pre-check complete: ${validatedCount} validated, ` +
+                    `${repairedCount} repaired, ${failedCount} unavailable.`
+                );
+            })().catch(error => {
+                console.warn('[Persondle] Photo pre-check could not complete:', error);
+            });
+
+            return allPersonPhotosPrevalidationPromise;
+        }
+
+        // Optional browser-side audit for development. Run
+        // window.persondlePhotoAudit() from the console to verify every
+        // database image from the player's actual network connection.
+        // This is intentionally not run automatically because it would make
+        // a large number of image requests during normal gameplay.
+        window.persondlePhotoAudit = async function () {
+            const results = [];
+
+            for (const figure of figures) {
+                const url = await getReliablePersonPhotoUrl(figure);
+                results.push({
+                    name: figure.name,
+                    photoUrl: url || '',
+                    working: !!url
+                });
+            }
+
+            const failed = results.filter(result => !result.working);
+            console.table(results);
+            console.info(
+                `[Persondle] Browser photo audit: ${results.length - failed.length}/${results.length} working, ${failed.length} fallback.`
+            );
+            return results;
+        };
+
+        // Start the full database photo pre-check once all photo-validation
+        // helpers and caches have been initialized. Gameplay does not wait.
+        prevalidateAllPersonPhotos();
+
+        async function getReliablePersonPhotoUrl(figure) {
+            if (!figure || !figure.name) return '';
+
+            // Use a URL that has already been verified when available.
+            if (resolvedPersonPhotoCache.has(figure.name)) {
+                return resolvedPersonPhotoCache.get(figure.name);
+            }
+
+            // First try the figure's known photo URL directly. This is important
+            // on refresh: the background audit may still be running, and there is
+            // no reason to replace a known-good image with the emergency image
+            // just because an API lookup has not finished yet.
+            const directUrl = getPersonPhotoUrl(figure);
+            if (directUrl) {
+                if (await probeImageUrl(directUrl, 7000)) {
+                    resolvedPersonPhotoCache.set(figure.name, directUrl);
+                    return directUrl;
+                }
+            }
+
+            // Then use the repair pipeline: Wikipedia first, then Commons, then
+            // the optional Google Images provider.
+            const repairedUrl = await repairPersonPhoto(figure);
+            if (repairedUrl) return repairedUrl;
+
+            // Final Wikimedia Redirect endpoint fallback.
+            const fallbackUrl = getPersonPhotoFallbackUrl(figure);
+            if (fallbackUrl && await probeImageUrl(fallbackUrl, 7000)) {
+                resolvedPersonPhotoCache.set(figure.name, fallbackUrl);
+                return fallbackUrl;
+            }
+
+            // Do not substitute a generic image for the person.
+            // An unavailable photo should remain unavailable rather than
+            // displaying an image that could be mistaken for the person.
+            return '';
+        }
+
+        function renderSecretPhoto(persistedPhotoUrl = '') {
+            const photoSlot = document.getElementById('secret-photo-slot');
+            if (!photoSlot) return;
+            photoSlot.innerHTML = '';
+
+            const photoContainer = document.createElement('div');
+            photoContainer.id = 'secret-photo-reveal';
+            photoContainer.className = 'secret-photo-container photo-validating';
+
+            const photo = document.createElement('img');
+            photo.className = 'secret-photo';
+            photo.alt = `${secretFigure.name} — Person of the Day`;
+            photo.loading = 'eager';
+            photo.decoding = 'async';
+
+            const caption = document.createElement('div');
+            caption.className = 'secret-photo-caption';
+            caption.textContent = 'Person of the Day';
+
+            const fallbackMessage = document.createElement('div');
+            fallbackMessage.className = 'secret-photo-fallback';
+            fallbackMessage.textContent = 'Loading photo…';
+
+            photoContainer.appendChild(photo);
+            photoContainer.appendChild(caption);
+            photoContainer.appendChild(fallbackMessage);
+            photoSlot.appendChild(photoContainer);
+
+            let repairAttempted = false;
+
+            const failPhoto = () => {
+                photoContainer.classList.remove('photo-validating');
+                photoContainer.classList.add('photo-load-failed');
+                fallbackMessage.textContent = '';
+
+                // Never substitute the user's generic fallback image.
+                // If no verified photo can be found, leave the image absent and
+                // clearly identify that the photo is unavailable.
+                photo.removeAttribute('src');
+                fallbackMessage.textContent = 'Photo unavailable';
+            };
+
+            // IMPORTANT: attach handlers BEFORE assigning src. A cached image can
+            // finish loading immediately, which can otherwise bypass onload/onerror.
+            photo.onload = () => {
+                photoContainer.classList.remove('photo-validating', 'photo-load-failed');
+                fallbackMessage.textContent = '';
+            };
+
+            photo.onerror = async () => {
+                if (repairAttempted) {
+                    failPhoto();
+                    return;
+                }
+
+                repairAttempted = true;
+                photoContainer.classList.add('photo-validating');
+                fallbackMessage.textContent = 'Finding another photo…';
+
+                // Re-run the complete provider chain in case the initial request
+                // was a transient network failure.
+                resolvedPersonPhotoCache.delete(secretFigure.name);
+                failedPersonPhotoCache.delete(secretFigure.name);
+                const repairedUrl = await repairPersonPhoto(secretFigure);
+
+                if (repairedUrl) {
+                    completedSecretPhotoUrl = repairedUrl;
+                    saveState();
+                    photo.src = repairedUrl;
+                    return;
+                }
+
+                failPhoto();
+            };
+
+            // If the completed round already has a verified photo URL saved,
+            // restore it immediately on refresh. The normal error/repair pipeline
+            // below still protects against a source becoming unavailable later.
+            if (persistedPhotoUrl) {
+                photo.src = persistedPhotoUrl;
+            }
+
+            // Resolve the photo asynchronously, but always keep the reveal area
+            // present so a slow Commons response cannot make the game appear broken.
+            // The resolver now retries real sources instead of trusting a stale
+            // failed-cache entry from the background pre-check.
+            getReliablePersonPhotoUrl(secretFigure)
+                .then(url => {
+                    if (url) {
+                        completedSecretPhotoUrl = url;
+                        photo.src = url;
+                        saveState();
+                    } else if (!persistedPhotoUrl) {
+                        failPhoto();
+                    }
+                })
+                .catch(() => {
+                    if (!persistedPhotoUrl) failPhoto();
+                });
+        }
+
+        /* =========================================================
+           RENDER GUESS CARD
+           ========================================================= */
+
+        function renderGuessCard(
+            guess,
+            isReveal = false
+        ) {
+
+            const card =
+                document.createElement(
+                    'div'
+                );
+
+            card.className =
+                'guess-card';
+
+
+            const cardHeader =
+                document.createElement(
+                    'div'
+                );
+
+            cardHeader.className =
+                'guess-card-header';
+
+
+            cardHeader.innerHTML =
+                `<span>${
+                    isReveal
+                        ? 'SECRET FIGURE: '
+                        : ''
+                }${guess.name}</span>`;
+
+
+            card.appendChild(
+                cardHeader
+            );
+
+
+            const grid =
+                document.createElement(
+                    'div'
+                );
+
+            grid.className =
+                'attributes-grid';
+
+
+            grid.appendChild(
+                createCell(
+                    'Arena',
+                    guess.arena,
+                    secretFigure.arena,
+                    arenaEmojis[guess.arena] || '🌟',
+                    'arena',
+                    isReveal
+                )
+            );
+
+
+            grid.appendChild(
+                createCell(
+                    'Net Worth',
+                    guess.netWorth,
+                    secretFigure.netWorth,
+                    '💵',
+                    'netWorth',
+                    isReveal
+                )
+            );
+
+
+            grid.appendChild(
+                createCell(
+                    'Country',
+                    normalizeCountry(guess.country),
+                    normalizeCountry(secretFigure.country),
+                    countryEmojis[normalizeCountry(guess.country)] || '🌐',
+                    'country',
+                    isReveal
+                )
+            );
+
+
+            grid.appendChild(
+                createCell(
+                    'Followers',
+                    guess.followers,
+                    secretFigure.followers,
+                    '📱',
+                    'followers',
+                    isReveal
+                )
+            );
+
+
+            grid.appendChild(
+                createCell(
+                    'Gender',
+                    guess.gender,
+                    secretFigure.gender,
+                    genderEmojis[guess.gender] || '',
+                    'standard',
+                    isReveal
+                )
+            );
+
+
+            grid.appendChild(
+                createCell(
+                    'Age',
+                    guess.age,
+                    secretFigure.age,
+                    getAgeGroupEmoji(
+                        guess.age
+                    ),
+                    'age',
+                    isReveal
+                )
+            );
+
+
+            card.appendChild(
+                grid
+            );
+
+
+            guessesContainer.insertBefore(
+                card,
+                guessesContainer.firstChild
+            );
+
+        }
+
+
+        /* =========================================================
+           END GAME MESSAGES
+           ========================================================= */
+
+        function getEndGameMessage(
+            attempts,
+            won
+        ) {
+
+            if (!won) {
+
+                const lossMessages = [
+
+                    "10 guesses. 0 answers. The secret figure wins this round. Your dignity may file an appeal tomorrow.",
+
+                    "You used all 10 guesses and still missed. Somewhere, the correct answer is quietly laughing.",
+
+                    "Ten swings, ten misses. Impressive commitment to the wrong answer.",
+
+                    "And that's all 10 guesses gone. The good news: tomorrow is another day. The better news: you can pretend this never happened.",
+
+                    "10 guesses and no breakthrough. At least you were persistent. Accuracy was apparently on vacation.",
+
+                    "The answer escaped all 10 attempts. Consider this a valuable lesson in what NOT to do tomorrow.",
+
+                    "A full 10-guess adventure with absolutely no happy ending. Bold strategy.",
+
+                    "You made it through all 10 guesses without finding them. Honestly, that's almost a different kind of achievement.",
+
+                    "Game over. Ten guesses down, one celebrity still undefeated. Better luck tomorrow, detective.",
+
+                    "10 attempts. No cigar. The Person of the Day remains safely beyond your investigative abilities."
+
+                ];
+
+                return lossMessages[Math.floor(Math.random() * lossMessages.length)];
+
+            }
+
+
+            if (attempts === 1) {
+
+                const oneMessages = [
+
+                    "ONE GUESS?! Okay, show-off. Leave some glory for everyone else.",
+
+                    "Hole in one! You didn't even give the game a chance to get interesting.",
+
+                    "1 guess. Nailed it. Suspiciously impressive.",
+
+                    "FIRST TRY?! Either you're brilliant or today's clues were personally assigned to you.",
+
+                    "One and done. That's not a solve, that's a flex.",
+
+                    "1/10. Absolutely ridiculous. Please stop making the rest of us look bad.",
+
+                    "You got it immediately. We may need to make tomorrow's Person harder just for you.",
+
+                    "Perfect read. One guess and straight to victory. Okay, genius."
+
+                ];
+
+                return oneMessages[Math.floor(Math.random() * oneMessages.length)];
+
+            }
+
+
+            if (attempts >= 2 && attempts <= 3) {
+
+                const twoThreeMessages = [
+
+                    `Got it in ${attempts} guesses! That's seriously sharp.`,
+
+                    `${attempts} guesses? Very nice. You clearly came prepared today.`,
+
+                    `Solved in ${attempts}! That's an excellent read of the clues.`,
+
+                    `Only ${attempts} attempts. Clean, confident, and impressively efficient.`,
+
+                    `${attempts} guesses and you've cracked it. Somebody has been studying.`,
+
+                    `You figured it out in ${attempts}. That's a strong Persondle performance.`,
+
+                    `${attempts} tries! Excellent deduction. You made that look easier than it is.`,
+
+                    `Winner in ${attempts} guesses. Very, very solid work.`
+
+                ];
+
+                return twoThreeMessages[Math.floor(Math.random() * twoThreeMessages.length)];
+
+            }
+
+
+            if (attempts >= 4 && attempts <= 6) {
+
+                const fourSixMessages = [
+
+                    `Nice! You got it in ${attempts} guesses. Solid work.`,
+
+                    `Solved in ${attempts}. Good deduction and a well-earned win.`,
+
+                    `${attempts} guesses! Nice job — you worked through the clues and got there.`,
+
+                    `You got them in ${attempts}. Not effortless, not frantic — just a good solve.`,
+
+                    `Winner in ${attempts} guesses. A respectable piece of detective work.`,
+
+                    `Got it in ${attempts}. Nice recovery as the clues started narrowing things down.`,
+
+                    `${attempts} attempts and a correct answer. That's a very respectable Persondle.`,
+
+                    `Well played! ${attempts} guesses is a solid result. You earned that one.`
+
+                ];
+
+                return fourSixMessages[Math.floor(Math.random() * fourSixMessages.length)];
+
+            }
+
+
+            if (attempts >= 7 && attempts <= 8) {
+
+                const sevenEightMessages = [
+
+                    `Whew. You got it in ${attempts} guesses. We were starting to wonder where this was going.`,
+
+                    `${attempts} guesses! A win is a win... and we'll politely ignore how close that got.`,
+
+                    `You got there in ${attempts}. Not exactly a victory lap, but technically a victory.`,
+
+                    `Solved in ${attempts} guesses. The clues did most of the work eventually, huh?`,
+
+                    `${attempts} tries and you survived. That's what we're calling a successful investigation.`,
+
+                    `You found them on guess ${attempts}. A little late to the party, but you made it.`,
+
+                    `Victory in ${attempts}! We were beginning to prepare a very different message for you.`,
+
+                    `${attempts} guesses. No need to panic — you still had time. Probably.`,
+
+                    `You got it in ${attempts}. Let's call that a "strategic use of almost all available resources."`
+
+                ];
+
+                return sevenEightMessages[Math.floor(Math.random() * sevenEightMessages.length)];
+
+            }
+
+
+            const nineMessages = [
+
+                "GUESS #9?! You were one bad guess away from a very different ending. Massive escape.",
+
+                "You got it on the 9th guess. One more wrong answer and this message was going to be much meaner.",
+
+                "9 guesses. You were standing directly on the edge of the cliff and somehow walked away.",
+
+                "Solved on guess 9! That was not a comfortable margin. But hey — a win is a win.",
+
+                "NINTH GUESS. You had one life left and absolutely no business feeling this confident.",
+
+                "You found the answer with one guess remaining. Please enjoy this victory before tomorrow tries to humble you.",
+
+                "Guess #9 and you finally cracked it. That was less detective work and more controlled panic.",
+
+                "You survived until guess 9. The correct answer has officially been located before disaster struck."
+
+            ];
+
+            return nineMessages[Math.floor(Math.random() * nineMessages.length)];
+
+        }
+
+
+        /* =========================================================
+           GAME OVER
+           ========================================================= */
+
+        function triggerGameOver(
+            won,
+            attempts
+        ) {
+
+            gameOver = true;
+
+            // A completed game's message is chosen once and then persisted.
+            // This prevents a refresh from changing the player's result text.
+            if (!completedEndGameMessage) {
+                completedEndGameMessage =
+                    getEndGameMessage(
+                        attempts,
+                        won
+                    );
+            }
+
+            endGameText.textContent =
+                completedEndGameMessage;
+
+            endGameBox.className =
+                `end-game-message ${
+                    won ? 'win' : 'loss'
+                }`;
+
+            endGameBox.style.display =
+                'block';
+
+            input.disabled = true;
+
+            submitBtn.disabled = true;
+
+            suggestionsBox.style.display =
+                'none';
+
+            if (
+                !won &&
+                !document
+                    .querySelector(
+                        '.guess-card-header span'
+                    )
+                    ?.textContent
+                    .includes(
+                        'SECRET FIGURE'
+                    )
+            ) {
+
+                renderGuessCard(
+                    secretFigure,
+                    true
+                );
+
+            }
+
+            // Reveal the Person of the Day photo at the end of every round.
+            // Because the final/reveal guess is inserted first, doing this
+            // afterward places the photo immediately above that last guess.
+            renderSecretPhoto(completedSecretPhotoUrl);
+
+            // Persist the finished state immediately, including the exact
+            // message and any photo URL already known at this point.
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           SUBMIT GUESS
+           ========================================================= */
+
+        function submitGuess() {
+
+            if (gameOver) {
+                return;
+            }
+
+
+            const guessName =
+                input.value.trim();
+
+
+            const figure =
+                figures.find(
+                    f =>
+                        f.name
+                            .toLowerCase() ===
+                        guessName.toLowerCase()
+                );
+
+
+            if (!figure) {
+
+                alert(
+                    "Please select a valid figure from the dropdown list."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                guessedNames.has(
+                    figure.name
+                )
+            ) {
+
+                alert(
+                    "You've already guessed this figure!"
+                );
+
+                return;
+
+            }
+
+
+            guessedNames.add(
+                figure.name
+            );
+
+            guessHistoryObjects.push(
+                figure
+            );
+
+
+            saveState();
+
+
+            input.value = '';
+
+            suggestionsBox.style.display =
+                'none';
+
+
+            const currentAttemptCount =
+                guessedNames.size;
+
+
+            guessCounterDisplay.textContent =
+                `Guesses: ${currentAttemptCount} / ${maxGuesses}`;
+
+
+            renderGuessCard(
+                figure
+            );
+
+
+            if (
+                figure.name ===
+                secretFigure.name
+            ) {
+
+                triggerGameOver(
+                    true,
+                    currentAttemptCount
+                );
+
+                endGameBox.scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+            } else if (
+                currentAttemptCount >=
+                maxGuesses
+            ) {
+
+                triggerGameOver(
+                    false,
+                    currentAttemptCount
+                );
+
+                endGameBox.scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+            }
+
+        }
+
+
+// --- SEARCH / AUTOCOMPLETE ---
+
+function getNameParts(name) {
+    return name.trim().toLowerCase().split(/\s+/);
+}
+
+function nameMatchesSearch(name, query) {
+    const cleanQuery = query.trim().toLowerCase();
+
+    if (cleanQuery === '') {
+        return true;
+    }
+
+    const nameParts = getNameParts(name);
+
+    // If the user types multiple words, match the beginning
+    // of the corresponding first/last name parts.
+    const queryParts = cleanQuery.split(/\s+/);
+
+    if (queryParts.length > 1) {
+        return queryParts.every((queryPart, index) => {
+            return nameParts[index] &&
+                   nameParts[index].startsWith(queryPart);
+        });
+    }
+
+    // Single letter/word:
+    // Match the START of either the first name OR last name.
+    return nameParts.some(part => part.startsWith(cleanQuery));
+}
+
+
+function showSuggestions() {
+
+    if (gameOver) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    const query = input.value.trim().toLowerCase();
+
+    suggestionsBox.innerHTML = '';
+
+    const matches = figures.filter(function (figure) {
+
+        return !guessedNames.has(figure.name) &&
+               nameMatchesSearch(figure.name, query);
+
+    });
+
+    if (matches.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    matches.forEach(function (figure) {
+
+        const suggestionItem = document.createElement('div');
+
+        suggestionItem.className = 'suggestion-item';
+
+        // Only display the person's name.
+        suggestionItem.textContent = figure.name;
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT use mousedown here.
+         *
+         * On mobile, mousedown fires immediately when the
+         * user's finger touches the screen. That prevents
+         * normal scrolling.
+         *
+         * Using click allows the browser to distinguish
+         * between a tap and a swipe/scroll.
+         */
+
+        suggestionItem.addEventListener('click', function (event) {
+
+            event.stopPropagation();
+
+            input.value = figure.name;
+
+            suggestionsBox.style.display = 'none';
+
+            input.focus();
+
+        });
+
+        suggestionsBox.appendChild(suggestionItem);
+    });
+
+    suggestionsBox.style.display = 'block';
+}
+
+
+// Typing in the search box
+input.addEventListener('input', function () {
+
+    if (gameOver) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+
+    showSuggestions();
+
+});
+
+
+// Tapping/focusing the search box opens the full list.
+//
+// This is what allows the player to simply tap the box
+// and scroll through all available people without typing.
+input.addEventListener('focus', function () {
+
+    if (gameOver) return;
+
+    showSuggestions();
+
+});
+
+
+// Clicking the input again should keep the list available.
+input.addEventListener('click', function () {
+
+    if (gameOver) return;
+
+    showSuggestions();
+
+});
+
+
+// Close the dropdown when clicking outside the search area.
+document.addEventListener('click', function (e) {
+
+    if (!e.target.closest('.input-wrapper')) {
+        suggestionsBox.style.display = 'none';
+    }
+
+});
+
+
+// Submit button
+submitBtn.addEventListener('click', submitGuess);
+
+
+// Enter key
+input.addEventListener('keydown', function (e) {
+
+    if (e.key === 'Enter') {
+
+        e.preventDefault();
+
+        submitGuess();
+
+    }
+
+});
+
+
+
+        /* =========================================================
+           SHARE BUTTON
+           ========================================================= */
+
+        shareBtn.addEventListener(
+            'click',
+            function() {
+
+                const resultStatus =
+                    guessedNames.has(
+                        secretFigure.name
+                    )
+                        ? `${guessedNames.size}/10`
+                        : 'X/10';
+
+
+                const emojiBlocks =
+                    buildShareEmojiGrid();
+
+
+                const gameUrl =
+                    window.location.href;
+
+
+                const scoreText =
+                    `Persondle #${dayIndex + 1}: ${resultStatus}\n` +
+                    `${emojiBlocks}\n\n` +
+                    `Play todays round - ${gameUrl}`;
+
+
+                if (
+                    navigator.share
+                ) {
+
+                    navigator.share({
+                        text: scoreText
+                    });
+
+                } else {
+
+                    navigator.clipboard
+                        .writeText(
+                            scoreText
+                        )
+                        .then(
+                            function() {
+
+                                alert(
+                                    "Score copied to clipboard!"
+                                );
+
+                            }
+                        )
+                        .catch(
+                            function() {
+
+                                alert(
+                                    scoreText
+                                );
+
+                            }
+                        );
+
+                }
+
+            }
+        );
+
+    
+
+        /* =========================================================
+           FAQ MODAL
+           ========================================================= */
+
+        const faqButton = document.getElementById('faq-button');
+        const faqOverlay = document.getElementById('faq-overlay');
+        const faqClose = document.getElementById('faq-close');
+
+        function closeFaq() {
+            faqOverlay.classList.remove('show');
+        }
+
+        faqButton.addEventListener('click', function() {
+            faqOverlay.classList.add('show');
+        });
+
+        faqClose.addEventListener('click', closeFaq);
+
+        faqOverlay.addEventListener('click', function(event) {
+            if (event.target === faqOverlay) {
+                closeFaq();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeFaq();
+            }
+        });
+</script>
+
+</body>
+</html>
