@@ -408,10 +408,12 @@
         }
 
         .secret-photo-caption {
-            margin-top: 6px;
-            color: #818384;
-            font-size: 0.72rem;
-            font-weight: normal;
+            margin-top: 12px;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .secret-person-name {
@@ -419,6 +421,15 @@
             color: #ffffff;
             font-size: 1.15rem;
             font-weight: bold;
+        }
+
+        .final-reveal-slot {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .final-reveal-slot .attributes-grid {
+            margin-top: 8px;
         }
 
         .next-person-timer {
@@ -695,13 +706,13 @@
     <h1>PERSONDLE</h1>
 
     <div class="subtitle">
-        Guess the 21st century figure. They can be from any of these arenas:
+        Guess the 21st century figure. They can be from any of these lines of work:
         <br>
         <strong>
-            🎵 <strong>Music / Literature / Writer/Director</strong><br>
-            🎬 <strong>Movies / TV / Reality TV</strong><br>
+            ✍️ <strong>Music / Literature / Writer/Director</strong><br>
+            📺 <strong>Movies / TV / Reality TV</strong><br>
             🎙️ <strong>Podcasters / Influencers</strong><br>
-            🔬 <strong>Tech &amp; Science / Business / Politics / Journalism</strong><br>
+            🌐 <strong>Tech &amp; Science / Business / Politics / Journalism</strong><br>
             🏆 <strong>Sports</strong>
         </strong>
     </div>
@@ -754,6 +765,8 @@
             <div id="end-game-text"></div>
 
             <div id="secret-photo-slot" class="secret-photo-slot" aria-live="polite"></div>
+
+            <div id="final-reveal-slot" class="final-reveal-slot" aria-live="polite"></div>
 
             <div class="next-person-timer">
                 Next Person in:
@@ -2689,9 +2702,11 @@ const figures = [{"name": "Anthony Fauci", "arena": "Tech & Science", "netWorth"
             }
 
             // Reveal the Person of the Day photo at the end of every round.
-            // Because the final/reveal guess is inserted first, doing this
-            // afterward places the photo immediately above that last guess.
             renderSecretPhoto(completedSecretPhotoUrl);
+
+            // Reuse the existing reveal cells, keep their current size/style,
+            // and move them into the large end-game box below the person's name.
+            moveFinalRevealIntoEndGame();
 
             // Persist the finished state immediately, including the exact
             // message and any photo URL already known at this point.
@@ -2700,9 +2715,49 @@ const figures = [{"name": "Anthony Fauci", "arena": "Tech & Science", "netWorth"
         }
 
 
+        function moveFinalRevealIntoEndGame() {
+            const slot = document.getElementById('final-reveal-slot');
+            if (!slot) return;
+
+            slot.innerHTML = '';
+
+            const cards = Array.from(
+                guessesContainer.querySelectorAll('.guess-card')
+            );
+
+            const finalCard = cards.find(card => {
+                const header = card.querySelector('.guess-card-header span');
+                if (!header) return false;
+
+                const text = header.textContent.trim();
+
+                return (
+                    text === secretFigure.name ||
+                    text === `SECRET FIGURE: ${secretFigure.name}`
+                );
+            });
+
+            if (!finalCard) return;
+
+            const grid = finalCard.querySelector('.attributes-grid');
+            if (!grid) return;
+
+            const name = document.createElement('div');
+            name.className = 'secret-person-name';
+            name.textContent = secretFigure.name;
+
+            slot.appendChild(name);
+            slot.appendChild(grid);
+
+            // The cells were rendered with isReveal=true for the final answer,
+            // so the existing cells remain their normal size and are all green.
+            finalCard.remove();
+        }
+
+
         /* =========================================================
            SUBMIT GUESS
-           ========================================================= */
+           =========================================================
 
         function submitGuess() {
 
@@ -3056,9 +3111,14 @@ input.addEventListener('keydown', function (e) {
                     })()
                     : window.location.href;
 
+                // Keep the URL out of the share text when using the native
+                // share API. The `url` field already supplies it, and including
+                // it here as well causes some share targets to show the link twice.
                 const scoreText = isChallengeMode
-                    ? `🎯 PERSONDLE CHALLENGE: ${resultStatus}\n${emojiBlocks}\n\nCan you beat me? 👀\n${gameUrl}`
-                    : `🧠 PERSONDLE #${dayIndex + 1}: ${resultStatus}\n${emojiBlocks}\n\nCan you guess today’s figure? 👀\n${gameUrl}`;
+                    ? `🎯 PERSONDLE CHALLENGE: ${resultStatus}\n${emojiBlocks}\n\nCan you beat me? 👀`
+                    : `🧠 PERSONDLE #${dayIndex + 1}: ${resultStatus}\n${emojiBlocks}\n\nCan you guess today’s figure? 👀`;
+
+                const clipboardText = `${scoreText}\n${gameUrl}`;
 
 
                 if (
@@ -3077,7 +3137,7 @@ input.addEventListener('keydown', function (e) {
 
                     navigator.clipboard
                         .writeText(
-                            scoreText
+                            clipboardText
                         )
                         .then(
                             function() {
@@ -3092,7 +3152,7 @@ input.addEventListener('keydown', function (e) {
                             function() {
 
                                 alert(
-                                    scoreText
+                                    clipboardText
                                 );
 
                             }
